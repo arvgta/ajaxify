@@ -5,7 +5,6 @@
  *
  * Author: Arvind Gupta
  *
- * Please adhere to the jQuery license
  */ 
 
 (function ($) {
@@ -13,7 +12,7 @@
     var History = function ($this, fn, options) {
 
         // Local variables
-        var settings, div;
+        var settings, div, History;
    
         /**
          * The constructor. Will be called automatically
@@ -22,7 +21,9 @@
           
             // List of all available settings with default values
             settings = $.extend({
-                'verbosity'    : 0
+                'verbosity'    : 0,
+				'completedEventName' : 'statechangecomplete',
+				'scrollTo' : false
             }, options);
 
             if (settings['verbosity'] >= 1) {
@@ -30,19 +31,35 @@
             }
             
             var init = function () {
-                 if(settings['div1']) 
-				     div = $(settings['div1']);
-				 else
-				     div = $this;
+
+                if(settings['scrollTo']) {
+                     $.getScript('http://4nf.org/js/scrollto.js');   
+                }
+				
+				History = window.History;
+
+                // Check to see if History.js is enabled for our Browser
+                if ( !History.enabled ) {
+                    return;
+                }
 				 
-				 setupClicks();
+                if(settings['div1']) 
+                    div = $(settings['div1']);
+                else
+                    div = $this;
+				 
+                setupClicks();
                 
-                 window.onpopstate = function () {
-                     getDiv(window.location);
-                 };
+                window.onstatechange  = function () { //instead of popstate
+                    getDiv(window.location);
+                };
             };
             
-            $.getScript('http://4nf.org/js/urlinternal.js', init);
+            var init0 = function () {
+                 $.getScript('http://4nf.org/js/bhistory.js', init);
+            };
+			
+            $.getScript('http://4nf.org/js/urlinternal.js', init0);
             
             
         };
@@ -80,6 +97,9 @@
 
             // Make sure, link is internal
             if(!($.isUrlInternal(l.href))) return;
+			
+			// Check whether not-ajaxify is specified
+			if($(l).find('.no-ajaxy').length) return;
 
             addClicker(l);
         };
@@ -93,7 +113,7 @@
             }
 
             link.addEventListener("click", function (e) {
-                history.pushState(null, null, link.href);
+                History.pushState(null, null, link.href);
                 e.preventDefault();
                 getDiv(link.href);
             }, false);
@@ -126,7 +146,11 @@
             $.ajax({
                     url: href,
                     success: function(htmlTotal) {
-                        var eDiv = $(documentHtml(htmlTotal)).find('#' + $this.attr('id'));
+                        
+                        //Replace content div
+						
+                        var $data=$(documentHtml(htmlTotal)), 
+                            eDiv = $data.find('#' + $this.attr('id'));
                         
                         if (settings['verbosity'] >= 1) {
                              window.console && console.log('getDiv(\'' + href + '\') - getFileContents succeeded');
@@ -137,8 +161,38 @@
                         if (settings['verbosity'] >= 1) {
                              window.console && console.log('replaceWith() - succeeded');
                          }
+						 
+                         //Update title
+                         document.title = $data.find('.document-title:first').text();
+                         try {
+                             document.getElementsByTagName('title')[0].innerHTML = document.title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+                         }
+                         catch ( Exception ) { }
+						 
+                         //Scroll To if enabled
+                         if(settings['scrollTo']) {
+                             scrollOptions = {
+                                 duration: 800,
+                                 easing:'swing'
+                             };
+
+                             $body = $(document.body);
+                             if ( $body.ScrollTo||false ) { 
+                                 $body.ScrollTo(scrollOptions); 
+                             }
+                         }
                          
-                        if(fn) fn(); //callback to client function                         
+                         // Inform Google Analytics of the change
+                         if ( typeof window._gaq !== 'undefined' ) {
+                             window._gaq.push(['_trackPageview', History.getState().url.replace(History.getRootUrl(), '')]);
+                         }
+                         
+                         //Trigger event and call callback if given
+                         $window=$(window);
+                         $cEventName=settings['completedEventName'];
+
+                         if(fn) $window.one($cEventName, fn);
+                         $window.trigger($cEventName);  
                     }
                 });
                 
@@ -151,9 +205,9 @@
 
     // Register jQuery function
     $.fn.history = function (fn, options) {
-        return this.each(function(){
-            var $this = $(this);
-            new History($this, fn, options);
-        });
+		    return this.each(function(){
+                var $this = $(this);
+                new History($this, fn, options);
+            });
     };
 })(jQuery);
