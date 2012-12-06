@@ -41,6 +41,7 @@
             // List of all available settings with default values
             settings = $.extend({
                 'verbosity'    : 0,
+                'div1' : 'body div:first',
 				'completedEventName' : 'statechangecomplete',
 				'scrollTo' : false
             }, options);
@@ -189,13 +190,18 @@
                     window.console && console.log('getDiv(\'' + href + '\') - getFileContents succeeded');
                 } 
 
-                if(fn) eDiv = fn(outerHTML(eDiv));
+                
+				if(fn) eDiv = fn(outerHTML(eDiv));
 				if(eDiv) $('#' + $this.attr('id')).replaceWith(eDiv);
-						
-                if (settings['verbosity'] >= 1) {
+				
+				if (settings['verbosity'] >= 1) {
                     window.console && console.log('replaceWith() - succeeded');
                 }
-						 
+				
+                //Re-ajaxify content div
+                div = $('#' + $this.attr('id'));
+                setupClicks();
+						
                 //Update title
                 document.title = $data.find('.document-title:first').text();
                 try {
