@@ -42,8 +42,8 @@
             settings = $.extend({
                 'verbosity'    : 0,
                 'div1' : 'body div:first',
-				'completedEventName' : 'statechangecomplete',
-				'scrollTo' : false
+                'completedEventName' : 'statechangecomplete',
+                'scrollTo' : false
             }, options);
 
             if (settings['verbosity'] >= 1) {
@@ -191,10 +191,10 @@
                 } 
 
                 
-				if(fn) eDiv = fn(outerHTML(eDiv));
-				if(eDiv) $('#' + $this.attr('id')).replaceWith(eDiv);
+                if(fn) eDiv = fn(outerHTML(eDiv));
+                if(eDiv) $('#' + $this.attr('id')).replaceWith(eDiv);
 				
-				if (settings['verbosity'] >= 1) {
+                if (settings['verbosity'] >= 1) {
                     window.console && console.log('replaceWith() - succeeded');
                 }
 				
