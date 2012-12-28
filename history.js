@@ -24,12 +24,14 @@
             'div1' : null,
             'fn' : null,
             'verbosity'    : 0,
-            'completedEventName' : 'statechangecomplete'
+            'completedEventName' : 'statechangecomplete',
+            'cb' : null
         }, options),
 			
         $this1 = $this,
         div = gDiv(), 
-        fn = gFn(), 
+        fn = gFn(),
+        cb = settings['cb'],		
         bHistory = window.History, 
         $data, $scripts, $scriptsO,
    
@@ -123,7 +125,7 @@
                     detScripts();
                     cacheScripts();
                     if(gS1) setupClicks(); 
-                    else allDivs(setupClicks);;
+                    else allDivs(setupClicks);
                 }
             });
         },
@@ -150,9 +152,12 @@
             addScripts();
             cacheScripts();				
 			
-            informGA();                
+            informGA();        
+            
+            $this; if(cb) cb();			
                 
             $(window).trigger(settings['completedEventName']);
+			
         },
 
         stateChange = function(){
