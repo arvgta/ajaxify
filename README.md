@@ -1,4 +1,4 @@
 history
 =======
 
-A jQuery encapsulation of the HTML5 History API
+New jQuery Plugin: HTML5 History API - Ajaxify your entire website!
