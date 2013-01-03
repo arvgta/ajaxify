@@ -25,12 +25,14 @@
             'fn' : null,
             'verbosity'    : 0,
             'completedEventName' : 'statechangecomplete',
+            'scripts' : true,
             'cb' : null
         }, options),
 			
         $this1 = $this,
         div = gDiv(), 
         fn = gFn(),
+        scriptsd = settings['scripts'],
         cb = settings['cb'],		
         bHistory = window.History, 
         $data, $scripts, $scriptsO,
@@ -86,13 +88,13 @@
                 var $script = $(this), scriptText = $script.text(), scriptSrc = $script.attr('src'), scriptNode = document.createElement('script');
                              
                 if(scriptSrc) {
-                    if(!findScriptText(scriptSrc)) {
+                    if(!scriptsd || (scriptsd && !findScriptText(scriptSrc))) {
                         scriptNode.src = scriptSrc;
                         contentNode.appendChild(scriptNode);
                     }
                 }
                 else {
-                   if(!findScriptText(scriptText)) {
+                   if(!scriptsd || (scriptsd && !findScriptText(scriptText))) {
                        scriptNode.appendChild(document.createTextNode(scriptText));
                        contentNode.appendChild(scriptNode);
                    }
