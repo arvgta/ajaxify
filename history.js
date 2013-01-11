@@ -50,8 +50,6 @@
         },
 		
         hello = function() { log('Entering History, div : ' + (gS1() ?  gS1() : gHId()), 0); },
-        outerHTML = function(e) { return $(e).clone().wrap('<html>').parent().html(); },
-
         gData = function(h) { return $data = $(documentHtml(h)); },
         detScripts = function() { var d = $data.find('.document-script'); 
              return $scripts = (d.length ? d.detach() : d); },
@@ -102,22 +100,18 @@
             });
         },
 		
+        lFn = function() { if(fn) { fn(div); log('lFn div id: ' + div.attr('id'), 2); } },
         allDivs = function(h) { $this.each(function(){ $this1 = $(this); div = gD(); h() } ); },
-		
-        fnDiv1 = function() {
-            if(fn) { 
-                $data = fn(outerHTML(div));
-                if($data) div.replaceWith($data);
-                gDiv();
-                log('Master div contents: ' + div.html(), 2);
-            }
-        },
+        fnDiv1 = function() { lFn(); },
 		
         __construct = function() {
             hello();
             
             if(!bHistory.enabled) return;
-            if(gS1) fnDiv1(); 
+            
+            if(gS1()) {
+                 fnDiv1();
+            }                 
             else allDivs(fnDiv1);
 
             $.ajax({
@@ -128,19 +122,18 @@
                     cacheScripts();
                     if(gS1) setupClicks(); 
                     else allDivs(setupClicks);
+					
+                    $this; if(cb) cb();
                 }
             });
         },
 		
         fnDiv = function() {
-            div = $data.find(gHId());
-            if(fn) div = fn(outerHTML(div));
-            if(div) gD().replaceWith(div);
-				
-            log('replaceWith() - succeeded');
+            gD().replaceWith($data.find(gHId()));
+            div = gD();
+            lFn();
 				
             //Re-ajaxify content div
-            div = gD();
             setupClicks();
         },
 		
