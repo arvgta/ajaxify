@@ -21,7 +21,7 @@
 
         //Local variables
         settings = $.extend({
-            'div1' : null,
+            'div1' : 'body div:first',
             'fn' : null,
             'verbosity'    : 0,
             'completedEventName' : 'statechangecomplete',
@@ -41,9 +41,9 @@
         documentHtml = function(html) {
             var result = String(html)
                 .replace(/<\!DOCTYPE[^>]*>/i, '')
-                .replace(/<(html|head|body|title|meta|script)([\s\>])/gi,
+                .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi,
                     '<div class="document-$1"$2')
-                 .replace(/<\/(html|head|body|title|meta|script)\>/gi,'</div>')
+                 .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
             ;
 
             return result;
@@ -51,7 +51,7 @@
 		
         hello = function() { log('Entering History, div : ' + (gS1() ?  gS1() : gHId()), 0); },
         gData = function(h) { return $data = $(documentHtml(h)); },
-        detScripts = function() { var d = $data.find('.document-script'); 
+        detScripts = function() { var d = $data.find('.document-script, .document-link'); 
              return $scripts = (d.length ? d.detach() : d); },
 
         log = function(m, v) { if(!v) v = 1; settings['verbosity'] >= v && window.console && console.log(m); },
@@ -77,25 +77,32 @@
 		
         findScriptText = function(t) { var r = false;
             $scriptsO.each(function(){ var $s = $(this); 
-                if($s.text() == t || $s.attr('src') == t) r = true; });
+                if($s.text() == t || $s.attr('src') == t || $s.attr('href') == t ) r = true; });
             return r;
         },
 		
         addScripts = function() { var contentNode = gD().get(0);
             $scripts.each(function(){
-                var $script = $(this), scriptText = $script.text(), scriptSrc = $script.attr('src'), scriptNode = document.createElement('script');
+                var $script = $(this), scriptText = $script.text(), scriptHref = $script.attr('href'), scriptSrc = $script.attr('src'), scriptNode = document.createElement('script');
                              
-                if(scriptSrc) {
-                    if(!scriptsd || (scriptsd && !findScriptText(scriptSrc))) {
-                        scriptNode.src = scriptSrc;
-                        contentNode.appendChild(scriptNode);
-                    }
+                if(scriptHref) { 
+                     if(!scriptsd || !findScriptText(scriptHref)) { log('link detected');
+                         $('head link').last().after('<link rel="stylesheet" type="text/css" href="' + scriptHref + '" />');
+                     }
                 }
                 else {
-                   if(!scriptsd || (scriptsd && !findScriptText(scriptText))) {
-                       scriptNode.appendChild(document.createTextNode(scriptText));
-                       contentNode.appendChild(scriptNode);
-                   }
+                    if(scriptSrc) {
+                        if(!scriptsd || !findScriptText(scriptSrc)) { log('script src detected');
+                            scriptNode.src = scriptSrc;
+                            contentNode.appendChild(scriptNode);
+                        }
+                    } 
+                    else {
+                        if(!scriptsd || !findScriptText(scriptText)) { log('inline script detected');
+                            scriptNode.appendChild(document.createTextNode(scriptText));
+                            contentNode.appendChild(scriptNode);
+                        }
+                    }
                 }
             });
         },
