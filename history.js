@@ -111,7 +111,7 @@
         allDivs = function(h) { $this.each(function(){ $this1 = $(this); div = gD(); h() } ); },
         fnDiv1 = function() { lFn(); },
 		
-        __construct = function() {
+        __construct = function() { $(function () { //on DOMready
             hello();
             
             if(!bHistory.enabled) return;
@@ -133,6 +133,8 @@
                     $this; if(cb) cb();
                 }
             });
+            
+            }); //end on DOMready
         },
 		
         fnDiv = function() {
