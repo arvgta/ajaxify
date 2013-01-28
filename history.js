@@ -39,29 +39,32 @@
    
         //Helper functions
         documentHtml = function(html) {
-            var result = String(html)
+            var $r, result = String(html)
                 .replace(/<\!DOCTYPE[^>]*>/i, '')
                 .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi,
                     '<div class="document-$1"$2')
                  .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
             ;
 
-            return result;
+            if(result.trim().substr(0,1) == '<') $r = $(result);
+            else $r = $('<div><pre>' + result + '</pre></div>');
+            
+            return $r;
         },
 		
         hello = function() { log('Entering History, div : ' + (gS1() ?  gS1() : gHId()), 0); },
-        gData = function(h) { return $data = $(documentHtml(h)); },
+        gData = function(h) { $data = documentHtml(h); return $data; },
         detScripts = function() { var d = $data.find('.document-script, .document-link'); 
              return $scripts = (d.length ? d.detach() : d); },
 
         log = function(m, v) { if(!v) v = 1; settings['verbosity'] >= v && window.console && console.log(m); },
         informGA = function() { typeof window._gaq !== 'undefined'  && window._gaq.push(['_trackPageview', bHistory.getState().url.replace(bHistory.getRootUrl(), '')]); },
-        deepLink = function(h) { return h && h.substring(h.lastIndexOf('/') + 1).indexOf('.') != -1; },
+        //deepLink = function(h) { return h && h.substring(h.lastIndexOf('/') + 1).indexOf('.') != -1; },
         cacheScripts = function() { $scriptsO = $scripts; },
         setupClicks = function() { log('setupClicks()'); div.find('a').each(function() { parseLink(this); }); log('setupClicks succeeded!'); },
 		
         parseLink = function(l) { log('parseLink(\'' + l.href + '\')'); 
-            if(!deepLink(l.href) && $.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length) 
+            if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length) 
                 addClicker(l);
         },
 		
@@ -108,8 +111,24 @@
         },
 		
         lFn = function() { if(fn) { fn(div); log('lFn div id: ' + div.attr('id'), 2); } },
-        allDivs = function(h) { $this.each(function(){ $this1 = $(this); div = gD(); h() } ); },
-        fnDiv1 = function() { lFn(); },
+        allDivs = function(h) { var f = false;
+            $this.each(function(){ 
+                  $this1 = $(this); 
+                  div = gD(); 
+                  f = h();
+            } ); 
+            
+            if(!f) { //no content div in target -> load in entire data, as we're assuming deep-link
+               gD().html($data.html());
+               div = gD();
+               lFn();
+				
+               //Re-ajaxify content div
+               setupClicks();
+            }
+        },
+        
+        fnDiv1 = function() { lFn(); return true; },
 		
         __construct = function() { $(function () { //on DOMready
             hello();
@@ -124,7 +143,7 @@
             $.ajax({
                 url: location,
                 success: function(h) {
-                    $data = $(documentHtml(h));
+                    $data = documentHtml(h);
                     detScripts();
                     cacheScripts();
                     if(gS1) setupClicks(); 
@@ -137,16 +156,22 @@
             }); //end on DOMready
         },
 		
-        fnDiv = function() {
-            gD().replaceWith($data.find(gHId()));
+        fnDiv = function() { //Replace div
+            var $divhtml = $data.find(gHId());
+            
+            if(!$divhtml.length) return false;
+            
+            gD().replaceWith($divhtml);
             div = gD();
             lFn();
 				
-            //Re-ajaxify content div
+            //Re-ajaxify div
             setupClicks();
+            
+            return true;
         },
 		
-        cDiv = function(h) { //Replace content div
+        cDiv = function(h) { //Replace all divs
             gData(h);
             allDivs(fnDiv);			 
  
