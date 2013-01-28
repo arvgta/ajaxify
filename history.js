@@ -188,15 +188,22 @@
             $(window).trigger(settings['completedEventName']);
 			
         },
-
+        
+        check_content_type = function(c){
+            return c.indexOf('text') != -1 || c.indexOf('javascript') != -1;
+        },
+        
         stateChange = function(){
             var href = bHistory.getState().url;
 			
             log('statechange - \'' + href + '\'');
                         
-            $.ajax({
+            var xhr = $.ajax({
                 url: href,
-                success: function(h) { cDiv(h); } 
+                success: function(h) { 
+                    if(check_content_type(xhr.getResponseHeader("Content-Type"))) cDiv(h);
+                    else location = href;                    
+                }
             });
         };
 		
