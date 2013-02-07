@@ -5,9 +5,9 @@
 "keywords": [
 "jquery",
 "effect",
+"ajax",
 "content",
-"div",
-"ajax"
+"div"
 ],
 "version": "0.1.0",
 "author": {
