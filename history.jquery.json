@@ -4,6 +4,7 @@
 "description": "jQuery plugin: Change content div(s) with JavaScript - faster page load time!",
 "keywords": [
 "jquery",
+"effect",
 "content",
 "div",
 "ajax"
