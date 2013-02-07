@@ -1,0 +1,27 @@
+{
+"name": "history",
+"title": "jQuery History API",
+"description": "jQuery plugin: Change content div(s) with JavaScript - faster page load time!",
+"keywords": [
+"content div",
+"ajax"
+],
+"version": "0.1.0",
+"author": {
+"name": "Arvind Gupta",
+"url": "https://github.com/arvgta"
+},
+"licenses": [
+{
+"type": "MIT",
+"url": "https://github.com/arvgta/history/blob/discuss/MIT-License.txt"
+}
+],
+"bugs": "https://github.com/arvgta/history/issues",
+"homepage": "https://github.com/arvgta/history",
+"docs": "https://github.com/arvgta/history",
+"download": "https://github.com/arvgta/history/blob/discuss/history.js",
+"dependencies": {
+"jquery": ">=1.5"
+}
+}
