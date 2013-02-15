@@ -119,4 +119,4 @@ Refer to: http://4nf.org/load-content-div/
 
 ## History
 
-- v0.1.0 - 7. February, 2013
+- v0.7.1 - 15. February, 2013
