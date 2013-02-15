@@ -60,7 +60,7 @@ Example:
 
 1. For all internal links in the content divs:
 
-    1. Make sure it's not a deeplink (deeplinks are not ajaxified)
+    1. Make sure if deeplink of mime-type 'text/html' (other deeplinks are not ajaxified)
     1. Make sure the class ".no-ajaxy" is not attached
    1. Add the custom "click" event that triggers the following
 
