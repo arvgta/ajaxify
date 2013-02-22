@@ -4,11 +4,9 @@ This plugin will make your page load time faster on sub-pages of your site much 
 
 We need your comments and feedback!!  Please drop one at one of the following:
 
-[Gist](https://gist.github.com/arvgta/4017712)
-
-[4nf.org](http://4nf.org/load-content-div/)
-
-[forum.jquery.com](http://forum.jquery.com/topic/new-plugin-history-api)
+- [Gist](https://gist.github.com/arvgta/4017712)
+- [4nf.org](http://4nf.org/load-content-div/)
+- [forum.jquery.com](http://forum.jquery.com/topic/new-plugin-history-api)
 
 ## Introduction
 
