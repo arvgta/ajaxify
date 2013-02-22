@@ -1,5 +1,13 @@
 This plugin will make your page load time faster on sub-pages of your site much like [Balupton's gist](https://gist.github.com/854622), however, with a lean and easy to use interface amongst powerful and standard jQuery options.
 
+## Comments
+
+We need your comments and feedback!!  Please drop one at one of the following:
+
+[Gist](https://gist.github.com/arvgta/4017712)
+[4nf.org](http://4nf.org/load-content-div/)
+[forum.jquery.com](http://forum.jquery.com/topic/new-plugin-history-api)
+
 ## Introduction
 
 Most websites have the following page structure:
