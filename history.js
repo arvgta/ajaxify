@@ -12,7 +12,7 @@
     var History = function($this, options) { var
       //Private 
         settings = $.extend({
-            'div1' : 'body div:first',
+            'first' : 'body',
             'verbosity'    : 0,
             'completedEventName' : 'statechangecomplete',
             'scripts' : true,
@@ -22,7 +22,7 @@
         //Getters
         gId = function() { return $thisId1; },
         gD = function() { return $(gId()); },
-        gS1 = function() { return settings['div1']; },
+        gS1 = function() { return settings['first']; },
 
         //Local variables
         $thisId1 = gS1(), 
@@ -43,7 +43,7 @@
             return $(result);
         },
 		
-        hello = function() { log('Entering History, div : ' + gId(), 0); },
+        hello = function() { log('Entering History, selection : ' + gId(), 0); },
         
         detScripts = function() { 
             var d = $data.find('.document-script, .document-link'); 
@@ -59,11 +59,11 @@
         informGA = function() { typeof window._gaq !== 'undefined'  && window._gaq.push(['_trackPageview', bHistory.getState().url.replace(bHistory.getRootUrl(), '')]); },
 
         setupClicks = function(h) { 
-            log('setupClicks() on div ID : ' + gId()); 
-            if(h) gD().replaceWith(h); //If HTML is passed replace div
+            log('setupClicks() on selection : ' + gId()); 
+            if(h) gD().html(h); //If HTML is passed replace div
             
             //Re-ajaxify content div
-            gD().find('a').each(function() { 
+            (h ? $(gS1()) : gD()).find('a').each(function() { 
                 parseLink(this); }
             ); 
             
@@ -75,9 +75,9 @@
                 addClicker(l);
         },
 		
-        addClicker = function(l) { log('addClicker(\'' + l.href + '\')'); 
+        addClicker = function(l) { log('addClicker(\'' + l.href + '\')');            
             l.addEventListener("click", 
-                function(e) { bHistory.pushState(null, null, l.href); e.preventDefault(); }, false); 
+                function(e) { bHistory.pushState({page:l.href}, l.title, l.href); e.preventDefault(); }, false); 
         },
 		
         updateTitle = function() { document.title = $data.find('.document-title:first').text(); 
@@ -133,7 +133,7 @@
         },
         
         fnDiv = function() { //Replace div
-            setupClicks($data.find(gId()));
+            setupClicks($data.find(gId()).html());
         },
 		
         cDivs = function(h, f) { //Replace all divs
@@ -156,12 +156,9 @@
 			
             log('statechange - \'' + href + '\'');
                         
-            var xhr = $.ajax({
-                url: href,
-                success: function(h) { 
+            var xhr = $.get(href, function(h) { 
                     if(xhr.getResponseHeader("Content-Type").indexOf('text/html') != -1) cDivs(h, 1);
                     else location = href; //not HTML                  
-                }
             });
         };
 		
@@ -170,14 +167,13 @@
             hello();
             
             if(!bHistory.enabled) return;
-           
-            // Hook into State Changes
-            window.onstatechange = stateChange;
-        
-            $.ajax({
-                url: location,
-                success: function(h) { cDivs(h); }
+            
+            $.get(location, function(h) { 
+                    cDivs(h);
+                    window.onstatechange = stateChange;                    
             });
+            
+            
             
         }); //end on DOMready
 	
