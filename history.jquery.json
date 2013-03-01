@@ -9,10 +9,10 @@
 "content",
 "div"
 ],
-"version": "0.7.4",
+"version": "0.7.5",
 "author": {
 "name": "Arvind Gupta",
-"url": "https://github.com/arvgta"
+"url": "http://4nf.org/about/"
 },
 "licenses": [
 {
@@ -23,8 +23,8 @@
 "bugs": "https://github.com/arvgta/history/issues",
 "homepage": "https://github.com/arvgta/history",
 "demo": "http://4nf.org/",
-"docs": "https://github.com/arvgta/history",
-"download": "https://github.com/arvgta/history/blob/discuss/history.js",
+"docs": "http://4nf.org/load-content-div/",
+"download": "http://4nf.org/history.js",
 "dependencies": {
 "jquery": ">=1.5"
 }
