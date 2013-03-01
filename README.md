@@ -51,7 +51,7 @@ Example:
 //Option default values:
 
 {
-    'div1' : 'body div:first',   //Top-level div to be handled first - override with ID or null
+    'first' : 'body',    //Top-level selection to be handled first - override any jQuery selection or null
     'verbosity'    : 0,  //Debugging level to console: 1 = medium, 2 = verbose
     'completedEventName' : 'statechangecomplete',  //Custom event that is triggered on completion
     'scripts' : true, // true = deltas loaded, false = all scripts loaded
