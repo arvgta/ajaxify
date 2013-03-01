@@ -1,1 +1,1 @@
-For documentation, please refer to: [4nf.org](http://4nf.org/load-content-div/)
+For documentation, please refer to: [New jQuery Plugin: Change content div(s) with JavaScript - faster page load time @4nf.org](http://4nf.org/load-content-div/)
