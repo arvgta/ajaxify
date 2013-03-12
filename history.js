@@ -76,8 +76,7 @@
         },
 		
         addClicker = function(l) { log('addClicker(\'' + l.href + '\')');            
-            l.addEventListener("click", 
-                function(e) { bHistory.pushState({page:l.href}, l.title, l.href); e.preventDefault(); }, false); 
+            $(l).click(function(e) { bHistory.pushState(null, l.title||null, l.href); e.preventDefault(); return false}); 
         },
 		
         updateTitle = function() { document.title = $data.find('.document-title:first').text(); 
@@ -151,10 +150,11 @@
             _callback(f);		
         },
         
-        stateChange = function(){
-            var href = bHistory.getState().url;
+        stateChange = function(f){
+            log('Statechange: '); //alert(location);
+            var href = f ? location : bHistory.getState().url;
 			
-            log('statechange - \'' + href + '\'');
+            log(href);
                         
             var xhr = $.get(href, function(h) { 
                     if(xhr.getResponseHeader("Content-Type").indexOf('text/html') != -1) cDivs(h, 1);
@@ -170,7 +170,8 @@
             
             $.get(location, function(h) { 
                     cDivs(h);
-                    window.onstatechange = stateChange;                    
+                    window.onstatechange = function() { stateChange(0); };
+                    window.onanchorchange = function() { stateChange(1); };                       
             });
             
             
