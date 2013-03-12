@@ -78,7 +78,9 @@
 		
         addClicker = function(l) { log('addClicker(\'' + l.href + '\')');            
             $(l).click(function(e) { 
-                bHistory.pushState(null, l.title||null, l.href);
+                if(l.href.indexOf('#') != -1) location = l.href;
+                else bHistory.pushState(null, l.title||null, l.href);
+                
                 e.preventDefault(); 
                 return false
             }); 
@@ -155,9 +157,9 @@
             _callback(f);		
         },
         
-        stateChange = function(f){
+        stateChange = function(){
             log('Statechange: ');
-            var href = f ? location : bHistory.getState().url;
+            var href = bHistory.getState().url;
             
             log(href);
                         
@@ -176,11 +178,7 @@
             $.get(location, function(h) { 
                     cDivs(h);
                     window.onstatechange = function() { stateChange(); };
-                    window.onanchorchange = function() { stateChange(1); };                       
             });
-            
-            
-            
         }); //end on DOMready
 	
     }; //end History class
@@ -197,4 +195,5 @@
         return $this;
     };
 })(jQuery);
+
 
