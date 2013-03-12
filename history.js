@@ -29,7 +29,7 @@
         scriptsd = settings['scripts'],
         cb = settings['cb'],		
         bHistory = window.History,
-        bHash = null,        
+        fH = 0,
         $data, $scripts, $scriptsO,
         
         //Helper functions
@@ -78,8 +78,7 @@
 		
         addClicker = function(l) { log('addClicker(\'' + l.href + '\')');            
             $(l).click(function(e) { 
-                if(i.href.indexOf('#') != -1) bHash = l.href; 
-                bHistory.pushState(null, l.title||null, l.href); 
+                bHistory.pushState(null, l.title||null, l.href);
                 e.preventDefault(); 
                 return false
             }); 
@@ -160,9 +159,6 @@
             log('Statechange: ');
             var href = f ? location : bHistory.getState().url;
             
-            if(!f && bHash) href = bHash;
-            bHash = null;           
-			
             log(href);
                         
             var xhr = $.get(href, function(h) { 
@@ -179,7 +175,7 @@
             
             $.get(location, function(h) { 
                     cDivs(h);
-                    window.onstatechange = function() { stateChange(0); };
+                    window.onstatechange = function() { stateChange(); };
                     window.onanchorchange = function() { stateChange(1); };                       
             });
             
