@@ -72,15 +72,13 @@
         },
 		
         parseLink = function(l) { log('parseLink(\'' + l.href + '\')'); 
-            if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length) 
+            if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length && l.href.indexOf('#') == -1) 
                 addClicker(l);
         },
 		
         addClicker = function(l) { log('addClicker(\'' + l.href + '\')');            
             $(l).click(function(e) { 
-                if(l.href.indexOf('#') != -1) location = l.href;
-                else bHistory.pushState(null, l.title||null, l.href);
-                
+                bHistory.pushState(null, l.title||null, l.href);
                 e.preventDefault(); 
                 return false
             }); 
@@ -195,5 +193,3 @@
         return $this;
     };
 })(jQuery);
-
-
