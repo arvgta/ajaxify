@@ -28,7 +28,8 @@
         $thisId1 = gS1(), 
         scriptsd = settings['scripts'],
         cb = settings['cb'],		
-        bHistory = window.History, 
+        bHistory = window.History,
+        bHash = null,        
         $data, $scripts, $scriptsO,
         
         //Helper functions
@@ -76,7 +77,12 @@
         },
 		
         addClicker = function(l) { log('addClicker(\'' + l.href + '\')');            
-            $(l).click(function(e) { bHistory.pushState(null, l.title||null, l.href); e.preventDefault(); return false}); 
+            $(l).click(function(e) { 
+                if(i.href.indexOf('#') != -1) bHash = l.href; 
+                bHistory.pushState(null, l.title||null, l.href); 
+                e.preventDefault(); 
+                return false
+            }); 
         },
 		
         updateTitle = function() { document.title = $data.find('.document-title:first').text(); 
@@ -151,8 +157,11 @@
         },
         
         stateChange = function(f){
-            log('Statechange: '); //alert(location);
+            log('Statechange: ');
             var href = f ? location : bHistory.getState().url;
+            
+            if(!f && bHash) href = bHash;
+            bHash = null;           
 			
             log(href);
                         
@@ -192,3 +201,4 @@
         return $this;
     };
 })(jQuery);
+
