@@ -175,7 +175,7 @@
             
             $.get(location, function(h) { 
                     cDivs(h);
-                    window.onstatechange = function() { stateChange(); };
+                    window.onstatechange = stateChange;
             });
         }); //end on DOMready
 	
