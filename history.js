@@ -99,9 +99,9 @@
 		
         addScripts = function() { var contentNode = gD().get(0);
             $scripts.each(function(){
-                var $script = $(this), scriptText = $script.text(), scriptHref = $script.attr('href'), scriptSrc = $script.attr('src'), scriptNode = document.createElement('script');
+                var $script = $(this), scriptText = $script.text(), scriptHref = $script.attr('href'), scriptRel = $script.attr('rel'), scriptSrc = $script.attr('src'), scriptNode = document.createElement('script');
                              
-                if(scriptHref) { 
+                if(scriptRel && scriptRel.indexOf('stylesheet') != -1 && scriptHref) { 
                      if(!scriptsd || !findScriptText(scriptHref)) { log('CSS : ' + scriptHref, 2);
                          $('head link').last().after('<link rel="stylesheet" type="text/css" href="' + scriptHref + '" />');
                      }
