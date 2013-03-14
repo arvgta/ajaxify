@@ -154,7 +154,7 @@ var History = function($this, options) { var //Private
 		
     updateTitle = function() { 
         document.title = page.gTitle(); 
-	    document.getElementsByTagName('title')[0].innerHTML = 
+        document.getElementsByTagName('title')[0].innerHTML = 
             document.title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
     },
 		
