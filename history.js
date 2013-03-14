@@ -7,15 +7,21 @@
  *
  */
 
-(function ($) {
+(function ($) { var 
 
-var log = function(m, v) {
-    if(!v) v = 1;
-    this.verbosity >= v && window.console && console.log(m);
-};
+bHistory, //Balupton History.js object
+
+Log = function() { var con = window.console;
+    this.w = function(m, v) {
+        if(!v) v = 1;
+        this.verbosity >= v && con && con.log(m);
+    }
+},
+
+log = new Log(), //instantiate plugin-global Log object
 
 // The Page class
-var Page = function() { var $data; //Private
+Page = function() { var $data; //Private
     //Protected
     this.gTitle = function() { return $data.find('.document-title:first').text(); };
     this.gClasses = function() { return $data.find('.document-script, .document-link'); }
@@ -31,12 +37,12 @@ var Page = function() { var $data; //Private
         
         $data = $(result); 
     };
-}; //end Page class
+}, //end Page class
 
-var page = new Page(); //instantiate plugin-global Page object
+page = new Page(), //instantiate plugin-global Page object
 
 // The Scripts class
-var Scripts = function(scriptd) { var //Private
+Scripts = function(delta) { var //Private
     cNode, $script, $scripts, $scriptsO,
 
     det = function() {
@@ -53,9 +59,9 @@ var Scripts = function(scriptd) { var //Private
     },
     
     add1 = function(a) { var o =  a == 'text' ? $script.text() : $script.attr(a);
-        if(!o || (scriptsd && findText(o))) return false;
+        if(!o || (delta && findText(o))) return false;
         
-        log('script: ' + a + ' // ' + o, 2);
+        log.w('script: ' + a + ' // ' + o, 2);
             
         if(a == 'href') { 
             $('head link').last().after('<link rel="stylesheet" type="text/css" href="' + o + '" />');
@@ -89,10 +95,10 @@ var Scripts = function(scriptd) { var //Private
         if(f) add(div);
         $scriptsO = $scripts;
     };
-}; //end Scripts class
+}, //end Scripts class
 
 // The History class
-var History = function($this, options) { var //Private 
+History = function($this, options) { var //Private 
     settings = $.extend({
         'first' : 'body',
         'verbosity'    : 0,
@@ -108,17 +114,16 @@ var History = function($this, options) { var //Private
 
     //Local variables
     $thisId1 = gS1(), 
-    cb = settings['cb'],		
-    bHistory = window.History,
-    scripts = new Scripts(settings['scripts']),
+    cb = settings['cb'],
+    scripts = new Scripts(settings['scripts']);    
             
     //Helper functions
     hello = function() { 
         log.verbosity = settings['verbosity'];
-        log('Entering History, selection : ' + gId(), 0); 
+        log.w('Entering History, selection : ' + gId(), 0); 
     },
         
-    _callback = function(f) { 
+    _callback = function(f) {
         $this; if(cb) cb(); 
         if(f) $(window).trigger(settings['completedEventName']);
     }, 
@@ -126,7 +131,7 @@ var History = function($this, options) { var //Private
     informGA = function() { typeof window._gaq !== 'undefined'  && window._gaq.push(['_trackPageview', bHistory.getState().url.replace(bHistory.getRootUrl(), '')]); },
 
     setupClicks = function(h) { 
-        log('setupClicks() on selection : ' + gId()); 
+        log.w('setupClicks() on selection : ' + gId()); 
         if(h) gD().html(h); //If HTML is passed replace div
            
         //Re-ajaxify content div
@@ -134,17 +139,17 @@ var History = function($this, options) { var //Private
             parseLink(this); 
         }); 
             
-        log('setupClicks succeeded!'); 
+        log.w('setupClicks succeeded!'); 
     },
 		
     parseLink = function(l) { 
-        log('parseLink(\'' + l.href + '\')'); 
+        log.w('parseLink(\'' + l.href + '\')'); 
         if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length && l.href.indexOf('#') == -1) 
             addClicker(l);
     },
 		
     addClicker = function(l) { 
-        log('addClicker(\'' + l.href + '\')');            
+        log.w('addClicker(\'' + l.href + '\')');            
         $(l).click(function(e) { 
             bHistory.pushState(null, l.title||null, l.href);
             e.preventDefault(); 
@@ -186,10 +191,10 @@ var History = function($this, options) { var //Private
     },
         
     stateChange = function(){
-        log('Statechange: ');
+        log.w('Statechange: ');
         var href = bHistory.getState().url;
             
-        log(href);
+        log.w(href);
                         
         var xhr = $.get(href, function(h) { 
             if(h && xhr.getResponseHeader("Content-Type").indexOf('text/html') != -1) cDivs(h, 1);
@@ -201,8 +206,6 @@ var History = function($this, options) { var //Private
     $(function () { //on DOMready
         hello();
             
-        if(!bHistory.enabled) return;
-           
         $.get(location, function(h) { 
             cDivs(h);
             window.onstatechange = stateChange;
@@ -214,11 +217,16 @@ var History = function($this, options) { var //Private
 // Register jQuery function
 $.fn.history = function(options) {
     var $this = $(this),
-        _init = function() { new History($this, options); },
-        init0 = function() { $.getScript('http://4nf.org/js/bhistory.js', _init)},
-        init1 = function() { $.getScript('http://4nf.org/js/urlinternal.js', init0)}; 
+    _init = function() { 
+        bHistory = window.History;
+        if(!bHistory.enabled) return;            
+        new History($this, options); 
+    },
+        
+    init0 = function() { $.getScript('http://4nf.org/js/bhistory.js', _init)},
+    init1 = function() { $.getScript('http://4nf.org/js/urlinternal.js', init0)}; 
 	 
-        init1();
+    init1();
         
     return $this;
 };
