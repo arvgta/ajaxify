@@ -7,27 +7,42 @@
  *
  */
 
-(function ($) { var 
+(function ($) { 
 
-bHistory, //Balupton History.js object
+var bHistory, //plugin-global Balupton History.js object
+html, //plugin-global html - avoids passing around
 
-Log = function() { var con = window.console;
+// The Log class
+log = new function() { var con = window.console, verbosity; //Private
+    //Protected
+    this.set = function(v) { verbosity = v; };
     this.w = function(m, v) {
         if(!v) v = 1;
-        this.verbosity >= v && con && con.log(m);
+        verbosity >= v && con && con.log(m);
     }
-},
-
-log = new Log(), //instantiate plugin-global Log object
+}, //end Log class
 
 // The Page class
-Page = function() { var $data; //Private
+page = new function() { var $data; //Private
+    gTitle = function() { return $data.find('.document-title:first').text(); };
+    
     //Protected
-    this.gTitle = function() { return $data.find('.document-title:first').text(); };
+    this.updateTitle = function() {
+        document.title = gTitle(); 
+        document.getElementsByTagName('title')[0].innerHTML = 
+            document.title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+    },
+    
+    this.informGA = function() { 
+        typeof window._gaq !== 'undefined'  && 
+        window._gaq.push(['_trackPageview', 
+            bHistory.getState().url.replace(bHistory.getRootUrl(), '')]); 
+    },
+    
     this.gClasses = function() { return $data.find('.document-script, .document-link'); }
     this.find = function(i) { return $data.find(i).html(); };
     
-    this.load = function(html) { 
+    this.load = function() { 
         var result = String(html)
             .replace(/<\!DOCTYPE[^>]*>/i, '')
             .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi,
@@ -39,11 +54,9 @@ Page = function() { var $data; //Private
     };
 }, //end Page class
 
-page = new Page(), //instantiate plugin-global Page object
-
 // The Scripts class
-Scripts = function(delta) { var //Private
-    cNode, $script, $scripts, $scriptsO,
+scripts = new function() { var //Private
+    delta, div, $script, $scripts, $scriptsO,
 
     det = function() {
         var d = page.gClasses();
@@ -72,12 +85,13 @@ Scripts = function(delta) { var //Private
         if(a == 'src') node.src = o;
         if(a == 'text') node.appendChild(document.createTextNode(o));
             
-        cNode.appendChild(node);
+        div.get(0).appendChild(node);
         
         return true;
     },
 		
-    add = function(div) { cNode = div.get(0);
+    add = function() { 
+        if(!div) return;
         $scripts.each(function(){
             $script = $(this); 
             
@@ -90,12 +104,41 @@ Scripts = function(delta) { var //Private
     };
         
     //Protected
-    this.handle = function(f, div) {
+    this.set = function(d) { delta = d; };
+    this.handle = function(d) { div = d;
         det();
-        if(f) add(div);
+        add();
         $scriptsO = $scripts;
     };
 }, //end Scripts class
+
+// The History_API class
+History_API = new function() { var //Private
+    parseLink = function(l) { 
+        log.w('parseLink(\'' + l.href + '\')'); 
+        if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length && l.href.indexOf('#') == -1) 
+            addClicker(l);
+    },
+		
+    addClicker = function(l) { 
+        log.w('addClicker(\'' + l.href + '\')');            
+        $(l).click(function(e) { 
+            bHistory.pushState(null, l.title||null, l.href);
+            e.preventDefault(); 
+            return false
+        }); 
+    };
+    
+    //Protected
+    this.setupClicks = function(s) {
+        log.w('setupClicks() on selection with ID: ' + $(s).attr('id')); 
+        s.find('a').each(function() { 
+            parseLink(this); 
+        });
+        
+        log.w('setupClicks succeeded!');        
+    };
+}, //end History_API class
 
 // The History class
 History = function($this, options) { var //Private 
@@ -114,103 +157,71 @@ History = function($this, options) { var //Private
 
     //Local variables
     $thisId1 = gS1(), 
-    cb = settings['cb'],
-    scripts = new Scripts(settings['scripts']);    
-            
+    pass = 0, //Handling very first page load
+              
     //Helper functions
     hello = function() { 
-        log.verbosity = settings['verbosity'];
-        log.w('Entering History, selection : ' + gId(), 0); 
+        scripts.set(settings['scripts']);
+        log.set(settings['verbosity']);
+        log.w('Entering History, selection : ' + gId()); 
     },
         
-    _callback = function(f) {
+    _callback = function() { var cb = settings['cb'];
         $this; if(cb) cb(); 
-        if(f) $(window).trigger(settings['completedEventName']);
+        if(pass) $(window).trigger(settings['completedEventName']);
     }, 
     
-    informGA = function() { typeof window._gaq !== 'undefined'  && window._gaq.push(['_trackPageview', bHistory.getState().url.replace(bHistory.getRootUrl(), '')]); },
+    handleDiv = function() { 
+        if(pass) gD().html(page.find(gId())); //Load in div
+        History_API.setupClicks(pass ? gD() : $(gS1()));
+    },
 
-    setupClicks = function(h) { 
-        log.w('setupClicks() on selection : ' + gId()); 
-        if(h) gD().html(h); //If HTML is passed replace div
-           
-        //Re-ajaxify content div
-        (h ? $(gS1()) : gD()).find('a').each(function() { 
-            parseLink(this); 
-        }); 
-            
-        log.w('setupClicks succeeded!'); 
-    },
-		
-    parseLink = function(l) { 
-        log.w('parseLink(\'' + l.href + '\')'); 
-        if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length && l.href.indexOf('#') == -1) 
-            addClicker(l);
-    },
-		
-    addClicker = function(l) { 
-        log.w('addClicker(\'' + l.href + '\')');            
-        $(l).click(function(e) { 
-            bHistory.pushState(null, l.title||null, l.href);
-            e.preventDefault(); 
-            return false
-        }); 
-    },
-		
-    updateTitle = function() { 
-        document.title = page.gTitle(); 
-        document.getElementsByTagName('title')[0].innerHTML = 
-            document.title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
-    },
-		
-    allDivs = function(h) {
-        $this.each(function(){ 
-            $thisId1 = '#' + $(this).attr('id'); 
-            h();
-        }); 
-    },
+    allDivs = function() {
+        if(!pass && gS1()) { handleDiv(); return; }
         
-    fnDiv = function() { //Replace div
-        setupClicks(page.find(gId()));
+        $this.each(function(){
+            $thisId1 = '#' + $(this).attr('id');
+            handleDiv();
+        });
     },
-		
-    cDivs = function(h, f) { //Replace all divs
-        page.load(h);
-        if(f) allDivs(fnDiv);
-        scripts.handle(f, gD());            
- 
-        if(!f) { 
-            if(gS1()) setupClicks(); 
-            else allDivs(setupClicks);              
-        } else {  
-            updateTitle(); 
-            informGA();
+    
+    cPage = function() { //Build up new page
+        page.load();
+        allDivs();
+        scripts.handle(pass ? gD() : null);
+        if(pass) {
+            page.updateTitle();
+            page.informGA();
         }
-                      
-        _callback(f);		
+        
+        _callback();
+    },
+		
+    cURL = function(href) { //Load in URL content via GET
+        var xhr = $.get(href, function(h) { 
+            if(pass && (!h || xhr.getResponseHeader("Content-Type").indexOf('text/html') == -1)) {
+                    location = href; //not HTML
+                    return;
+            }
+            
+            html = h;
+            cPage();
+            if(!pass) window.onstatechange = stateChange; //Hook into state changes
+        });
     },
         
-    stateChange = function(){
+    stateChange = function(){ pass = 1; //Handling subsequent page loads
         log.w('Statechange: ');
         var href = bHistory.getState().url;
-            
         log.w(href);
-                        
-        var xhr = $.get(href, function(h) { 
-            if(h && xhr.getResponseHeader("Content-Type").indexOf('text/html') != -1) cDivs(h, 1);
-            else location = href; //not HTML                  
-        });
+        cURL(href);
     };
 		
     // Run constructor
     $(function () { //on DOMready
         hello();
-            
-        $.get(location, function(h) { 
-            cDivs(h);
-            window.onstatechange = stateChange;
-        });
-    }); //end on DOMready
+        cURL(location);
+    });
 	
 }; //end History class
 
