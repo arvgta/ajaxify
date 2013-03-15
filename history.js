@@ -131,8 +131,8 @@ History_API = new function() { var //Private
     
     //Protected
     this.setupClicks = function(s) {
-        log.w('setupClicks() on selection with ID: ' + $(s).attr('id')); 
-        s.find('a').each(function() { 
+        log.w('setupClicks() on selection : ' + s); 
+        $(s).find('a').each(function() { 
             parseLink(this); 
         });
         
@@ -173,7 +173,7 @@ History = function($this, options) { var //Private
     
     handleDiv = function() { 
         if(pass) gD().html(page.find(gId())); //Load in div
-        History_API.setupClicks(pass ? gD() : $(gS1()));
+        History_API.setupClicks(pass ? gId() : gS1());
     },
 
     allDivs = function() {
