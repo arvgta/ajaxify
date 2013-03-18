@@ -7,141 +7,284 @@
  *
  */
 
-(function ($) { 
+// The All plugin
+(function ($) {
+ // The All class
+var All = function() {
+    this.a = function($this, t, fn) {
+        $this.each(function(i) {
+            t = t.split('*').join('$(this)');
+            t += ';';
+            eval(t);
+        });
+    };
+}; //end All class
 
-var bHistory, //plugin-global Balupton History.js object
-html, //plugin-global html - avoids passing around
+// Register jQuery function
+$.fn.all = function(t, fn) {
+    var $this = $(this);
+    $.fn.all.o = $.fn.all.o ? $.fn.all.o : new All();
+    $.fn.all.o.a($this, t, fn);
+    return $this;
+};
 
+})(jQuery); //end All plugin
+ 
+// The Log plugin
+(function ($) {
 // The Log class
-log = new function() { var con = window.console, verbosity; //Private
-    //Protected
-    this.set = function(v) { verbosity = v; };
-    this.w = function(m, v) {
-        if(!v) v = 1;
-        verbosity >= v && con && con.log(m);
-    }
-}, //end Log class
-
-// The Page class
-page = new function() { var $data; //Private
-    gTitle = function() { return $data.find('.document-title:first').text(); };
+var Log = function(options) { var con = window.console, verbosity, vp, //Private
+    settings = $.extend({
+        'verbosity'    : 0
+    }, options);
     
-    //Protected
-    this.updateTitle = function() {
-        document.title = gTitle(); 
-        document.getElementsByTagName('title')[0].innerHTML = 
-            document.title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
-    },
+    verbosity = settings['verbosity'];
     
-    this.informGA = function() { 
-        typeof window._gaq !== 'undefined'  && 
-        window._gaq.push(['_trackPageview', 
-            bHistory.getState().url.replace(bHistory.getRootUrl(), '')]); 
-    },
-    
-    this.gClasses = function() { return $data.find('.document-script, .document-link'); }
-    this.find = function(i) { return $data.find(i).html(); };
-    
-    this.load = function() { 
-        var result = String(html)
-            .replace(/<\!DOCTYPE[^>]*>/i, '')
-            .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi,
-                '<div class="document-$1"$2')
-            .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
-        ;
-        
-        $data = $(result); 
+    this.a = function(m, v) {
+        if(v >= 0) vp = v;
+        verbosity > vp && con && con.log(m);
     };
-}, //end Page class
+}; //end Log class 
 
+// Register jQuery function
+$.log = function(m, v, options) {
+    $.log.o = $.log.o ? $.log.o : new Log(options);
+    $.log.o.a(m, v);
+};
+
+})(jQuery); //end Log plugin
+
+// The getScripts plugin
+(function ($) {
 // The Scripts class
-scripts = new function() { var //Private
-    delta, div, $script, $scripts, $scriptsO,
-
-    det = function() {
-        var d = page.gClasses();
-        $scripts = (d.length ? d.detach() : d);
-    },
-    
-    findText = function(t) { var r = false;
-        $scriptsO.each(function(){ var $s = $(this);
-            if($s.attr('src') == t || $s.attr('href') == t || $s.text() == t ) r = true;
+var Scripts = function() { 
+    this.a = function($this, cb) { var s = '';
+        if($this.length == 0) { cb && cb(); return; }
+        $this.each(function(i){
+            s += 'addsrc* = function() { $.getScript("*", *).fail(function(jqxhr, settings, exception) {alert(exception);}); }'.replace('*', i)
+                .replace('*', $(this).attr('src'))
+                .replace('*', i == $this.length - 1 ? 'cb' : 'addsrc' + (i + 1));
+            s += i == $this.length - 1 ? ';' : ',';
         });
-            
-        return r;
-    },
-    
-    add1 = function(a) { var o =  a == 'text' ? $script.text() : $script.attr(a);
-        if(!o || (delta && findText(o))) return false;
         
-        log.w('script: ' + a + ' // ' + o, 2);
-            
-        if(a == 'href') { 
-            $('head link').last().after('<link rel="stylesheet" type="text/css" href="' + o + '" />');
-            return true;
-        }
-            
-        var node = document.createElement('script');
-        if(a == 'src') node.src = o;
-        if(a == 'text') node.appendChild(document.createTextNode(o));
-            
-        div.get(0).appendChild(node);
+        s = 'var ' + s + '\n' + 'addsrc0();';
         
-        return true;
-    },
-		
-    add = function() { 
-        if(!div) return;
-        $scripts.each(function(){
-            $script = $(this); 
-            
-            var rel = $script.attr('rel');
-            if( (rel && rel.indexOf('stylesheet') != -1 && add1('href'))
-               || add1('src')
-               || add1('text')
-            ) return true;
-        });
+        $.log(s);
+        try { eval(s); } catch(e) {alert(e);};
     };
-        
-    //Protected
-    this.set = function(d) { delta = d; };
-    this.handle = function(d) { div = d;
-        det();
-        add();
-        $scriptsO = $scripts;
-    };
-}, //end Scripts class
+}; //end Scripts class
+ 
+// Register jQuery function
+$.fn.getScripts = function(cb) {
+    var $this = $(this);
+    $.fn.getScripts.o = $.fn.getScripts.o ? $.fn.getScripts.o : new Scripts();
+    $.fn.getScripts.o.a($this, cb);
+    return $this;
+};
 
-// The History_API class
-History_API = new function() { var //Private
+})(jQuery); //end getScripts plugin
+ 
+// The setupClicks plugin
+(function ($) {
+// The Links class
+var Links = function(options) { var //Private
     parseLink = function(l) { 
-        log.w('parseLink(\'' + l.href + '\')'); 
         if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length && l.href.indexOf('#') == -1) 
             addClicker(l);
     },
 		
     addClicker = function(l) { 
-        log.w('addClicker(\'' + l.href + '\')');            
         $(l).click(function(e) { 
-            bHistory.pushState(null, l.title||null, l.href);
+            History.pushState(null, l.title||null, l.href);
             e.preventDefault(); 
             return false
         }); 
     };
     
-    //Protected
-    this.setupClicks = function(s) {
-        log.w('setupClicks() on selection : ' + s); 
-        $(s).find('a').each(function() { 
+    setupClicks = function($this1) {
+        $this1.find('a').each(function() { 
             parseLink(this); 
         });
-        
-        log.w('setupClicks succeeded!');        
     };
-}, //end History_API class
+    
+    this.a = function($this) {
+        $this.all('fn(*)', setupClicks);
+    };
+}; //end Links class
+ 
+// Register jQuery function
+$.fn.setupClicks = function(options) {
+    var $this = $(this);
+    init = function() { 
+        $.fn.setupClicks.o = $.fn.setupClicks.o ? $.fn.setupClicks.o : new Links(options);
+        $.fn.setupClicks.o.a($this);
+    }
+    
+    $.getScript('http://4nf.org/js/urlinternal.js', init);
+    
+    return $this;
+};
 
-// The History class
-History = function($this, options) { var //Private 
+})(jQuery); //end setupClicks plugin
+
+// The getPage plugin
+(function ($) {
+// The Page class
+var Page = function() { var $page;
+    this.a = function($this, t, p) {
+        if(!t) return $page;
+        
+        if(t.indexOf('/') != -1) {
+            var xhr = $.get(t, function(h) {
+                if(!h || xhr.getResponseHeader("Content-Type").indexOf('text/html') == -1) {
+                    location = t; //not HTML
+                    
+                    return false;
+                }
+
+                var result = String(h)
+                    .replace(/<\!DOCTYPE[^>]*>/i, '')
+                    .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi,
+                        '<div class="document-$1"$2')
+                    .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
+                ;
+                
+                $page = $(result);
+                p && p();
+                
+                return true;
+            });
+            
+            return true;
+        }
+        
+        if(t == '-') {
+            var pF = function(s) { return $page.find('#' + s.attr('id')); };
+            $this.all('*.html(fn(*))', pF);
+            $this.all('*.find(".document-link, .document-script").remove()');
+            
+            return $this;
+        }
+        
+        return $page.find('.document-' + t);
+    };
+}; //end Page class
+ 
+// Register jQuery function
+$.fn.getPage = function(t, p) {
+    var $this = $(this);
+    $.fn.getPage.o = $.fn.getPage.o ? $.fn.getPage.o : new Page();
+    return $.fn.getPage.o.a($this, t, p);
+};
+
+})(jQuery); //end getPage plugin
+
+// The Scripts plugin
+(function ($) {
+
+// The Scripts class
+var Scripts = function(options) { var //Private
+    delta, $script, $scripts = {}, $scriptsO = {}, scriptsNo,
+    
+    settings = $.extend({
+        'scripts'    : true
+    }, options),
+
+    det = function() {
+        var links = $().getPage('link');
+            jss = $().getPage('script');
+            
+        var csss = links.filter(function() { 
+                return $(this).attr('rel').indexOf('stylesheet') != -1; }),
+            srcs = jss.filter(function() { 
+                return $(this).attr('src'); }),
+            txts = jss.filter(function() { 
+                return !($(this).attr('src')); });
+            
+        $scripts.c = csss;
+        $scripts.s = srcs;
+        $scripts.t = txts;
+    }, 
+    
+    findText = function(m, t) { var r = false, $scriptsOM, att;
+        if(!$scriptsO) return r;
+        
+        switch(m) {
+             case 'c': $scriptsOM = $scriptsO.c; att = 'href'; break;
+             case 's': $scriptsOM = $scriptsO.s; att = 'src'; break;
+             case 't': $scriptsOM = $scriptsO.t; break;
+             default: return r;
+        }
+         
+        if(!$scriptsOM) return r;
+        
+        $scriptsOM.each(function(){ var $s = $(this);
+            if( (m == 't') ? ($s.html() == t) : ($s.attr(att) == t) ) r = true;
+        }); 
+            
+        return r;
+    },
+    
+    addcsss = function() { $.log('Entering addcss');
+        $scripts.c.each(function(){ var href = $(this).attr('href');
+            if(!delta || !findText('c', href)) {
+                $('head link').last().after(
+                     '<link rel="stylesheet" type="text/css" href="' + href + '" />');
+                $.log('CSS : ' + href);
+            }
+            
+            return true; 
+        });
+    },
+    
+    addtxts = function() { $.log('Entering addtxts'); 
+        $scripts.t.each(function(){ var txt = $(this).html();
+            if(!delta || !findText('t', txt)) {
+                $.log('inline script : ' + txt);
+                eval(txt);
+            }
+            
+            return true;
+        });
+        
+        $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
+        $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
+        $scriptsO.t = $scripts.t;
+    },
+    
+    addsrcs = function() { $.log('Entering addsrcs'); 
+        $scripts.s.filter(function(){ return(!delta || !findText('s', $(this).attr('src'))); })
+            .getScripts(addtxts);
+    },
+    
+    add = function() { $.log('Entering scripts.add()');
+        addcsss();
+        addsrcs();
+    };
+        
+    //Protected
+    this.a = function() {
+        det();
+        add();
+    };
+    
+    delta = settings['scripts'];
+    
+}; //end Scripts class
+
+// Register jQuery function
+$.scripts = function(options) {
+    $.scripts.o = $.scripts.o ? $.scripts.o : new Scripts(options);
+    $.scripts.o.a();
+};
+
+})(jQuery); //end Scripts plugin
+
+// The Ajaxify plugin
+(function ($) { var
+
+// The Ajaxify class
+Ajaxify = function($this, options) { var //Private
     settings = $.extend({
         'first' : 'body',
         'verbosity'    : 0,
@@ -150,96 +293,59 @@ History = function($this, options) { var //Private
         'cb' : null
     }, options),        
         
-    //Getters
-    gId = function() { return $thisId1; },
-    gD = function() { return $(gId()); },
-    gS1 = function() { return settings['first']; },
-
-    //Local variables
-    $thisId1 = gS1(), 
-    pass = 0, //Handling very first page load
-              
     //Helper functions
-    hello = function() { 
-        scripts.set(settings['scripts']);
-        log.set(settings['verbosity']);
-        log.w('Entering History, selection : ' + gId()); 
+    hello = function() {
+        $.log('Entering ajaxify...', 1, settings);
     },
         
     _callback = function() { var cb = settings['cb'];
-        $this; if(cb) cb(); 
-        if(pass) $(window).trigger(settings['completedEventName']);
-    }, 
-    
-    handleDiv = function() { 
-        if(pass) gD().html(page.find(gId())); //Load in div
-        History_API.setupClicks(pass ? gId() : gS1());
-    },
-
-    allDivs = function() {
-        if(!pass && gS1()) { handleDiv(); return; }
-        
-        $this.each(function(){
-            $thisId1 = '#' + $(this).attr('id');
-            handleDiv();
-        });
+        $this; if(cb) cb();
+        $(window).trigger(settings['completedEventName']);
     },
     
+    informGA = function() {
+        typeof window._gaq !== 'undefined'  &&
+        window._gaq.push(['_trackPageview',
+            History.getState().url.replace(History.getRootUrl(), '')]);
+    },
+       
     cPage = function() { //Build up new page
-        page.load();
-        allDivs();
-        scripts.handle(pass ? gD() : null);
-        if(pass) {
-            page.updateTitle();
-            page.informGA();
-        }
-        
+        $this.getPage('-').setupClicks();
+        document.title = $().getPage('title').text();
+        $.scripts(settings);
+        informGA();
         _callback();
     },
 		
-    cURL = function(href) { //Load in URL content via GET
-        var xhr = $.get(href, function(h) { 
-            if(pass && (!h || xhr.getResponseHeader("Content-Type").indexOf('text/html') == -1)) {
-                    location = href; //not HTML
-                    return;
-            }
-            
-            html = h;
-            cPage();
-            if(!pass) window.onstatechange = stateChange; //Hook into state changes
-        });
-    },
-        
-    stateChange = function(){ pass = 1; //Handling subsequent page loads
-        log.w('Statechange: ');
-        var href = bHistory.getState().url;
-        log.w(href);
-        cURL(href);
+    stateChange = function(){
+        $.log('Statechange: ');
+        var href = History.getState().url;
+        $.log(href);
+        $().getPage(href, cPage);
     };
 		
     // Run constructor
     $(function () { //on DOMready
         hello();
-        cURL(location);
+        var s = settings['first'];
+        s = s ? $(s) : $this;
+        s.setupClicks();
+        window.onstatechange = stateChange;
     });
 	
-}; //end History class
+}; //end Ajaxify class
 
 // Register jQuery function
-$.fn.history = function(options) {
+$.fn.ajaxify = function(options) {
     var $this = $(this),
-    _init = function() { 
-        bHistory = window.History;
-        if(!bHistory.enabled) return;            
-        new History($this, options); 
-    },
+    init = function() {
+        if(!History.enabled) return;     
+        new Ajaxify($this, options);
+    };
         
-    init0 = function() { $.getScript('http://4nf.org/js/bhistory.js', _init)},
-    init1 = function() { $.getScript('http://4nf.org/js/urlinternal.js', init0)}; 
-	 
-    init1();
-        
+    $.getScript('http://4nf.org/js/bhistory.js', init);
+
     return $this;
 };
     
-})(jQuery); //end plugin
+})(jQuery); //end Ajaxify plugin
