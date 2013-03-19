@@ -88,8 +88,8 @@ $.fn.getScripts = function(cb) {
 (function ($) {
 // The Links class
 var Links = function(options) { var //Private
-    parseLink = function(l) { 
-        if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length && l.href.indexOf('#') == -1) 
+    parseLink = function(l) { l.hash = ''; //Balupton History can't handle hashes yet
+        if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length) 
             addClicker(l);
     },
 		
