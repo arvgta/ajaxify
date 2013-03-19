@@ -249,10 +249,12 @@ var Scripts = function(options) { var //Private
         
         $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
         $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
-        $scriptsO.t = $scripts.t;
+        //$scriptsO.c = $scripts.c;
+        //$scriptsO.s = $scripts.s;
+        $scriptsO.t = null;
     },
     
-    addsrcs = function() { $.log('Entering addsrcs'); 
+    addsrcs = function() { $.log('Entering addsrcs');
         $scripts.s.filter(function(){ return(!delta || !findText('s', $(this).attr('src'))); })
             .getScripts(addtxts);
     },
@@ -327,10 +329,16 @@ Ajaxify = function($this, options) { var //Private
     // Run constructor
     $(function () { //on DOMready
         hello();
-        var s = settings['first'];
-        s = s ? $(s) : $this;
-        s.setupClicks();
-        window.onstatechange = stateChange;
+        var first = function() {
+            var s = settings['first'];
+            s = s ? $(s) : $this;
+            s.setupClicks();
+            window.onstatechange = stateChange;
+        };
+        
+        $().getPage(location, first);
+        
+        
     });
 	
 }; //end Ajaxify class
