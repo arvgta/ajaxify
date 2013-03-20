@@ -249,8 +249,6 @@ var Scripts = function(options) { var //Private
         
         $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
         $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
-        //$scriptsO.c = $scripts.c;
-        //$scriptsO.s = $scripts.s;
         $scriptsO.t = null;
     },
     
@@ -336,7 +334,7 @@ Ajaxify = function($this, options) { var //Private
             window.onstatechange = stateChange;
         };
         
-        $().getPage(location, first);
+        $().getPage(location.href, first);
         
         
     });
