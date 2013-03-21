@@ -247,8 +247,8 @@ var Scripts = function(options) { var //Private
             return true;
         });
         
-        $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
-        $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
+        $scriptsO.c = $.extend(true, $scriptsO.c, $scripts.c);
+        $scriptsO.s = $.extend(true, $scriptsO.s, $scripts.s); 
         $scriptsO.t = null;
     },
     
@@ -257,15 +257,24 @@ var Scripts = function(options) { var //Private
             .getScripts(addtxts);
     },
     
+    addScripts = function(s1, s2) {
+        s2.each(function() { s1.add($(this)); });
+        return s1;
+    };
+    
     add = function() { $.log('Entering scripts.add()');
         addcsss();
         addsrcs();
     };
         
     //Protected
-    this.a = function() {
+    this.a = function(f) {
         det();
-        add();
+        if(f) { 
+            $scriptsO.c = $.extend(true, $scriptsO.c, $scripts.c);
+            $scriptsO.s = $.extend(true, $scriptsO.s, $scripts.s);
+        }            
+        else add();
     };
     
     delta = settings['scripts'];
@@ -273,9 +282,9 @@ var Scripts = function(options) { var //Private
 }; //end Scripts class
 
 // Register jQuery function
-$.scripts = function(options) {
+$.scripts = function(options, f) {
     $.scripts.o = $.scripts.o ? $.scripts.o : new Scripts(options);
-    $.scripts.o.a();
+    $.scripts.o.a(f);
 };
 
 })(jQuery); //end Scripts plugin
@@ -331,6 +340,7 @@ Ajaxify = function($this, options) { var //Private
             var s = settings['first'];
             s = s ? $(s) : $this;
             s.setupClicks();
+            $.scripts(settings, true);
             window.onstatechange = stateChange;
         };
         
