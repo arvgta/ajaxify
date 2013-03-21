@@ -247,8 +247,8 @@ var Scripts = function(options) { var //Private
             return true;
         });
         
-        $scriptsO.c = $.extend(true, $scriptsO.c, $scripts.c);
-        $scriptsO.s = $.extend(true, $scriptsO.s, $scripts.s); 
+        $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
+        $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
         $scriptsO.t = null;
     },
     
@@ -256,11 +256,6 @@ var Scripts = function(options) { var //Private
         $scripts.s.filter(function(){ return(!delta || !findText('s', $(this).attr('src'))); })
             .getScripts(addtxts);
     },
-    
-    addScripts = function(s1, s2) {
-        s2.each(function() { s1.add($(this)); });
-        return s1;
-    };
     
     add = function() { $.log('Entering scripts.add()');
         addcsss();
@@ -271,8 +266,9 @@ var Scripts = function(options) { var //Private
     this.a = function(f) {
         det();
         if(f) { 
-            $scriptsO.c = $.extend(true, $scriptsO.c, $scripts.c);
-            $scriptsO.s = $.extend(true, $scriptsO.s, $scripts.s);
+            $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
+            $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
+            $scriptsO.t = null;
         }            
         else add();
     };
