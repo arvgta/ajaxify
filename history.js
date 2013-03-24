@@ -149,7 +149,7 @@ var Page = function() { var $page;
                     .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
                 ;
                 
-                $page = $(result);
+                $page = $($.parseHTML ? $.parseHTML(result) : result);
                 p && p();
                 
                 return true;
@@ -337,6 +337,7 @@ Ajaxify = function($this, options) { var //Private
             s = s ? $(s) : $this;
             s.setupClicks();
             $.scripts(settings, true);
+			_callback();
             window.onstatechange = stateChange;
         };
         
