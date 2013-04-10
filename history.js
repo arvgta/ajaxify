@@ -274,10 +274,10 @@ Ajaxify = function($this, options) { var //Private
     $(function () { //on DOMready
        hello();
 	   
-	   $this.pronto(settings);
-	   $(window).on("pronto.render", initPage);
+       $this.pronto(settings);
+       $(window).on("pronto.render", initPage);
 	
-	   initPage();
+       initPage();
     });
 	
 }; //end Ajaxify class
