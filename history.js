@@ -11,7 +11,7 @@
 (function ($) {
  // The All class
 var All = function() {
-    this.a = function($this, t, fn) {
+    this.a = function($this, t, fn, obj) {
         $this.each(function(i) {
             t = t.split('*').join('$(this)');
             t += ';';
@@ -21,15 +21,15 @@ var All = function() {
 }; //end All class
 
 // Register jQuery function
-$.fn.all = function(t, fn) {
+$.fn.all = function(t, fn, obj) {
     var $this = $(this);
     $.fn.all.o = $.fn.all.o ? $.fn.all.o : new All();
-    $.fn.all.o.a($this, t, fn);
+    $.fn.all.o.a($this, t, fn, obj);
     return $this;
 };
 
 })(jQuery); //end All plugin
- 
+
 // The Log plugin
 (function ($) {
 // The Log class
@@ -84,49 +84,6 @@ $.fn.getScripts = function(cb) {
 
 })(jQuery); //end getScripts plugin
  
-// The setupClicks plugin
-(function ($) {
-// The Links class
-var Links = function(options) { var //Private
-    parseLink = function(l) { l.hash = ''; //Balupton History can't handle hashes yet
-        if($.isUrlInternal(l.href) && !$(l).find('.no-ajaxy').length) 
-            addClicker(l);
-    },
-		
-    addClicker = function(l) { 
-        $(l).click(function(e) { 
-            History.pushState(null, l.title||null, l.href);
-            e.preventDefault(); 
-            return false
-        }); 
-    };
-    
-    setupClicks = function($this1) {
-        $this1.find('a').each(function() { 
-            parseLink(this); 
-        });
-    };
-    
-    this.a = function($this) {
-        $this.all('fn(*)', setupClicks);
-    };
-}; //end Links class
- 
-// Register jQuery function
-$.fn.setupClicks = function(options) {
-    var $this = $(this);
-    init = function() { 
-        $.fn.setupClicks.o = $.fn.setupClicks.o ? $.fn.setupClicks.o : new Links(options);
-        $.fn.setupClicks.o.a($this);
-    }
-    
-    $.getScript('http://4nf.org/js/urlinternal.js', init);
-    
-    return $this;
-};
-
-})(jQuery); //end setupClicks plugin
-
 // The getPage plugin
 (function ($) {
 // The Page class
@@ -157,8 +114,8 @@ var Page = function() { var $page;
             
             return true;
         }
-        
-        if(t == '-') {
+		
+		if(t == '-') {
             var pF = function(s) { return $page.find('#' + s.attr('id')); };
             $this.all('*.html(fn(*))', pF);
             $this.all('*.find(".document-link, .document-script").remove()');
@@ -270,7 +227,8 @@ var Scripts = function(options) { var //Private
             $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
             $scriptsO.t = null;
         }            
-        else add();
+        
+		add();
     };
     
     delta = settings['scripts'];
@@ -291,11 +249,9 @@ $.scripts = function(options, f) {
 // The Ajaxify class
 Ajaxify = function($this, options) { var //Private
     settings = $.extend({
-        'first' : 'body',
-        'verbosity'    : 0,
-        'completedEventName' : 'statechangecomplete',
-        'scripts' : true,
-        'cb' : null
+        selector: "a",
+        requestKey: "pronto",
+        scripts: true,
     }, options),        
         
     //Helper functions
@@ -303,62 +259,38 @@ Ajaxify = function($this, options) { var //Private
         $.log('Entering ajaxify...', 1, settings);
     },
         
-    _callback = function() { var cb = settings['cb'];
-        $this; if(cb) cb();
-        $(window).trigger(settings['completedEventName']);
+    cPage = function() { //Handle scripts on page
+        $.scripts(settings, true);
     },
     
-    informGA = function() {
-        typeof window._gaq !== 'undefined'  &&
-        window._gaq.push(['_trackPageview',
-            History.getState().url.replace(History.getRootUrl(), '')]);
-    },
-       
-    cPage = function() { //Build up new page
-        $this.getPage('-').setupClicks();
-        document.title = $().getPage('title').text();
-        $.scripts(settings);
-        informGA();
-        _callback();
-    },
-		
-    stateChange = function(){
+    initPage = function(){
         $.log('Statechange: ');
-        var href = History.getState().url;
+        var href = location.href;
         $.log(href);
         $().getPage(href, cPage);
     };
-		
+    
     // Run constructor
     $(function () { //on DOMready
-        hello();
-        var first = function() {
-            var s = settings['first'];
-            s = s ? $(s) : $this;
-            s.setupClicks();
-            $.scripts(settings, true);
-			_callback();
-            window.onstatechange = stateChange;
-        };
-        
-        $().getPage(location.href, first);
-        
-        
+       hello();
+	   
+	   $this.pronto(settings);
+	   $(window).on("pronto.render", initPage);
+	
+	   initPage();
     });
 	
 }; //end Ajaxify class
 
 // Register jQuery function
 $.fn.ajaxify = function(options) {
-    var $this = $(this),
-    init = function() {
-        if(!History.enabled) return;     
+    $this = $(this);
+    var init = function() {
         new Ajaxify($this, options);
     };
-        
-    $.getScript('http://4nf.org/js/bhistory.js', init);
-
-    return $this;
+    
+    $.getScript('http://4nf.org/js/pronto.js', init);
+	return $this;
 };
     
 })(jQuery); //end Ajaxify plugin
