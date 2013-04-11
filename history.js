@@ -252,6 +252,7 @@ Ajaxify = function($this, options) { var //Private
         selector: "a",
         requestKey: "pronto",
         scripts: true,
+        cb: null
     }, options),        
         
     //Helper functions
@@ -261,6 +262,7 @@ Ajaxify = function($this, options) { var //Private
         
     cPage = function() { //Handle scripts on page
         $.scripts(settings, true);
+        if(settings['cb']) settings['cb']();
     },
     
     initPage = function(){
