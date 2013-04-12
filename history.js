@@ -141,12 +141,12 @@ $.fn.getPage = function(t, p) {
 
 // The Scripts class
 var Scripts = function(options) { var //Private
-    delta, $script, $scripts = {}, $scriptsO = {}, scriptsNo,
+    delta, $script, $scripts = {}, $scriptsO = {}, pass = 0,
     
     settings = $.extend({
         'scripts'    : true
     }, options),
-
+    
     det = function() {
         var links = $().getPage('link');
             jss = $().getPage('script');
@@ -203,10 +203,6 @@ var Scripts = function(options) { var //Private
             
             return true;
         });
-        
-        $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
-        $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
-        $scriptsO.t = null;
     },
     
     addsrcs = function() { $.log('Entering addsrcs');
@@ -220,15 +216,12 @@ var Scripts = function(options) { var //Private
     };
         
     //Protected
-    this.a = function(f) {
+    this.a = function() {
         det();
-        if(f) { 
-            $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
-            $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
-            $scriptsO.t = null;
-        }            
-        
-		add();
+        if(pass++) add();   
+        $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
+        $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
+        $scriptsO.t = null;
     };
     
     delta = settings['scripts'];
@@ -253,15 +246,15 @@ Ajaxify = function($this, options) { var //Private
         requestKey: "pronto",
         scripts: true,
         cb: null
-    }, options),        
-        
+    }, options),  
+
     //Helper functions
     hello = function() {
         $.log('Entering ajaxify...', 1, settings);
     },
         
     cPage = function() { //Handle scripts on page
-        $.scripts(settings, true);
+        $.scripts(settings);
         if(settings['cb']) settings['cb']();
     },
     
