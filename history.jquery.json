@@ -27,6 +27,6 @@
 "docs": "http://4nf.org/change-content-div/",
 "download": "http://4nf.org/history.js",
 "dependencies": {
-"jquery": ">=1.5"
+"jquery": ">=1.7"
 }
 }
