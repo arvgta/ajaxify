@@ -117,7 +117,7 @@ var Page = function() { var $page;
 		
 		if(t == '-') {
             var pF = function(s) { return $page.find('#' + s.attr('id')); };
-            $this.all('*.html(fn(*))', pF);
+            $this.all('*.html(fn(*).html())', pF);
             $this.all('*.find(".document-link, .document-script").remove()');
             
             return $this;
@@ -229,9 +229,9 @@ var Scripts = function(options) { var //Private
 }; //end Scripts class
 
 // Register jQuery function
-$.scripts = function(options, f) {
+$.scripts = function(options) {
     $.scripts.o = $.scripts.o ? $.scripts.o : new Scripts(options);
-    $.scripts.o.a(f);
+    $.scripts.o.a();
 };
 
 })(jQuery); //end Scripts plugin
@@ -242,7 +242,7 @@ $.scripts = function(options, f) {
 // The Ajaxify class
 Ajaxify = function($this, options) { var //Private
     settings = $.extend({
-        selector: "a",
+        selector: "a:not(.no-ajaxy)",
         requestKey: "pronto",
         scripts: true,
         cb: null
