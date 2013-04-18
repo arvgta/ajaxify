@@ -196,7 +196,7 @@ var Scripts = function(options) { var //Private
     
     addtxts = function() { $.log('Entering addtxts'); 
         $scripts.t.each(function(){ var txt = $(this).html();
-            if(!delta || !findText('t', txt)) {
+            if((!delta || !findText('t', txt)) && txt.indexOf('ajaxify(')==-1) {
                 $.log('inline script : ' + txt);
                 eval(txt);
             }
