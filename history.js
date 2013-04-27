@@ -106,6 +106,7 @@ var Page = function() { var $page;
                     .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
                 ;
                 
+                result = $.trim(result);
                 $page = $($.parseHTML ? $.parseHTML(result) : result);
                 p && p();
                 
@@ -136,6 +137,141 @@ $.fn.getPage = function(t, p) {
 
 })(jQuery); //end getPage plugin
 
+// The addScript plugin
+(function ($) {
+
+// The Script class
+var Script = function(options) { var //Private
+    
+    insert = function($Script, PK) {
+        if(PK == 'href') {
+            $('head link').last().after(
+                 '<link rel="stylesheet" type="text/css" ' + PK + '="' + $Script + '" />');
+        } else {
+            $('head script').last().after(
+                 '<script type="text/javascript" ' + PK + '="' + $Script + '" />');
+        }
+        $.log(PK + ' + : ' + $Script);
+    },
+    
+    remove = function($Script, PK) {
+        if(PK == 'href' ) $("link["+ PK + "*='" + $Script + "']").remove();
+        else $("script["+ PK + "*='" + $Script + "']").remove();
+        $.log(PK + ' - : ' + $Script);
+    },
+    
+    find = function($Script, $Scripts) { //Find and flag common if found
+        if(!$Script) return false;
+        for(var i = 0; i < $Scripts.length; i++) { 
+            if($Scripts[i][0] == $Script) {
+                $Scripts[i][1] = 1;  //Found -> flag as common
+                return true;
+            }
+        }
+        
+        return false;
+    };
+    
+    //Protected
+    this.a = function($Script, operator, PK, $Scripts) { 
+        switch(operator) {
+            case 'f' : return find($Script, $Scripts);
+            case 'i' : return insert($Script, PK);
+            case 'r' : return remove($Script, PK);
+            default : $.log('Bad operator in Script');
+        }
+    }; //end "a" function
+    
+}; //end Script class
+
+// Register jQuery function
+$.addScript = function(newScript, operator, PK, Scripts) {
+    $.addScript.o = $.addScript.o ? $.addScript.o : new Script();
+    if(newScript) return $.addScript.o.a(newScript, operator, PK, Scripts);
+};
+
+})(jQuery); //end addScript plugin
+
+
+// The addScripts plugin
+(function ($) {
+
+// The Scripts class
+var Scripts = function(options) { var //Private
+    //Build up two two dimensional arrays, old and new - [PK, flag]
+    //Flag: 0 = new, 1 = common, 2 = old
+    $scriptsO = [], PK, pass = 0,
+    
+    settings = $.extend({
+        'deltas'    : true,
+    }, options);
+    
+    //Protected
+    this.a = function($newScripts, PK) { $.log("Entering Scripts a()");
+        if(!settings['deltas']) {  //No deltas -> just add all CSSs
+            $newScripts.each(function(){
+                $.addScript($(this).attr(PK), 'i', PK);
+            });
+            
+            return; //Quick return - no tampering of private variables
+        }
+        
+        //Delta loading start - delta was true
+        $scriptsN = [];
+        //$scriptsN[0] = [null, 2];  //inital null member - initalise to 'old'
+        
+        //Initialise new Array freshly
+        $newScripts.each(function(){
+            $scriptsN.push([$(this).attr(PK), 0]); //assume new
+            if(!pass) $scriptsO.push([$(this).attr(PK), 0]); //only on first pass - copy to old Array
+        });
+        
+        pass++;
+        
+        //A priori we're expecting just "old new" and "old common" (0/1)
+        
+        // Pass 1 - find common
+        for(var i = 0; i < $scriptsO.length; i++) { //Old Array is master
+            $scriptsO[i][1] = 2; // State: default -> old
+            // Try to find in new Array -> if found -> common -> State = 1 IN BOTH arrays -> do nothing
+            if($.addScript($scriptsO[i][0], 'f', PK, $scriptsN)) $scriptsO[i][1] = 1;
+        }
+        
+        // Pass 2 - free "Old old"
+        for(var i = 0; i < $scriptsO.length; i++) { //Old Array is master
+            if($scriptsO[i][1] == 2) { 
+                if($scriptsO[i][0]) $.addScript($scriptsO[i][0], 'r', PK);
+                $scriptsO.splice(i, 1); //...and variable
+            }
+        }
+        
+        // Pass 3 - Genuinely new? -> reiterate new Array, creating where State still is 0
+        for(var i = 0; i < $scriptsN.length; i++) { //New Array is master
+            if($scriptsN[i][1] == 0) $.addScript($scriptsN[i][0], 'i', PK);
+        }
+                
+        // Pass 4 - New becomes old
+        $scriptsO = $scriptsN.slice();
+            
+    }; //end "a" function
+    
+    $.addScript(null, null, null, settings);
+    
+}; //end Scripts class
+
+// Register jQuery function
+$.addScripts = function(newScripts, pk, options) {
+    if(pk == 'href') { 
+        $.addScripts.h = newScripts ? $.addScripts.h : new Scripts(options);
+        if(newScripts) $.addScripts.h.a(newScripts, pk);
+    } else {
+        $.addScripts.s = newScripts ? $.addScripts.s : new Scripts(options);
+        if(newScripts) $.addScripts.s.a(newScripts, pk);
+    }
+};
+
+})(jQuery); //end addScripts plugin
+
 // The Scripts plugin
 (function ($) {
 
@@ -147,7 +283,7 @@ var Scripts = function(options) { var //Private
         'scripts'    : true
     }, options),
     
-    det = function() {
+    det = function() { $.log('Entering det');
         var links = $().getPage('link');
             jss = $().getPage('script');
             
@@ -182,18 +318,6 @@ var Scripts = function(options) { var //Private
         return r;
     },
     
-    addcsss = function() { $.log('Entering addcss');
-        $scripts.c.each(function(){ var href = $(this).attr('href');
-            if(!delta || !findText('c', href)) {
-                $('head link').last().after(
-                     '<link rel="stylesheet" type="text/css" href="' + href + '" />');
-                $.log('CSS : ' + href);
-            }
-            
-            return true; 
-        });
-    },
-    
     addtxts = function() { $.log('Entering addtxts'); 
         $scripts.t.each(function(){ var txt = $(this).html();
             if((!delta || !findText('t', txt)) && txt.indexOf('ajaxify(')==-1) {
@@ -211,20 +335,23 @@ var Scripts = function(options) { var //Private
     },
     
     add = function() { $.log('Entering scripts.add()');
-        addcsss();
-        addsrcs();
+        $.addScripts($scripts.c, 'href');
+        $.addScripts($scripts.s, 'src');
+        addtxts();
     };
         
     //Protected
     this.a = function() {
         det();
-        if(pass++) add();   
-        $scriptsO.c = $scriptsO.c ? $scriptsO.c.add($scripts.c) : $scripts.c;
-        $scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
+        if(pass++) add(); else { $.addScripts($scripts.c, 'href'); $.addScripts($scripts.s, 'src'); }   
+        //$scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
         $scriptsO.t = null;
     };
     
     delta = settings['scripts'];
+    $.addScripts(null, 'href', settings);
+    $.addScripts(null, 'src', settings); 
+    
     
 }; //end Scripts class
 
@@ -244,6 +371,7 @@ Ajaxify = function($this, options) { var //Private
     settings = $.extend({
         selector: "a:not(.no-ajaxy)",
         requestKey: "pronto",
+        requestDelay: 0,
         scripts: true,
         cb: null
     }, options),  
