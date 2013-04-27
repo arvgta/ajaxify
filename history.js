@@ -54,36 +54,6 @@ $.log = function(m, v, options) {
 
 })(jQuery); //end Log plugin
 
-// The getScripts plugin
-(function ($) {
-// The Scripts class
-var Scripts = function() { 
-    this.a = function($this, cb) { var s = '';
-        if($this.length == 0) { cb && cb(); return; }
-        $this.each(function(i){
-            s += 'addsrc* = function() { $.getScript("*", *).fail(function(jqxhr, settings, exception) {alert(exception);}); }'.replace('*', i)
-                .replace('*', $(this).attr('src'))
-                .replace('*', i == $this.length - 1 ? 'cb' : 'addsrc' + (i + 1));
-            s += i == $this.length - 1 ? ';' : ',';
-        });
-        
-        s = 'var ' + s + '\n' + 'addsrc0();';
-        
-        $.log(s);
-        try { eval(s); } catch(e) {alert(e);};
-    };
-}; //end Scripts class
- 
-// Register jQuery function
-$.fn.getScripts = function(cb) {
-    var $this = $(this);
-    $.fn.getScripts.o = $.fn.getScripts.o ? $.fn.getScripts.o : new Scripts();
-    $.fn.getScripts.o.a($this, cb);
-    return $this;
-};
-
-})(jQuery); //end getScripts plugin
- 
 // The getPage plugin
 (function ($) {
 // The Page class
@@ -299,20 +269,11 @@ var Scripts = function(options) { var //Private
         $scripts.t = txts;
     }, 
     
-    findText = function(m, t) { var r = false, $scriptsOM, att;
-        if(!$scriptsO) return r;
+    findText = function(t) { var r = false;
+        if(!$scriptsO.t) return r;
         
-        switch(m) {
-             case 'c': $scriptsOM = $scriptsO.c; att = 'href'; break;
-             case 's': $scriptsOM = $scriptsO.s; att = 'src'; break;
-             case 't': $scriptsOM = $scriptsO.t; break;
-             default: return r;
-        }
-         
-        if(!$scriptsOM) return r;
-        
-        $scriptsOM.each(function(){ var $s = $(this);
-            if( (m == 't') ? ($s.html() == t) : ($s.attr(att) == t) ) r = true;
+        $scriptsO.t.each(function(){ var $s = $(this);
+            if($s.html() == t) r = true;
         }); 
             
         return r;
@@ -320,18 +281,13 @@ var Scripts = function(options) { var //Private
     
     addtxts = function() { $.log('Entering addtxts'); 
         $scripts.t.each(function(){ var txt = $(this).html();
-            if((!delta || !findText('t', txt)) && txt.indexOf('ajaxify(')==-1) {
+            if((!delta || !findText(txt)) && txt.indexOf('ajaxify(')==-1) {
                 $.log('inline script : ' + txt);
                 eval(txt);
             }
             
             return true;
         });
-    },
-    
-    addsrcs = function() { $.log('Entering addsrcs');
-        $scripts.s.filter(function(){ return(!delta || !findText('s', $(this).attr('src'))); })
-            .getScripts(addtxts);
     },
     
     add = function() { $.log('Entering scripts.add()');
@@ -344,7 +300,6 @@ var Scripts = function(options) { var //Private
     this.a = function() {
         det();
         if(pass++) add(); else { $.addScripts($scripts.c, 'href'); $.addScripts($scripts.s, 'src'); }   
-        //$scriptsO.s = $scriptsO.s ? $scriptsO.s.add($scripts.s) : $scripts.s;
         $scriptsO.t = null;
     };
     
