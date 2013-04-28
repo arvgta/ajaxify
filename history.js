@@ -115,10 +115,10 @@ var Script = function(options) { var //Private
     
     insert = function($Script, PK) {
         if(PK == 'href') {
-            $('head link').last().after(
+            $('head').append(
                  '<link rel="stylesheet" type="text/css" ' + PK + '="' + $Script + '" />');
         } else {
-            $('head script').last().after(
+            $('head').append(
                  '<script type="text/javascript" ' + PK + '="' + $Script + '" />');
         }
         $.log(PK + ' + : ' + $Script);
