@@ -94,8 +94,8 @@ var Page = function() { var $page;
             return $this;
         }
         
-        return $page.find('.document-' + t);
-    };
+        return $page.find('.document-' + t); //.removeClass('document-' + t); 
+    };        
 }; //end Page class
  
 // Register jQuery function
@@ -180,7 +180,7 @@ var Scripts = function(options) { var //Private
     this.a = function($newScripts, PK) { $.log("Entering Scripts a()");
         if(!settings['deltas']) {  //No deltas -> just add all CSSs
             $newScripts.each(function(){
-                $.addScript($(this).attr(PK), 'i', PK);
+                $.addScript($(this)[0], 'i', PK);
             });
             
             return; //Quick return - no tampering of private variables
@@ -188,7 +188,6 @@ var Scripts = function(options) { var //Private
         
         //Delta loading start - delta was true
         $scriptsN = [];
-        //$scriptsN[0] = [null, 2];  //inital null member - initalise to 'old'
         
         //Initialise new Array freshly
         $newScripts.each(function(){
@@ -230,14 +229,16 @@ var Scripts = function(options) { var //Private
 }; //end Scripts class
 
 // Register jQuery function
-$.addScripts = function(newScripts, pk, options) {
+$.fn.addScripts = function(pk, options) {
+    $this = $(this);
     if(pk == 'href') { 
-        $.addScripts.h = newScripts ? $.addScripts.h : new Scripts(options);
-        if(newScripts) $.addScripts.h.a(newScripts, pk);
+        $.fn.addScripts.h = $this.length ? $.fn.addScripts.h : new Scripts(options);
+        if($this.length) $.fn.addScripts.h.a($this, pk);
     } else {
-        $.addScripts.s = newScripts ? $.addScripts.s : new Scripts(options);
-        if(newScripts) $.addScripts.s.a(newScripts, pk);
+        $.fn.addScripts.s = $this.length ? $.fn.addScripts.s : new Scripts(options);
+        if($this.length) $.fn.addScripts.s.a($this, pk);
     }
+    return $this;
 };
 
 })(jQuery); //end addScripts plugin
@@ -250,7 +251,7 @@ var Scripts = function(options) { var //Private
     delta, $script, $scripts = {}, $scriptsO = {}, pass = 0,
     
     settings = $.extend({
-        'scripts'    : true
+        'deltas'    : true
     }, options),
     
     det = function() { $.log('Entering det');
@@ -291,21 +292,21 @@ var Scripts = function(options) { var //Private
     },
     
     add = function() { $.log('Entering scripts.add()');
-        $.addScripts($scripts.c, 'href');
-        $.addScripts($scripts.s, 'src');
+        $scripts.c.addScripts('href');
+        $scripts.s.addScripts('src');
         addtxts();
     };
         
     //Protected
     this.a = function() {
         det();
-        if(pass++) add(); else { $.addScripts($scripts.c, 'href'); $.addScripts($scripts.s, 'src'); }   
+        if(pass++) add(); else { $scripts.c.addScripts('href'); $scripts.s.addScripts('src'); }   
         $scriptsO.t = null;
     };
     
-    delta = settings['scripts'];
-    $.addScripts(null, 'href', settings);
-    $.addScripts(null, 'src', settings); 
+    delta = settings['deltas'];
+    $().addScripts('href', settings);
+    $().addScripts('src', settings); 
     
     
 }; //end Scripts class
@@ -327,7 +328,8 @@ Ajaxify = function($this, options) { var //Private
         selector: "a:not(.no-ajaxy)",
         requestKey: "pronto",
         requestDelay: 0,
-        scripts: true,
+        verbosity: 0,
+        deltas: true,
         cb: null
     }, options),  
 
