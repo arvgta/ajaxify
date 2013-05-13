@@ -365,7 +365,7 @@ $.fn.ajaxify = function(options) {
         new Ajaxify($this, options);
     };
     
-    $.getScript('http://4nf.org/js/pronto.js', init);
+    $.getScript('http://4nf.org/js/pronto.min.js', init);
 	return $this;
 };
     
