@@ -94,7 +94,7 @@ var Page = function() { var $page;
             return $this;
         }
         
-        return $page.find('.document-' + t); //.removeClass('document-' + t); 
+        return $page.find('.document-' + t);
     };        
 }; //end Page class
  
@@ -255,19 +255,15 @@ var Scripts = function(options) { var //Private
     }, options),
     
     det = function() { $.log('Entering det');
-        var links = $().getPage('link');
+        var links = $().getPage('link'),
             jss = $().getPage('script');
             
-        var csss = links.filter(function() { 
-                return $(this).attr('rel').indexOf('stylesheet') != -1; }),
-            srcs = jss.filter(function() { 
-                return $(this).attr('src'); }),
-            txts = jss.filter(function() { 
+        $scripts.c = links.filter(function() { 
+                return $(this).attr('rel').indexOf('stylesheet') != -1; });
+        $scripts.s = jss.filter(function() { 
+                return $(this).attr('src'); });
+        $scripts.t = jss.filter(function() { 
                 return !($(this).attr('src')); });
-            
-        $scripts.c = csss;
-        $scripts.s = srcs;
-        $scripts.t = txts;
     }, 
     
     findText = function(t) { var r = false;
