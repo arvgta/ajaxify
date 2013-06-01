@@ -27,7 +27,7 @@
 "homepage": "https://github.com/arvgta/history",
 "demo": "http://4nf.org/",
 "docs": "http://4nf.org/change-content-div/",
-"download": "http://4nf.org/history.js",
+"download": "http://4nf.org/history.min.js",
 "dependencies": {
 "jquery": ">=1.7"
 }
