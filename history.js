@@ -5,6 +5,9 @@
  *
  * Author: Arvind Gupta
  *
+ * Copyright © 2013 Arvind Gupta <arvgta@gmail.com>
+ * Released under the MIT License <http: www.opensource.org="" licenses="" mit-license.php="">
+ *
  */
 
 // The All plugin
@@ -54,10 +57,16 @@ $.log = function(m, v, options) {
 
 })(jQuery); //end Log plugin
 
+jQuery.fn.outerHTML = function(s) {
+return (s)
+? this.before(s).remove()
+: jQuery("<div>").append(this.eq(0).clone())[0].innerHTML;
+};
+
 // The getPage plugin
 (function ($) {
 // The Page class
-var Page = function() { var $page;
+var Page = function() { var $page, $pageraw, pass = 0;
     this.a = function($this, t, p) {
         if(!t) return $page;
         
@@ -68,16 +77,26 @@ var Page = function() { var $page;
                     
                     return false;
                 }
-
-                var result = String(h)
+                
+                var result1 = String(h)
                     .replace(/<\!DOCTYPE[^>]*>/i, '')
-                    .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi,
+                    .replace(/<(html|head|body|title|meta)([\s\>])/gi,
                         '<div class="document-$1"$2')
-                    .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>')
+                    .replace(/<\/(html|head|body|title|meta)\>/gi,'</div>')
                 ;
                 
-                result = $.trim(result);
-                $page = $($.parseHTML ? $.parseHTML(result) : result);
+                result1 = $.trim(result1);
+                
+                $pageraw = $($.parseHTML ? $.parseHTML(result1, document, true) : result1);
+                //$.log($pageraw.html());
+                
+                var result2 = String(result1)
+                    .replace(/<(script|link)([\s\>])/gi,
+                        '<div class="document-$1"$2')
+                    .replace(/<\/(script|link)\>/gi,'</div>');
+                
+                result2 = $.trim(result2);
+                $page = $($.parseHTML ? $.parseHTML(result2) : result2);
                 p && p();
                 
                 return true;
@@ -87,9 +106,15 @@ var Page = function() { var $page;
         }
 		
 		if(t == '-') {
-            var pF = function(s) { return $page.find('#' + s.attr('id')); };
-            $this.all('*.html(fn(*).html())', pF);
-            $this.all('*.find(".document-link, .document-script").remove()');
+            if(pass) {
+                var pF = function(s) { return $pageraw.find('#' + s.attr('id')); };
+                $this.all('var $div = fn(*); *.html($div.html())', pF);
+            }
+            
+            pass++;
+            
+            var pF2 = function(s) { $page.find('#' + s.attr('id')).remove(); };
+            $this.all('fn(*)', pF2);
             
             return $this;
         }
@@ -115,11 +140,9 @@ var Script = function(options) { var //Private
     
     insert = function($Script, PK) {
         if(PK == 'href') {
-            $('head').append(
-                 '<link rel="stylesheet" type="text/css" ' + PK + '="' + $Script + '" />');
+            $('head').append('<link rel="stylesheet" type="text/css" ' + PK + '="' + $Script + '" />');
         } else {
-            $('head').append(
-                 '<script type="text/javascript" ' + PK + '="' + $Script + '" />');
+            $('head').append('<script type="text/javascript" ' + PK + '="' + $Script + '" />');
         }
         $.log(PK + ' + : ' + $Script);
     },
@@ -266,7 +289,7 @@ var Scripts = function(options) { var //Private
                 return !($(this).attr('src')); });
     }, 
     
-    findText = function(t) { var r = false;
+    /*findText = function(t) { var r = false;
         if(!$scriptsO.t) return r;
         
         $scriptsO.t.each(function(){ var $s = $(this);
@@ -274,11 +297,11 @@ var Scripts = function(options) { var //Private
         }); 
             
         return r;
-    },
+    },*/
     
     addtxts = function() { $.log('Entering addtxts'); 
         $scripts.t.each(function(){ var txt = $(this).html();
-            if((!delta || !findText(txt)) && txt.indexOf('ajaxify(')==-1) {
+            if(/*(!delta || !findText(txt)) &&*/ txt.indexOf(').ajaxify(')==-1) {
                 $.log('inline script : ' + txt);
                 eval(txt);
             }
@@ -330,6 +353,7 @@ Ajaxify = function($this, options) { var //Private
     }, options),  
 
     //Helper functions
+   
     hello = function() {
         $.log('Entering ajaxify...', 1, settings);
     },
@@ -343,7 +367,12 @@ Ajaxify = function($this, options) { var //Private
         $.log('Statechange: ');
         var href = location.href;
         $.log(href);
-        $().getPage(href, cPage);
+        cPage();
+    };
+    
+    firstRun = function(){
+        $this.getPage('-');
+        cPage();
     };
     
     // Run constructor
@@ -353,7 +382,7 @@ Ajaxify = function($this, options) { var //Private
        $this.pronto(settings);
        $(window).on("pronto.render", initPage);
 	
-       initPage();
+       $().getPage(location.href, firstRun);
     });
 	
 }; //end Ajaxify class
@@ -365,7 +394,7 @@ $.fn.ajaxify = function(options) {
         new Ajaxify($this, options);
     };
     
-    $.getScript('http://4nf.org/js/pronto.min.js', init);
+    $.getScript('http://4nf.org/js/pronto.js', init);
 	return $this;
 };
     
