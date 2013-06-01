@@ -57,12 +57,6 @@ $.log = function(m, v, options) {
 
 })(jQuery); //end Log plugin
 
-jQuery.fn.outerHTML = function(s) {
-return (s)
-? this.before(s).remove()
-: jQuery("<div>").append(this.eq(0).clone())[0].innerHTML;
-};
-
 // The getPage plugin
 (function ($) {
 // The Page class
