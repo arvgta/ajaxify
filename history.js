@@ -82,8 +82,7 @@ var Page = function() { var $page, $pageraw, pass = 0;
                 result1 = $.trim(result1);
                 
                 $pageraw = $($.parseHTML ? $.parseHTML(result1, document, true) : result1);
-                //$.log($pageraw.html());
-                
+                 
                 var result2 = String(result1)
                     .replace(/<(script|link)([\s\>])/gi,
                         '<div class="document-$1"$2')
@@ -283,21 +282,15 @@ var Scripts = function(options) { var //Private
                 return !($(this).attr('src')); });
     }, 
     
-    /*findText = function(t) { var r = false;
-        if(!$scriptsO.t) return r;
-        
-        $scriptsO.t.each(function(){ var $s = $(this);
-            if($s.html() == t) r = true;
-        }); 
-            
-        return r;
-    },*/
-    
     addtxts = function() { $.log('Entering addtxts'); 
         $scripts.t.each(function(){ var txt = $(this).html();
-            if(/*(!delta || !findText(txt)) &&*/ txt.indexOf(').ajaxify(')==-1) {
+            if(txt.indexOf(').ajaxify(')==-1) {
                 $.log('inline script : ' + txt);
-                eval(txt);
+                try {
+                    $.globalEval(txt);
+                } catch(e) {
+                    alert(e);
+                }
             }
             
             return true;
