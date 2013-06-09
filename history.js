@@ -101,7 +101,7 @@ var Page = function() { var $page, $pageraw, pass = 0;
 		if(t == '-') {
             if(pass) {
                 var pF = function(s) { return $pageraw.find('#' + s.attr('id')); };
-                $this.all('var $div = fn(*); *.html($div.html())', pF);
+                $this.all('*.html(fn(*).html())', pF);
             }
             
             pass++;
