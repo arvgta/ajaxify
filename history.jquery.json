@@ -1,0 +1,35 @@
+{
+"name": "history",
+"title": "jQuery History API",
+"description": "jQuery plugin: Change content div(s) with JavaScript - faster page load time!",
+"keywords": [
+"performance",
+"speed",
+"jquery",
+"effect",
+"ajax",
+"html5",
+"scroll",
+"content",
+"div"
+],
+"version": "3.0.2",
+"author": {
+"name": "Arvind Gupta",
+"url": "http://4nf.org/about/"
+},
+"licenses": [
+{
+"type": "MIT",
+"url": "http://www.opensource.org/licenses/mit-license.php"
+}
+],
+"bugs": "http://4nf.org/change-content-div/#comments",
+"homepage": "https://github.com/arvgta/history",
+"demo": "http://4nf.org/",
+"docs": "http://4nf.org/change-content-div/",
+"download": "http://4nf.org/history.min.js",
+"dependencies": {
+"jquery": ">=1.9"
+}
+}
