@@ -1,0 +1,36 @@
+{
+"name": "ajaxify",
+"title": "Ajaxify your site",
+"description": "jQuery plugin: Ajaxify your site instantly",
+"keywords": [
+"performance",
+"speed",
+"jquery",
+"effect",
+"ajax",
+"html5",
+"scroll",
+"form",
+"content",
+"div"
+],
+"version": "3.4.0",
+"author": {
+"name": "Arvind Gupta",
+"url": "http://4nf.org/more/about/"
+},
+"licenses": [
+{
+"type": "MIT",
+"url": "http://www.opensource.org/licenses/mit-license.php"
+}
+],
+"bugs": "http://4nf.org/ajaxify/#comments",
+"homepage": "http://4nf.org/",
+"demo": "http://4nf.org/",
+"docs": "http://4nf.org/ajaxify/",
+"download": "http://4nf.org/ajaxify.min.js",
+"dependencies": {
+"jquery": ">=1.9.1"
+}
+}
