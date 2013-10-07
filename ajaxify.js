@@ -1,7 +1,7 @@
 /**
- * history.js
+ * ajaxify.js
  *
- * History API Plugin
+ * Ajaxify Plugin
  *
  * Author: Arvind Gupta
  *
@@ -24,7 +24,7 @@
 (function ($) {
  // The All class
 var All = function() {
-    this.a = function($this, t, fn, obj) {
+    this.a = function($this, t, fn) {
         $this.each(function(i) {
             t = t.split('*').join('$(this)');
             t += ';';
@@ -34,10 +34,10 @@ var All = function() {
 }; //end All class
 
 // Register jQuery function
-$.fn.all = function(t, fn, obj) {
+$.fn.all = function(t, fn) {
     var $this = $(this);
     $.fn.all.o = $.fn.all.o ? $.fn.all.o : new All();
-    $.fn.all.o.a($this, t, fn, obj);
+    $.fn.all.o.a($this, t, fn);
     return $this;
 };
 
@@ -150,9 +150,7 @@ var Page = function() { var result1, heu, $pages = [], $page;
             lPage(t, p, null, post); return; 
         }
 
-        if(t == '+') { lPage(p, null, true); 
-            /*lPage(t, p, null, post);*/ return; 
-        }
+        if(t == '+') lPage(p, null, true); 
         
         if(t.charAt(0) == '#') { result1.find(t).html(p); t = '-'; }
 		
