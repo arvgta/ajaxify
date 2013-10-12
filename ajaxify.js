@@ -10,6 +10,47 @@
  *
  */
  
+function pP(dna) { var bp = '(function ($) { var Name = function(options) { Private this.a = function(args) {aBody;}; }; $.fnn = function(arg0) {var $this = $(this); $.fnn.o = $.fnn.o ? $.fnn.o : new Name(options); $.fnn.o.a(args); return $this;}; })(jQuery);',
+    dnas = dna.split(' | '), name = dnas[0], Name = name.substr(0, 1).toUpperCase() + name.substr(1, name.length - 1), Settings, Private, Mode, Args, Args0, ABody;
+	for(var i = 1; i < dnas.length; i++) {
+	    var dnap = dnas[i];
+		if(dnap.substr(0, 1) == '{') {
+		    dnap = dnap.substr(2, dnap.length - 3);
+			Settings = 'settings = $.extend({' + dnap + '}, options);';
+			Settings += '\n';
+			var sa = dnap.indexOf(', ') + 1 ? dnap.split(', ') : [dnap]; 
+			for(var j = 0; j < sa.length; j++) { 
+			    var si = sa[j];
+				var sn = si.substr(1, si.lastIndexOf('"') - 1); 
+				Settings +=  (sn + ' = settings["' + sn + '"];\n');
+			}
+		}
+		
+		else if(dnap.substr(0, 1) == '(') {
+		    var del = dnap.indexOf(')'); 
+			ABody = dnap.substr(del + 2, dnap.length - del - 2);
+			ABody = ABody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + ABody + ';})') : ABody;
+		    Args = dnap.substr(1, del - 1);
+			Mode = Args.indexOf('$this') + 1;
+			Args0 = Args.replace('$this, ', '');
+			if(Settings) Args0 += ', options';
+		}
+		
+		else { 
+		    Private = 'var ' + dnap; 
+	    }
+		
+    }
+	
+	if(!Private) Private = '';
+    if(Settings) Private += (', ' + Settings); else bp = bp.replace(/options/g, '');
+	if(Mode) bp = bp.replace(/fnn/g, 'fn.'+name); else bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', '').replace(' return $this;', '');
+	bp = bp.replace(/name/g, name).replace(/Name/g, Name).replace('Private', Private).replace(/args/g, Args).replace('aBody', ABody).replace('arg0', Args0);
+   
+	
+    try { eval(bp); } catch(e) { alert(e); }
+} 
+ 
 /*!
  * hoverIntent r7 // 2013.03.11 // jQuery 1.9.1+
  * http://cherne.net/brian/resources/jquery.hoverIntent.html
@@ -20,52 +61,8 @@
 
 (function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
 
-// The All plugin
-(function ($) {
- // The All class
-var All = function() {
-    this.a = function($this, t, fn) {
-        $this.each(function(i) {
-            t = t.split('*').join('$(this)');
-            t += ';';
-            eval(t);
-        });
-    };
-}; //end All class
-
-// Register jQuery function
-$.fn.all = function(t, fn) {
-    var $this = $(this);
-    $.fn.all.o = $.fn.all.o ? $.fn.all.o : new All();
-    $.fn.all.o.a($this, t, fn);
-    return $this;
-};
-
-})(jQuery); //end All plugin
-
-// The Log plugin
-(function ($) {
-// The Log class
-var Log = function(options) { var con = window.console, verbosity, vp, //Private
-    settings = $.extend({
-        'verbosity'    : 0
-    }, options);
-    
-    verbosity = settings['verbosity'];
-    
-    this.a = function(m, v) {
-        if(v >= 0) vp = v;
-        verbosity > vp && con && con.log(m);
-    };
-}; //end Log class 
-
-// Register jQuery function
-$.log = function(m, v, options) {
-    $.log.o = $.log.o ? $.log.o : new Log(options);
-    $.log.o.a(m, v);
-};
-
-})(jQuery); //end Log plugin
+pP('all | ($this, t, fn) t = t.split("*").join("$(this)"); t += ";"; eval(t)');                                                                                                 // The All Plugin
+pP('log | con = window.console, vp | { "verbosity" : 0 } | (m, v) if(v >= 0) vp = v; verbosity > vp && con && con.log(m)');                                                     // The Log Plugin
 
 // The getPage plugin
 (function ($) {
@@ -150,7 +147,7 @@ var Page = function() { var result1, heu, $pages = [], $page;
             lPage(t, p, null, post); return; 
         }
 
-        if(t == '+') lPage(p, null, true); 
+        if(t == '+') { lPage(p, null, true); return; }
         
         if(t.charAt(0) == '#') { result1.find(t).html(p); t = '-'; }
 		
