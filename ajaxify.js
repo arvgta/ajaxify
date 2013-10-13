@@ -10,9 +10,10 @@
  *
  */
  
-function pP(dna) { var bp = '(function ($) { var Name = function(options) { Private this.a = function(args) {aBody;}; }; $.fnn = function(arg0) {var $this = $(this); $.fnn.o = $.fnn.o ? $.fnn.o : new Name(options); $.fnn.o.a(args); return $this;}; })(jQuery);',
-    dnas = dna.split(' | '), name = dnas[0], Name = name.substr(0, 1).toUpperCase() + name.substr(1, name.length - 1), Settings, Private, Mode, Args, Args0, ABody;
-	for(var i = 1; i < dnas.length; i++) {
+function pP(dna) { var bp = '(function ($) { var Name = function(options) { Private this.a = function(args) {aBody;}; }; $.fnn = function(arg0) {var r; var $this = $(this); $.fnn.o = $.fnn.o ? $.fnn.o : new Name(options); r = $.fnn.o.a(args); return $this;}; })(jQuery);',
+    dnas = dna.split(' | '), name = dnas[0], Name = name.substr(0, 1).toUpperCase() + name.substr(1, name.length - 1), Settings, Private, Mode, Mode2, Args, Args0, ABody;
+	Private = 'var d = [];';
+    for(var i = 1; i < dnas.length; i++) {
 	    var dnap = dnas[i];
 		if(dnap.substr(0, 1) == '{') {
 		    dnap = dnap.substr(2, dnap.length - 3);
@@ -28,27 +29,53 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 		
 		else if(dnap.substr(0, 1) == '(') {
 		    var del = dnap.indexOf(')'); 
-			ABody = dnap.substr(del + 2, dnap.length - del - 2);
-			ABody = ABody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + ABody + ';})') : ABody;
 		    Args = dnap.substr(1, del - 1);
 			Mode = Args.indexOf('$this') + 1;
 			Args0 = Args.replace('$this, ', '');
-			if(Settings) Args0 += ', options';
-		}
+			if(Settings) Args0 += ', options';	
+            ABody = dnap.substr(del + 2, dnap.length - del - 2);
+			Mode2 = ABody.indexOf('return') + 1;
+            if(ABody.indexOf(' : ') + 1) { 
+                 var ABodies = ABody.split(' : ');
+                 var Arg0 = Args0.indexOf(', ') + 1 ? Args0.split(', ')[0] : Args0;
+			     ABody = '';
+                 for(var i = 0; i < ABodies.length - 1; i++) { var tBody = ABodies[i]; 
+                     var tBody1 = ABodies[i + 1]; 
+                     var tNewBody = tBody1.substr(0, tBody1.lastIndexOf(';'));
+                     var sc = tBody.lastIndexOf(';');
+                     tBody = sc + 1 ? tBody.substr(sc + 2, tBody.length - sc - 2) : tBody;
+                     if(tBody.length == 1) {
+					     ABody += 'if('+Arg0+' ==="'+tBody+'") {...}\n';
+					 }
+					 else { 
+					     ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
+					 }
+                     tNewBody = tNewBody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + tNewBody + ';})') : tNewBody;
+                     ABody = ABody.replace('...', tNewBody);
+                 }
+            } else {
+                 if(!Mode2) ABody = ABody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + ABody + ';})') : ABody;
+            }                 
+	    }
 		
 		else { 
-		    Private = 'var ' + dnap; 
+		    Private += ' var ' + dnap; 
 	    }
 		
     }
 	
-	if(!Private) Private = '';
-    if(Settings) Private += (', ' + Settings); else bp = bp.replace(/options/g, '');
-	if(Mode) bp = bp.replace(/fnn/g, 'fn.'+name); else bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', '').replace(' return $this;', '');
+	if(Settings) Private += (', ' + Settings); else bp = bp.replace(/options/g, '');
+	if(Mode) { 
+	    bp = bp.replace(/fnn/g, 'fn.'+name);
+        if(Mode2) bp = bp.replace(' return $this', ' return r');
+    } 		
+	else { 
+	    bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', '').replace(' return $this', ' return r');
+    }
 	bp = bp.replace(/name/g, name).replace(/Name/g, Name).replace('Private', Private).replace(/args/g, Args).replace('aBody', ABody).replace('arg0', Args0);
-   
-	
-    try { eval(bp); } catch(e) { alert(e); }
+   	
+    //alert(bp);
+	try { eval(bp); } catch(e) { alert(e); }
 } 
  
 /*!
@@ -61,110 +88,29 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 
 (function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
 
-pP('all | ($this, t, fn) t = t.split("*").join("$(this)"); t += ";"; eval(t)');                                                                                                 // The All Plugin
-pP('log | con = window.console, vp | { "verbosity" : 0 } | (m, v) if(v >= 0) vp = v; verbosity > vp && con && con.log(m)');                                                     // The Log Plugin
+pP('all | ($this, t, fn) t = t.split("*").join("$(this)"); t += ";"; eval(t)');
+pP('log | con = window.console | { "verbosity": 0 } | (m, v) if(v >= 0) d = v; verbosity > d && con && con.log(m)');
+pP('isHtml | (x) d=x.getResponseHeader("Content-Type"); return d && (d.indexOf("text/html") + 1 || d.indexOf("text/xml") + 1)');
 
-// The getPage plugin
-(function ($) {
-// The Page class
-var Page = function() { var result1, heu, $pages = [], $page;
-    var fetch = function(href) { 
-        for(var i=0; i<$pages.length; i++) if($pages[i][0]==href) { 
-            result1 = $pages[i][1]; 
-            return; 
-        }
-        
-        result1 = false; 
-    };
-    
-    var isHtml = function(xhr) {  var ct=xhr.getResponseHeader("Content-Type");
-        return ct && (ct.indexOf('text/html') + 1 || ct.indexOf('text/xml') + 1);
-    };
-    
-    var _parseHTML = function(html, mode) { var r = 
-        mode ? String(html)             
-                .replace(/<\!DOCTYPE[^>]*>/i, '')
-                .replace(/<(html|head|body|title|meta)([\s\>])/gi, '<div class="document-$1"$2')
-                .replace(/<\/(html|head|body|title|meta)\>/gi,'</div>') 
-             : String(html)
-                  .replace(/<(script|link)([\s\>])/gi, '<div class="document-$1"$2')
-                  .replace(/<\/(script|link)\>/gi,'</div>')
-        ;
-        
-        r = $.trim(r); //Test if needed!
-        return $(mode ? $.parseHTML(r, document, true) : $.parseHTML(r)) ;
-    };
-    
-    var lDivs = function($this) { 
-        var pF = function(s) { s.html(result1.find('#' + s.attr('id')).html()); };
-        $this.all('fn(*)', pF);
-           
-        var pF2 = function(s) { $page.find('#' + s.attr('id')).remove(); };
-        $this.all('fn(*)', pF2);
-    };
-    
-    var lPage = function(hin, p, mode, post) {
-            if(hin.indexOf('#')+1) hin=hin.split('#')[0];
-            
-            if(post) result1 = null; else fetch(hin);
-            if(!result1) {            
-                var xhr = $.ajax({
-                        url: hin,
-                        type: post ? 'POST' : 'GET',
-                        data : post ? post.data : null,
-                        success: function(h) {  
-                            if(!h || !isHtml(xhr)) {
-                            if(!mode) location = hin; //not HTML
-                            }
-                
-                            result1 = _parseHTML(h, true);
-                            
-                            result1.find('.ignore').remove();
-                
-                            //Cache result1!
-                            $pages.push([hin, result1]);
-                
-                            lPage2(p);
-                        }
-                });
-                
-                return;
-            }
-            
-            lPage2(p);
-            return;
-    };
-    
-    var lPage2 = function(p) {
-        $page = _parseHTML(result1.html(), false);
-        p && p();
-    };
-    
-    this.a = function($this, t, p, post) { 
-        if(!t) return $page;
-        
-        if(t.indexOf('/') != -1) { 
-            lPage(t, p, null, post); return; 
-        }
-
-        if(t == '+') { lPage(p, null, true); return; }
-        
-        if(t.charAt(0) == '#') { result1.find(t).html(p); t = '-'; }
-		
-		if(t == '-') { lDivs($this); return $this; }
-        
-        return $page.find('.document-' + t);
-    };        
-}; //end Page class
- 
-// Register jQuery function
-$.fn.getPage = function(t, p, post) {
-    var $this = $(this);
-    $.fn.getPage.o = $.fn.getPage.o ? $.fn.getPage.o : new Page();
-    return $.fn.getPage.o.a($this, t, p, post);
-};
-
-})(jQuery); //end getPage plugin
+var docType = /<\!DOCTYPE[^>]*>/i;
+var tagso = /<(html|head|body|title|meta)([\s\>])/gi;
+var tagsc = /<\/(html|head|body|title|meta)\>/gi;
+var div12 =  '<div class="document-$1"$2';
+var scro = /<(script|link)([\s\>])/gi;
+var scrc = /<\/(script|link)\>/gi;
+pP('replD | (h) return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
+pP('replS | (h) return String(h).replace(scro, div12).replace(scrc,"</div>")');
+pP('_parseHTML | (h, m) d = m?$.replD(h):$.replS(h); d = $.trim(d); return $(m?$.parseHTML(d, document, true):$.parseHTML(d))');
+pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) return d[i][1]; return false; object : d.push(h);');
+pP('page1 | (o, h) ? : return d; ! : d = h;');
+pP('cache1 | (o, h) ? : return d; ! : d = h;');
+pP('lDivs | ($t) $t.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); }); $t.all("fn(*)", function(s) { $.page1("?").find("#" + s.attr("id")).remove(); });');
+pP('lPage2 | (p) $.page1("!", $._parseHTML($.cache1("?").html(), false)); p && p()');
+pP('lAjax | (hin, p, mode, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { ' +
+'if(!h || !$.isHtml(xhr)) { if(!mode) location = hin; } $.cache1("!",  $._parseHTML(h, true)); $.cache1("?").find(".ignore").remove(); $.pages([hin, $.cache1("?")]); $.lPage2(p); } })');
+pP('lPage | (hin, p, mode, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("!", post?null:$.pages(hin)); if(!$.cache1("?")) { $.lAjax(hin, p, mode, post); return; } $.lPage2(p); return;');
+pP('getPage | ($this, t, p, post) if(!t) return $.page1("?"); if(t.indexOf("/") != -1) { $.lPage(t, p, null, post); return; } if(t == "+") { $.lPage(p, null, true); return; }' +
+'if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") { $.lDivs($this); return $this; } return $.page1("?").find(".document-" + t); ');
 
 // The addScript plugin
 (function ($) {
@@ -214,7 +160,7 @@ var Script = function(options) { var //Private
 // Register jQuery function
 $.addScript = function(newScript, operator, PK, Scripts) {
     $.addScript.o = $.addScript.o ? $.addScript.o : new Script();
-    if(newScript) return $.addScript.o.a(newScript, operator, PK, Scripts);
+    return $.addScript.o.a(newScript, operator, PK, Scripts);
 };
 
 })(jQuery); //end addScript plugin
@@ -300,8 +246,6 @@ var Scripts = function(options) { var //Private
             
     }; //end "a" function
     
-    $.addScript(null, null, null, settings);
-    
 }; //end Scripts class
 
 // Register jQuery function
@@ -352,7 +296,6 @@ var Scripts = function(options) { var //Private
         $scripts.t.each(function(){ var txt = $(this).html();
             if(txt.indexOf(').ajaxify(')==-1 //Recognise own inline script, as we don't want a recursion :-)
                 && (settings['inline'] || $(this).hasClass('ajaxy') || _inline(txt))) { 
-                //$.log('inline script : ' + txt);
                  try {
                     $.globalEval(txt);
                 } catch(e) {
@@ -498,7 +441,6 @@ function _init(opts) {
 
 function _prefetch(e) {
      var link = e.currentTarget;
-     //alert(link.href);
      if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
      $().getPage('+', link.href);
 }
