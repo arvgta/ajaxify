@@ -70,7 +70,7 @@ $.log = function(m, v, options) {
 // The getPage plugin
 (function ($) {
 // The Page class
-var Page = function() { var result1, heu, $pages = [], $page;
+var Page = function() { var result1, $pages = [];
     var fetch = function(href) { 
         for(var i=0; i<$pages.length; i++) if($pages[i][0]==href) { 
             result1 = $pages[i][1]; 
@@ -84,29 +84,25 @@ var Page = function() { var result1, heu, $pages = [], $page;
         return ct && (ct.indexOf('text/html') + 1 || ct.indexOf('text/xml') + 1);
     };
     
-    var _parseHTML = function(html, mode) { var r = 
-        mode ? String(html)             
+    var _parseHTML = function(html) { var r = 
+        String(html)             
                 .replace(/<\!DOCTYPE[^>]*>/i, '')
-                .replace(/<(html|head|body|title|meta)([\s\>])/gi, '<div class="document-$1"$2')
-                .replace(/<\/(html|head|body|title|meta)\>/gi,'</div>') 
-             : String(html)
-                  .replace(/<(script|link)([\s\>])/gi, '<div class="document-$1"$2')
-                  .replace(/<\/(script|link)\>/gi,'</div>')
-        ;
-        
-        r = $.trim(r); //Test if needed!
-        return $(mode ? $.parseHTML(r, document, true) : $.parseHTML(r)) ;
+                .replace(/<(html|head|body|title|meta|script|link)([\s\>])/gi, '<div class="document-$1"$2')
+                .replace(/<\/(html|head|body|title|meta|script|link)\>/gi,'</div>');
+                
+        r = $.trim(r);
+        return r;
     };
     
     var lDivs = function($this) { 
         var pF = function(s) { s.html(result1.find('#' + s.attr('id')).html()); };
         $this.all('fn(*)', pF);
            
-        var pF2 = function(s) { $page.find('#' + s.attr('id')).remove(); };
+        var pF2 = function(s) { result1.find('#' + s.attr('id')).remove(); };
         $this.all('fn(*)', pF2);
     };
     
-    var lPage = function(hin, p, mode, post) {
+    var lPage = function(hin, p, post) {
             if(hin.indexOf('#')+1) hin=hin.split('#')[0];
             
             if(post) result1 = null; else fetch(hin);
@@ -120,43 +116,38 @@ var Page = function() { var result1, heu, $pages = [], $page;
                             if(!mode) location = hin; //not HTML
                             }
                 
-                            result1 = _parseHTML(h, true);
+                            result1 = $(_parseHTML(h)); 
                             
                             result1.find('.ignore').remove();
                 
                             //Cache result1!
                             $pages.push([hin, result1]);
                 
-                            lPage2(p);
+                            p && p();
                         }
                 });
                 
                 return;
             }
             
-            lPage2(p);
+            p && p();
             return;
     };
     
-    var lPage2 = function(p) {
-        $page = _parseHTML(result1.html(), false);
-        p && p();
-    };
-    
     this.a = function($this, t, p, post) { 
-        if(!t) return $page;
+        if(!t) return result1;
         
         if(t.indexOf('/') != -1) { 
-            lPage(t, p, null, post); return; 
+            lPage(t, p, post); return; 
         }
 
-        if(t == '+') lPage(p, null, true); 
+        if(t == '+') { lPage(p); return; } 
         
         if(t.charAt(0) == '#') { result1.find(t).html(p); t = '-'; }
 		
 		if(t == '-') { lDivs($this); return $this; }
         
-        return $page.find('.document-' + t);
+        return result1.find('.document-' + t);
     };        
 }; //end Page class
  
@@ -217,7 +208,7 @@ var Script = function(options) { var //Private
 // Register jQuery function
 $.addScript = function(newScript, operator, PK, Scripts) {
     $.addScript.o = $.addScript.o ? $.addScript.o : new Script();
-    if(newScript) return $.addScript.o.a(newScript, operator, PK, Scripts);
+    return $.addScript.o.a(newScript, operator, PK, Scripts);
 };
 
 })(jQuery); //end addScript plugin
@@ -252,10 +243,6 @@ var Scripts = function(options) { var //Private
                 $(this).remove();
             }
         });
-        
-       
-        
-        if(PK=='src') {  pass++; return; }
         
         if(same) { //Add all old scripts and return quickly 
             for(var i = 0; i < $scriptsN.length; i++) { //Old Array is master
@@ -302,8 +289,6 @@ var Scripts = function(options) { var //Private
         $scriptsO = $scriptsN.slice();
             
     }; //end "a" function
-    
-    $.addScript(null, null, null, settings);
     
 }; //end Scripts class
 
@@ -430,7 +415,6 @@ Ajaxify = function($this, options) { var //Private
        var supported = window.history && window.history.pushState && window.history.replaceState;
        $.log('Entering ajaxify...', 1, settings);
        if(!supported) { $.log('HTML5 History API not supported properly - exiting'); return; }
-       if(!$.parseHTML) { $.log('Probably jQuery version too low - 1.8+ is required - exiting'); return; }
        if(!settings['on']) { $.log('Plugin set off manually - exiting'); return; }
        
        $this.pronto(settings);
@@ -501,7 +485,6 @@ function _init(opts) {
 
 function _prefetch(e) {
      var link = e.currentTarget;
-     //alert(link.href);
      if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
      $().getPage('+', link.href);
 }
@@ -679,8 +662,6 @@ function _doRender(url, scrollTop, doPush) {
 
      _doPush(url, doPush);
 
-     //$.log('Trigger pronto render : ' + (post ? 1 : 0));
-     
      // Fire render event
      var event = jQuery.Event("pronto.render");
      event.same = post ? true : false;
