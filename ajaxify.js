@@ -98,8 +98,8 @@ var Page = function() { var result1, $pages = [];
         var pF = function(s) { s.html(result1.find('#' + s.attr('id')).html()); };
         $this.all('fn(*)', pF);
            
-        var pF2 = function(s) { result1.find('#' + s.attr('id')).remove(); };
-        $this.all('fn(*)', pF2);
+        //var pF2 = function(s) { result1.find('#' + s.attr('id')).remove(); };
+        //$this.all('fn(*)', pF2);
     };
     
     var lPage = function(hin, p, post) {
