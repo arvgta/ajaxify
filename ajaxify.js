@@ -50,11 +50,11 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 					 else { 
 					     ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
 					 }
-                     tNewBody = tNewBody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + tNewBody + ';})') : tNewBody;
+                     //tNewBody = tNewBody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + tNewBody + ';})') : tNewBody;
                      ABody = ABody.replace('...', tNewBody);
                  }
             } else {
-                 if(!Mode2) ABody = ABody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + ABody + ';})') : ABody;
+                 //if(!Mode2) ABody = ABody.indexOf('this') + 1 ? ('$this.each(function(i) { ' + ABody + ';})') : ABody;
             }                 
 	    }
 		
@@ -88,7 +88,7 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 
 (function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
 
-pP('all | ($this, t, fn) t = t.split("*").join("$(this)"); t += ";"; eval(t)');
+pP('all | ($this, t, fn) $this.each(function(i) { t = t.split("*").join("$(this)"); t += ";"; eval(t); })');
 pP('log | con = window.console | { "verbosity": 0 } | (m, v) if(v >= 0) d = v; verbosity > d && con && con.log(m)');
 pP('isHtml | (x) d=x.getResponseHeader("Content-Type"); return d && (d.indexOf("text/html") + 1 || d.indexOf("text/xml") + 1)');
 
@@ -107,105 +107,28 @@ pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", 
 pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("!", post?null:$.pages(hin)); if(!$.cache1("?")) { $.lAjax(hin, p, post); return; } p && p(); return');
 pP('getPage | ($this, t, p, post) if(!t) return $.cache1("?"); if(t.indexOf("/") != -1) { $.lPage(t, p, post); return; } if(t == "+") { $.lPage(p); return;}' +
 'if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") { $.lDivs($this); return $this; } return $.cache1("?").find(".document-" + t)');
+
 var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
 pP('insertScript | ($S, PK) $("head").append((PK=="href"?linki: scri).replace("*", $S)); $.log(PK +" +: " + $S)');
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 pP('removeScript | ($S, PK) $((PK=="href"?linkr:scrr).replace("!", $S)).remove(); $.log(PK + " -: " + $S)');
 pP('findScript  | ($S, $Scripts) if(!$S) return false; for(var i = 0; i < $Scripts.length; i++) if($Scripts[i][0] == $S) { $Scripts[i][1] = 1; return true; }  return false');
 
-// The addScripts plugin
-(function ($) {
+pP('allScripts | (newS, PK, deltas) if(!deltas) { newS.each(function(){ $.insertScript($(this)[0], PK); }); return true; } return false');
+pP('classAlways | (s, PK) s.each(function(){ if($(this).attr("data-class") == "always") { $.log("Class always detected!"); $.insertScript($(this).attr(PK), PK); $(this).remove(); } })');
+pP('sameScripts | (sN, PK) for(var i = 0; i < sN.length; i++) { if(sN[i][1] == 0) { $.insertScript(sN[i][0], PK); $.log("Adding old script: " +  sN[i][0]); }  }');
+pP('newArray | (s, sN, sO, PK, pass) s.each(function(){ sN.push([$(this).attr(PK), 0]); if(!pass) sO.push([$(this).attr(PK), 0]); })');
+pP('findCommon | (s, sN) for(var i = 0; i < s.length; i++) { s[i][1] = 2; if($.findScript(s[i][0], sN)) s[i][1] = 1}');
+pP('freeOld | (s, PK) for(var i = 0; i < s.length; i++) { if(s[i][1] == 2) { if(s[i][0]) $.removeScript(s[i][0], PK); s.splice(i, 1); } }');
+pP('realNew | (s, PK) for(var i = 0; i < s.length; i++) { if(s[i][1] == 0) $.insertScript(s[i][0], PK); }');
 
-// The Scripts class
-var Scripts = function(options) { var //Private
-    //Build up two two dimensional arrays, old and new - [PK, flag]
-    //Flag: 0 = new, 1 = common, 2 = old
-    $scriptsO = [], PK, pass = 0,
-    
-    settings = $.extend({
-        'deltas'    : true,
-    }, options);
-    
-    //Protected
-    this.a = function($newScripts, PK, same) { $.log("Entering Scripts a()");
-        if(!settings['deltas']) {  //No deltas -> just add all scripts
-            $newScripts.each(function(){
-                $.insertScript($(this)[0], PK);
-            });
-            
-            return; //Quick return - no tampering of private variables
-        }
-        
-        if(pass) $newScripts.each(function(){ 
-            if($(this).attr('data-class') == 'always') { $.log('Class always detected!');
-                $.insertScript($(this).attr(PK), PK);
-                $(this).remove();
-            }
-        });
-        
-       
-        if(same) { //Add all old scripts and return quickly 
-            for(var i = 0; i < $scriptsN.length; i++) { //Old Array is master
-                if($scriptsN[i][1] == 0) { $.insertScript($scriptsN[i][0], PK); $.log('Adding old script : ' +  $scriptsN[i][0]); }
-            }
-            
-            return;
-        }
-        
-        //Delta loading start - delta was true
-        $scriptsN = [];
-        
-        //Initialise new Array freshly
-        $newScripts.each(function(){
-            $scriptsN.push([$(this).attr(PK), 0]); //assume new
-            if(!pass) $scriptsO.push([$(this).attr(PK), 0]); //only on first pass - copy to old Array
-        });
-        
-        pass++;
-        
-        //A priori we're expecting just "old new" and "old common" (0/1)
-        
-        // Pass 1 - find common
-        for(var i = 0; i < $scriptsO.length; i++) { //Old Array is master
-            $scriptsO[i][1] = 2; // State: default -> old
-            // Try to find in new Array -> if found -> common -> State = 1 IN BOTH arrays -> do nothing
-            if($.findScript($scriptsO[i][0], $scriptsN)) $scriptsO[i][1] = 1;
-        }
-        
-        // Pass 2 - free "Old old"
-        for(var i = 0; i < $scriptsO.length; i++) { //Old Array is master
-            if($scriptsO[i][1] == 2) { 
-                if($scriptsO[i][0]) $.removeScript($scriptsO[i][0], PK);
-                $scriptsO.splice(i, 1); //...and variable
-            }
-        }
-        
-        // Pass 3 - Genuinely new? -> reiterate new Array, creating where State still is 0
-        for(var i = 0; i < $scriptsN.length; i++) { //New Array is master
-            if($scriptsN[i][1] == 0) $.insertScript($scriptsN[i][0], PK);
-        }
-                
-        // Pass 4 - New becomes old
-        $scriptsO = $scriptsN.slice();
-            
-    }; //end "a" function
-    
-}; //end Scripts class
+var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | ($this, same) $.log("Entering Scripts a()");' +
+'if($.allScripts($this, "PK", deltas)) return; if(pass) $.classAlways($this, "PK");' +
+'if(same) { $.sameScripts($scriptsN, "PK"); return; } $scriptsN = []; $.newArray($this, $scriptsN, $scriptsO, "PK", pass);' +
+'pass++; $.findCommon($scriptsO, $scriptsN); $.freeOld($scriptsO, "PK"); $.realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice()';
 
-// Register jQuery function
-$.fn.addScripts = function(pk, same, options) {
-    $this = $(this);
-    if(pk == 'href') { 
-        $.fn.addScripts.h = $this.length ? $.fn.addScripts.h : new Scripts(options);
-        if($this.length) $.fn.addScripts.h.a($this, pk, same);
-    } else {
-        $.fn.addScripts.s = $this.length ? $.fn.addScripts.s : new Scripts(options);
-        if($this.length) $.fn.addScripts.s.a($this, pk, same);
-    }
-    return $this;
-};
-
-})(jQuery); //end addScripts plugin
+pP('addHrefs | ' + addAll.replace(/PK/g, "href"));
+pP('addSrcs | ' + addAll.replace(/PK/g, "src"));
 
 // The Scripts plugin
 (function ($) {
@@ -252,23 +175,20 @@ var Scripts = function(options) { var //Private
     },
     
     add = function(same) { $.log('Entering scripts.add()');
-        $scripts.c.addScripts('href', same);
-        $scripts.s.addScripts('src', same);
+        $scripts.c.addHrefs(same, settings);
+        $scripts.s.addSrcs(same, settings);
         addtxts();
     };
         
     //Protected
     this.a = function(same) {
         det(same);
-        if(pass++) add(same); else { $scripts.c.addScripts('href'); $scripts.s.addScripts('src'); }   
+        if(pass++) add(same); else { $scripts.c.addHrefs(same, settings); $scripts.s.addSrcs(same, settings); }   
         $scriptsO.t = null;
     };
     
     delta = settings['deltas'];
-    $().addScripts('href', null, settings);
-    $().addScripts('src', null, settings); 
-    
-    
+
 }; //end Scripts class
 
 // Register jQuery function
