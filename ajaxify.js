@@ -59,12 +59,12 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 	    }
 		
 		else { 
-		    Private += ' var ' + dnap; 
+		    Private += 'var ' + dnap + ';'; 
 	    }
 		
     }
 	
-	if(Settings) Private += (', ' + Settings); else bp = bp.replace(/options/g, '');
+	if(Settings) { Settings = 'var ' + Settings; Private += Settings; } else bp = bp.replace(/options/g, '');
 	if(Mode) { 
 	    bp = bp.replace(/fnn/g, 'fn.'+name);
         if(Mode2) bp = bp.replace(' return $this', ' return r');
@@ -99,13 +99,14 @@ var div12 =  '<div class="document-$1"$2';
 pP('replD | (h) return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
 pP('_parseHTML | (h) d = $.replD(h); d = $.trim(d); return d');
 pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) return d[i][1]; return false; object : d.push(h);');
-pP('cache1 | (o, h) ? : return d; ! : d = h;');
+pP('memory | { "memoryoff": false } | (h) if(memoryoff == true) return null; if(memoryoff == false) return h; d=memoryoff.split[", "]; for(var i=0; i<d.length; i++) if(h==d[i]) return h; return null');
+pP('cache1 | (o, h) ? : return d; ! : d = $.memory(h); d = d?d:null');
 pP('lDivs | ($t) $t.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
 pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { ' +
 'if(!h || !$.isHtml(xhr)) { location = hin; } $.cache1("!",  $($._parseHTML(h))); $.cache1("?").find(".ignore").remove(); $.pages([hin, $.cache1("?")]); p && p(); } })');
-pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("!", post?null:$.pages(hin)); if(!$.cache1("?")) { $.lAjax(hin, p, post); return; } p && p(); return;');
-pP('getPage | ($this, t, p, post) if(!t) return $.cache1("?"); if(t.indexOf("/") != -1) { $.lPage(t, p, post); return; } if(t == "+") { $.lPage(p); return; }' +
-'if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") { $.lDivs($this); return $this; } return $.cache1("?").find(".document-" + t);');
+pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("!", post?null:$.pages(hin)); if(!$.cache1("?")) { $.lAjax(hin, p, post); return; } p && p(); return');
+pP('getPage | ($this, t, p, post) if(!t) return $.cache1("?"); if(t.indexOf("/") != -1) { $.lPage(t, p, post); return; } if(t == "+") { $.lPage(p); return;}' +
+'if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") { $.lDivs($this); return $this; } return $.cache1("?").find(".document-" + t)');
 var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
 pP('insertScript | ($S, PK) $("head").append((PK=="href"?linki: scri).replace("*", $S)); $.log(PK +" +: " + $S)');
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
@@ -143,9 +144,6 @@ var Scripts = function(options) { var //Private
         });
         
        
-        
-        //if(PK=='src') {  pass++; return; }
-        
         if(same) { //Add all old scripts and return quickly 
             for(var i = 0; i < $scriptsN.length; i++) { //Old Array is master
                 if($scriptsN[i][1] == 0) { $.insertScript($scriptsN[i][0], PK); $.log('Adding old script : ' +  $scriptsN[i][0]); }
@@ -293,6 +291,7 @@ Ajaxify = function($this, options) { var //Private
         verbosity: 0,
         deltas: true,
         inline: false,
+        memoryoff: false,
         cb: null,
         on: true
     }, options),  
@@ -318,6 +317,7 @@ Ajaxify = function($this, options) { var //Private
        if(!supported) { $.log('HTML5 History API not supported properly - exiting'); return; }
        if(!$.parseHTML) { $.log('Probably jQuery version too low - 1.8+ is required - exiting'); return; }
        if(!settings['on']) { $.log('Plugin set off manually - exiting'); return; }
+       $.memory(settings);
        
        $this.pronto(settings);
        $(window).on("pronto.render", initPage);
