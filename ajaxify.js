@@ -96,12 +96,12 @@ var div12 =  '<div class="document-$1"$2';
 pP('replD | (h) return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
 pP('_parseHTML | (h) d = $.replD(h); d = $.trim(d); return d');
 pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) return d[i][1]; return false; object : d.push(h);');
-pP('memory | { memoryoff: false } | (h) if(memoryoff == true) return null; if(memoryoff == false) return h; d=memoryoff.split[", "]; for(var i=0; i<d.length; i++) if(h==d[i]) return h; return null');
-pP('cache1 | (o, h) ? : return d; ! : d = $.memory(h); d = d?d:null');
+pP('memory | { memoryoff: false } | (h) d=memoryoff; if(d == true) return null; if(d == false) return h; if(d.indexOf(", ") + 1) { d=d.split[", "]; for(var i=0; i<d.length; i++) if(h==d[i]) return null; return h; } return d==h?null:h');
+pP('cache1 | (o, h) ? : return d; + : d = $.memory(h); d=d?$.pages(d):null; ! : d = h;');
 pP('lDivs | ($t) $t.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
 pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { ' +
 'if(!h || !$.isHtml(xhr)) { location = hin; } $.cache1("!",  $($._parseHTML(h))); $.cache1("?").find(".ignore").remove(); $.pages([hin, $.cache1("?")]); p && p(); } })');
-pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("!", post?null:$.pages(hin)); if(!$.cache1("?")) { $.lAjax(hin, p, post); return; } p && p(); return');
+pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("+", post?null:hin); if(!$.cache1("?")) { $.lAjax(hin, p, post); return; } p && p(); return');
 pP('getPage | ($this, t, p, post) if(!t) return $.cache1("?"); if(t.indexOf("/") != -1) { $.lPage(t, p, post); return; } if(t == "+") { $.lPage(p); return;}' +
 'if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") { $.lDivs($this); return $this; } return $.cache1("?").find(".document-" + t)');
 
@@ -140,11 +140,11 @@ pP('scripts | $scripts = {}, pass = 0 | { "deltas": true } | (same) $.detScripts
 pP('cPage | { cb: null } | (o) undefined : $.scripts(null, settings); if(cb) cb(); boolean : $.scripts(o, settings); string : ;');
 pP('initPage | (e) $.log("Statechange: "); var href = location.href; $.log(href); $.cPage(e && e.same)');
 pP('initAjaxify | (s) var supported = window.history && window.history.pushState && window.history.replaceState;'+
-'$.log("Entering ajaxify...", 1, s); if(!supported) { $.log("HTML5 History API not supported properly - exiting"); return; }'+
-'if(!s["pluginon"]) { $.log("Plugin set off manually - exiting"); return; } $.memory(s); $.cPage("", s)');
+'$.log("Entering ajaxify...", 1, s); if(!supported) { $.log("HTML5 History API not supported properly - exiting"); return false; }'+
+'if(!s["pluginon"]) { $.log("Plugin set off manually - exiting"); return false; } $.memory(null, s); $.cPage("", s); return true');
 
 pP('ajaxify | { selector: "a:not(.no-ajaxy)", requestKey: "pronto", requestDelay: 0, verbosity: 0, deltas: true, inline: false, memoryoff: false, cb: null, pluginon: true } '+
-'| ($this) $(function () {  $.initAjaxify(settings); $this.pronto(settings); $(window).on("pronto.render", $.initPage); $().getPage(location.href, $.cPage);});');
+'| ($this) $(function () {  if(!$.initAjaxify(settings)) return; $this.pronto(settings); $(window).on("pronto.render", $.initPage); $().getPage(location.href, $.cPage);});');
 
 /*
 * Pronto Plugin
