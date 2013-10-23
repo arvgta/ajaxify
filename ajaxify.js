@@ -96,7 +96,7 @@ var div12 =  '<div class="document-$1"$2';
 pP('replD | (h) return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
 pP('_parseHTML | (h) d = $.replD(h); d = $.trim(d); return d');
 pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) return d[i][1]; return false; object : d.push(h);');
-pP('memory | { memoryoff: false } | (h) d=memoryoff; if(d == true) return null; if(d == false) return h; if(d.indexOf(", ") + 1) { d=d.split[", "]; for(var i=0; i<d.length; i++) if(h==d[i]) return null; return h; } return d==h?null:h');
+pP('memory | { memoryoff: false } | (h) d=memoryoff; if(!h || d == true) return null; if(d == false) return h; if(d.indexOf(", ") + 1) { d=d.split(", "); for(var i=0; i<d.length; i++) if(h==d[i]) return null; return h; } return h==d?null:h');
 pP('cache1 | (o, h) ? : return d; + : d = $.memory(h); d=d?$.pages(d):null; ! : d = h;');
 pP('lDivs | ($t) $t.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
 pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { ' +
