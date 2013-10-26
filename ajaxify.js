@@ -9,6 +9,10 @@
  * Released under the MIT License <http: www.opensource.org="" licenses="" mit-license.php="">
  *
  */
+
+var l=0;
+function showArgs(a) { s=''; for(var i=0; i<a.length; i++) s+=(a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (!a[i].length || a[i].length <= 100) ? a[i] : typeof a[i]) + ' | '; return s }
+function frmB(b, name) { if(name!='log' && !(b.indexOf('$.log(')+1)) return 'var r=false; l++; $.log(l+" | Name | args | " + showArgs(arguments));' + b + "; l--; return r;"; else return b; }
  
 function pP(dna) { var bp = '(function ($) { var Name = function(options) { Private this.a = function(args) {aBody;}; }; $.fnn = function(arg0) {var r; var $this = $(this); $.fnn.o = $.fnn.o ? $.fnn.o : new Name(options); r = $.fnn.o.a(args); return $this;}; })(jQuery);',
     dnas = dna.split(' | '), name = dnas[0], Name = name.substr(0, 1).toUpperCase() + name.substr(1, name.length - 1), Settings, Private, Mode, Mode2, Args, Args0, ABody;
@@ -30,11 +34,12 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 		else if(dnap.substr(0, 1) == '(') {
 		    var del = dnap.indexOf(')'); 
 		    Args = dnap.substr(1, del - 1);
-			Mode = Args.indexOf('$this') + 1;
+            Args = Args.indexOf('$this') + 1 ? Args : (Args ? '$this, ' + Args : '$this');
 			Args0 = Args.replace('$this, ', ''); Args0 = Args == '$this' ? '' : Args0;
 			if(Settings) Args0 += Args0 == '' ? 'options' : ', options';	
             ABody = dnap.substr(del + 2, dnap.length - del - 2);
-			Mode2 = ABody.indexOf('return') + 1;
+			Mode = ABody.indexOf('$this') + 1;
+            Mode2 = ABody.indexOf('return') + 1 || ABody.indexOf('r=') + 1;
             if(ABody.indexOf(' : ') + 1) { 
                  var ABodies = ABody.split(' : ');
                  var Arg0 = Args0.indexOf(', ') + 1 ? Args0.split(', ')[0] : Args0;
@@ -50,9 +55,12 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 					 else { 
 					     ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
 					 }
-                     ABody = ABody.replace('...', tNewBody);
+                     ABody = ABody.replace('...', frmB(tNewBody, name));
                  }
-            }              
+            }
+            else {
+                ABody = frmB(ABody, name);
+            }
 	    }
 		
 		else { 
@@ -67,9 +75,9 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
         if(Mode2) bp = bp.replace(' return $this', ' return r');
     } 		
 	else { 
-	    bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', '').replace(' return $this', ' return r');
+	    bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', 'var $this = "";').replace(' return $this', ' return r');
     }
-	bp = bp.replace(/name/g, name).replace(/Name/g, Name).replace('Private', Private).replace(/args/g, Args).replace('aBody', ABody).replace('arg0', Args0);
+	bp = bp.replace('aBody', ABody).replace(/name/g, name).replace(/Name/g, Name).replace('Private', Private).replace(/args/g, Args).replace('arg0', Args0);
    	
     //alert(bp);
 	try { eval(bp); } catch(e) { alert(e); }
@@ -85,66 +93,66 @@ function pP(dna) { var bp = '(function ($) { var Name = function(options) { Priv
 
 (function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
 
-pP('all | ($this, t, fn) $this.each(function(i) { t = t.split("*").join("$(this)"); t += ";"; eval(t); })');
-pP('log | con = window.console | { verbosity: 0 } | (m, v) if(v >= 0) d = v; verbosity > d && con && con.log(m)');
-pP('isHtml | (x) d=x.getResponseHeader("Content-Type"); return d && (d.indexOf("text/html") + 1 || d.indexOf("text/xml") + 1)');
+pP('all | (t, fn) $this.each(function(i) { t = t.split("*").join("$(this)"); t += ";"; eval(t); })');
+pP('log | con = window.console | { verbosity: 0 } | (m) l < verbosity && con && con.log(m)');
+pP('isHtml | (x) d=x.getResponseHeader("Content-Type"); r=d&&(d.indexOf("text/html")+1||d.indexOf("text/xml")+1)');
 
 var docType = /<\!DOCTYPE[^>]*>/i;
 var tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi;
 var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
-var div12 =  '<div class="document-$1"$2';
-pP('replD | (h) return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
-pP('_parseHTML | (h) d = $.replD(h); d = $.trim(d); return d');
-pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) return d[i][1]; return false; object : d.push(h);');
-pP('memory | { memoryoff: false } | (h) d=memoryoff; if(!h || d == true) return null; if(d == false) return h; if(d.indexOf(", ") + 1) { d=d.split(", "); for(var i=0; i<d.length; i++) if(h==d[i]) return null; return h; } return h==d?null:h');
-pP('cache1 | (o, h) ? : return d; + : d = $.memory(h); d=d?$.pages(d):null; ! : d = h;');
-pP('lDivs | ($t) $t.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
+var div12 =  '<div class="ajy-$1"$2';
+pP('replD | (h) r=String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
+pP('_parseHTML | (h) r=$.trim($.replD(h))');
+pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) r=d[i][1]; object : d.push(h);');
+pP('memory | { memoryoff: false } | (h) d=memoryoff; if(!h || d==true) r=null; else if(d==false) r=h; else if(d.indexOf(", ") + 1) { d=d.split(", "); for(var i=0, r=h; i<d.length; i++) if(h==d[i]) r=null;} else r=h==d?null:h');
+pP('cache1 | (o, h) ? : r=d; + : d=$.memory(h); d=d?$.pages(d):null; ! : d=h;');
+pP('lDivs | () $this.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
 pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { ' +
 'if(!h || !$.isHtml(xhr)) { location = hin; } $.cache1("!",  $($._parseHTML(h))); $.cache1("?").find(".ignore").remove(); $.pages([hin, $.cache1("?")]); p && p(); } })');
-pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("+", post?null:hin); if(!$.cache1("?")) { $.lAjax(hin, p, post); return; } p && p(); return');
-pP('getPage | ($this, t, p, post) if(!t) return $.cache1("?"); if(t.indexOf("/") != -1) { $.lPage(t, p, post); return; } if(t == "+") { $.lPage(p); return;}' +
-'if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") { $.lDivs($this); return $this; } return $.cache1("?").find(".document-" + t)');
+pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("+", post?null:hin); if(!$.cache1("?")) $.lAjax(hin, p, post); else p && p();');
+pP('getPage | (t, p, post) if(!t) r=$.cache1("?"); else if(t.indexOf("/") != -1) $.lPage(t, p, post); else if(t == "+") $.lPage(p);' +
+'else { if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") r=$this.lDivs(); else r=$.cache1("?").find(".ajy-" + t); }');
 
 var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
-pP('insertScript | ($S, PK) $("head").append((PK=="href"?linki: scri).replace("*", $S)); $.log(PK +" +: " + $S)');
+pP('insertScript | ($S, PK) $("head").append((PK=="href"?linki: scri).replace("*", $S))');
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
-pP('removeScript | ($S, PK) $((PK=="href"?linkr:scrr).replace("!", $S)).remove(); $.log(PK + " -: " + $S)');
-pP('findScript  | ($S, $Scripts) if(!$S) return false; for(var i = 0; i < $Scripts.length; i++) if($Scripts[i][0] == $S) { $Scripts[i][1] = 1; return true; }  return false');
+pP('removeScript | ($S, PK) $((PK=="href"?linkr:scrr).replace("!", $S)).remove()');
+pP('findScript  | ($S, $Scripts) if(!$S) ; else for(var i = 0; i < $Scripts.length; i++) if($Scripts[i][0] == $S) { $Scripts[i][1] = 1; r=true; }');
 
-pP('allScripts | (newS, PK, deltas) if(!deltas) { newS.each(function(){ $.insertScript($(this)[0], PK); }); return true; } return false');
-pP('classAlways | (s, PK) s.each(function(){ if($(this).attr("data-class") == "always") { $.log("Class always detected!"); $.insertScript($(this).attr(PK), PK); $(this).remove(); } })');
-pP('sameScripts | (sN, PK) for(var i = 0; i < sN.length; i++) { if(sN[i][1] == 0) { $.insertScript(sN[i][0], PK); $.log("Adding old script: " +  sN[i][0]); }  }');
-pP('newArray | (s, sN, sO, PK, pass) s.each(function(){ sN.push([$(this).attr(PK), 0]); if(!pass) sO.push([$(this).attr(PK), 0]); })');
+pP('allScripts | (PK, deltas) if(!deltas) { $this.each(function(){ $.insertScript($(this)[0], PK); }); return true; }');
+pP('classAlways | (PK) $this.each(function(){ if($(this).attr("data-class") == "always") { $.insertScript($(this).attr(PK), PK); $(this).remove(); } })');
+pP('sameScripts | (sN, PK) for(var i = 0; i < sN.length; i++) if(sN[i][1] == 0) $.insertScript(sN[i][0], PK)');
+pP('newArray | (sN, sO, PK, pass) $this.each(function(){ sN.push([$(this).attr(PK), 0]); if(!pass) sO.push([$(this).attr(PK), 0]); })');
 pP('findCommon | (s, sN) for(var i = 0; i < s.length; i++) { s[i][1] = 2; if($.findScript(s[i][0], sN)) s[i][1] = 1}');
-pP('freeOld | (s, PK) for(var i = 0; i < s.length; i++) { if(s[i][1] == 2) { if(s[i][0]) $.removeScript(s[i][0], PK); s.splice(i, 1); } }');
+pP('freeOld | (s, PK) for(var i = 0; i < s.length; i++) { if(s[i][1] == 2) { if(s[i][0]) $.removeScript(s[i][0], PK); } }');
 pP('realNew | (s, PK) for(var i = 0; i < s.length; i++) { if(s[i][1] == 0) $.insertScript(s[i][0], PK); }');
 
-var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | ($this, same) $.log("Entering Scripts a()");' +
-'if($.allScripts($this, "PK", deltas)) return; if(pass) $.classAlways($this, "PK");' +
-'if(same) { $.sameScripts($scriptsN, "PK"); return; } $scriptsN = []; $.newArray($this, $scriptsN, $scriptsO, "PK", pass);' +
-'pass++; $.findCommon($scriptsO, $scriptsN); $.freeOld($scriptsO, "PK"); $.realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice()';
+var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) ' +
+'if($this.allScripts("PK", deltas)) ; else { if(pass) $this.classAlways("PK");' +
+'if(same) $.sameScripts($scriptsN, "PK"); else { $scriptsN = []; $this.newArray($scriptsN, $scriptsO, "PK", pass);' +
+'pass++; $.findCommon($scriptsO, $scriptsN); $.freeOld($scriptsO, "PK"); $.realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice() } }';
 
 pP('addHrefs | ' + addAll.replace(/PK/g, "href"));
 pP('addSrcs | ' + addAll.replace(/PK/g, "src"));
 
-pP('detScripts | (same, $s) if(same) return; $.log("Entering detScripts"); var links = $().getPage("link"), jss = $().getPage("script");' +
-'$s.c = links.filter(function() { return $(this).attr("rel").indexOf("stylesheet") != -1; });' +
-'$s.s = jss.filter(function() { return $(this).attr("src"); }); $s.t = jss.filter(function() { return !($(this).attr("src")); });');
-pP('_inline | (txt, s) var strs = s["inlinehints"], r = false; if(!strs) return r; strs = strs.split(", "); for(var i=0; i<strs.length; i++) if(txt.indexOf(strs[i]) + 1) r = true; return r;');
-pP('addtxts | ($s, s) $.log("Entering addtxts"); $s.t.each(function(){ var txt = $(this).html(); if(txt.indexOf(").ajaxify(")==-1 &&'+
-'(s["inline"] || $(this).hasClass("ajaxy") || $._inline(txt, s))) { try { $.globalEval(txt); } catch(e) { alert(e); } } return true; });');
-pP('addScripts | (same, $s, st) $.log("Entering scripts.add()"); $s.c.addHrefs(same, st); $s.s.addSrcs(same, st); $.addtxts($s, st);'); 
+pP('detScripts | (same, $s) if(same) ; else { var links = $().getPage("link"), jss = $().getPage("script");' +
+'$s.c = links.filter(function() { return $(this).attr("rel").indexOf("stylesheet")!=-1; });' +
+'$s.s = jss.filter(function() { return $(this).attr("src"); });'+
+'$s.t = jss.filter(function(){ return !($(this).attr("src")); }) };');
+pP('_inline | (txt, s) var strs = s["inlinehints"], r = false; if(!strs) ; else { strs = strs.split(", "); for(var i=0; i<strs.length; i++) if(txt.indexOf(strs[i]) + 1) r = true;}');
+pP('addtxts | ($s, s) $s.t.each(function(){ var txt = $(this).html(); if(txt.indexOf(").ajaxify(")==-1 &&'+
+'(s["inline"] || $(this).hasClass("ajaxy") || $._inline(txt, s))) { try { $.globalEval(txt); } catch(e) { alert(e); } } r=true; });');
+pP('addScripts | (same, $s, st) $s.c.addHrefs(same, st); $s.s.addSrcs(same, st); $.addtxts($s, st);'); 
 pP('scripts | $scripts = {}, pass = 0 | { "deltas": true } | (same) $.detScripts(same, $scripts); if(pass++) $.addScripts(same, $scripts, settings); else'+
-'{ $scripts.c.addHrefs(same, settings); $scripts.s.addSrcs(same, settings); }');
+'{ $scripts.c.addHrefs(same, settings); $scripts.s.addSrcs(same, settings);}');
 
 pP('cPage | { cb: null } | (o) undefined : $.scripts(null, settings); if(cb) cb(); boolean : $.scripts(o, settings); string : ;');
-pP('initPage | (e) $.log("Statechange: "); var href = location.href; $.log(href); $.cPage(e && e.same)');
+pP('initPage | (e) var href = location.href; $.cPage(e && e.same)');
 pP('initAjaxify | (s) var supported = window.history && window.history.pushState && window.history.replaceState;'+
-'$.log("Entering ajaxify...", 1, s); if(!supported) { $.log("HTML5 History API not supported properly - exiting"); return false; }'+
-'if(!s["pluginon"]) { $.log("Plugin set off manually - exiting"); return false; } $.memory(null, s); $.cPage("", s); return true');
+'if(!supported || !s["pluginon"]) ; else { $.memory(null, s); $.cPage("", s); r=true}');
 
 pP('ajaxify | { selector: "a:not(.no-ajaxy)", requestKey: "pronto", requestDelay: 0, verbosity: 0, deltas: true, inline: false, memoryoff: false, cb: null, pluginon: true } '+
-'| ($this) $(function () {  if(!$.initAjaxify(settings)) return; $this.pronto(settings); $(window).on("pronto.render", $.initPage); $().getPage(location.href, $.cPage);});');
+'| () $(function () { $.log("Entering ajaxify...", settings); if(!$.initAjaxify(settings)) ; else { $this.pronto(settings); $(window).on("pronto.render", $.initPage); $().getPage(location.href, $.cPage);}});');
 
 /*
 * Pronto Plugin
