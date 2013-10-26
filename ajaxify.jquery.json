@@ -3,6 +3,8 @@
 "title": "Ajaxify your site",
 "description": "Ajaxify your site out of the box and instantly",
 "keywords": [
+"ui",
+"animation",
 "performance",
 "speed",
 "jquery",
@@ -11,8 +13,8 @@
 "html5",
 "scroll",
 "form",
-"content",
-"div"
+"change",
+"content"
 ],
 "version": "3.6.0",
 "author": {
