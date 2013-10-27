@@ -20,92 +20,65 @@
  * Also, I see the potential to avoid pollution of the jQuery namespace this way, but how? 
  * -> presumably introduce an internal prefix?
  */
-
-var l=0; //Debugging level, ranges from 0 - 8+ in Ajaxify, adjusted automatically in "frmB"
-
-function showArgs(a) { s=''; 
-for(var i=0; i<a.length; i++) s+=
-    (a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (!a[i].length || a[i].length <= 100) ? a[i] : typeof a[i]) 
-    + ' | '; 
-return s;
-}
-
-function frmB(b, name) { 
-if(name!='log' && !(b.indexOf('$.log(')+1)) 
-return 
-'var r=false; l++;'+ 
-'$.log(l+" | Name | args | " + showArgs(arguments));' + b + 
-'; l--; return r;'; 
-
-else return b; 
-}
  
-function pP(dna) { var bp = 
-'(function ($) { var Name = function(options) { var d = [];'+
-'Private this.a = function(args) {aBody;}; };' +
-'$.fnn = function(arg0) {'+
-'var r, $this = $(this);'+
-'$.fnn.o = $.fnn.o ? $.fnn.o : new Name(options);'+
-'r = $.fnn.o.a(args);'+
-'return $this;};'+ //by default returns $this, unless it's not used in "a" function and "a" returns a different value - then return "r"
-'})'+
-'(jQuery);',
-
-dnas = dna.split(' | '), 
-name = dnas[0], 
-Name = name.substr(0, 1).toUpperCase() + name.substr(1, name.length - 1), 
-Settings, Private, Mode, Mode2, Args, Args0, ABody;
-
+var l=0;
+function showArgs(a) { s=''; for(var i=0; i<a.length; i++) s+=(a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (!a[i].length || a[i].length <= 100) ? a[i] : typeof a[i]) + ' | '; return s }
+function frmB(b, name) { if(name!='log' && !(b.indexOf('$.log(')+1)) return 'var r=false; l++; $.log(l+" | Name | args | " + showArgs(arguments));' + b + "; l--; return r;"; else return b; }
+ 
+function pP(dna) { var bp = '(function ($) { var Name = function(options){ Private this.a = function(args) {aBody;}; }; $.fnn = function(arg0) {var r; var $this = $(this); $.fnn.o = $.fnn.o ? $.fnn.o : new Name(options); r = $.fnn.o.a(args); return $this;}; })(jQuery);',
+dnas = dna.split(' | '), name = dnas[0], Name = name.substr(0, 1).toUpperCase() + name.substr(1, name.length - 1), Settings, Private, Mode, Mode2, Args, Args0, ABody;
+Private = 'var d = [];';
 for(var i = 1; i < dnas.length; i++) {
-    var dnap = dnas[i];
-	if(dnap.substr(0, 1) == '{') {
-	    dnap = dnap.substr(2, dnap.length - 3);
-		Settings = 'settings = $.extend({' + dnap + '}, options);';
-		Settings += '\n';
-		var sa = dnap.indexOf(', ') + 1 ? dnap.split(', ') : [dnap]; 
-		for(var j = 0; j < sa.length; j++) { 
-		    var si = sa[j];
-			var sn = si.split(':')[0].replace('"', '').replace('"', ''); 
-			Settings +=  (sn + ' = settings["' + sn + '"];\n');
+	    var dnap = dnas[i];
+		if(dnap.substr(0, 1) == '{') {
+		    dnap = dnap.substr(2, dnap.length - 3);
+			Settings = 'settings = $.extend({' + dnap + '}, options);';
+			Settings += '\n';
+			var sa = dnap.indexOf(', ') + 1 ? dnap.split(', ') : [dnap]; 
+			for(var j = 0; j < sa.length; j++) { 
+			    var si = sa[j];
+				var sn = si.split(':')[0].replace('"', '').replace('"', ''); 
+				Settings +=  (sn + ' = settings["' + sn + '"];\n');
+			}
 		}
-	}
 		
-	else if(dnap.substr(0, 1) == '(') {
-	    var del = dnap.indexOf(')'); 
-	    Args = dnap.substr(1, del - 1);
-        Args = Args.indexOf('$this') + 1 ? Args : (Args ? '$this, ' + Args : '$this');
-		Args0 = Args.replace('$this, ', ''); Args0 = Args == '$this' ? '' : Args0;
-		if(Settings) Args0 += Args0 == '' ? 'options' : ', options';	
-        ABody = dnap.substr(del + 2, dnap.length - del - 2);
-        Mode = ABody.indexOf('$this') + 1;
-        Mode2 = ABody.indexOf('return') + 1 || ABody.indexOf('r=') + 1;
-        if(ABody.indexOf(' : ') + 1) { 
-           var ABodies = ABody.split(' : ');
-           var Arg0 = Args0.indexOf(', ') + 1 ? Args0.split(', ')[0] : Args0;
-		   ABody = '';
-           for(var i = 0; i < ABodies.length - 1; i++) { var tBody = ABodies[i]; 
-               var tBody1 = ABodies[i + 1]; 
-               var tNewBody = tBody1.substr(0, tBody1.lastIndexOf(';'));
-               var sc = tBody.lastIndexOf(';');
-               tBody = sc + 1 ? tBody.substr(sc + 2, tBody.length - sc - 2) : tBody;
-               if(tBody.length == 1) {
-		 	       ABody += 'if('+Arg0+' ==="'+tBody+'") {...}\n';
-				}
-				else { 
-				     ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
-				}
-                ABody = ABody.replace('...', frmB(tNewBody, name));
+		else if(dnap.substr(0, 1) == '(') {
+		    var del = dnap.indexOf(')'); 
+		    Args = dnap.substr(1, del - 1);
+            Args = Args.indexOf('$this') + 1 ? Args : (Args ? '$this, ' + Args : '$this');
+			Args0 = Args.replace('$this, ', ''); Args0 = Args == '$this' ? '' : Args0;
+			if(Settings) Args0 += Args0 == '' ? 'options' : ', options';	
+            ABody = dnap.substr(del + 2, dnap.length - del - 2);
+			Mode = ABody.indexOf('$this') + 1;
+            Mode2 = ABody.indexOf('return') + 1 || ABody.indexOf('r=') + 1;
+            if(ABody.indexOf(' : ') + 1) { 
+                 var ABodies = ABody.split(' : ');
+                 var Arg0 = Args0.indexOf(', ') + 1 ? Args0.split(', ')[0] : Args0;
+			     ABody = '';
+                 for(var i = 0; i < ABodies.length - 1; i++) { var tBody = ABodies[i]; 
+                     var tBody1 = ABodies[i + 1]; 
+                     var tNewBody = tBody1.substr(0, tBody1.lastIndexOf(';'));
+                     var sc = tBody.lastIndexOf(';');
+                     tBody = sc + 1 ? tBody.substr(sc + 2, tBody.length - sc - 2) : tBody;
+                     if(tBody.length == 1) {
+					     ABody += 'if('+Arg0+' ==="'+tBody+'") {...}\n';
+					 }
+					 else { 
+					     ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
+					 }
+                     ABody = ABody.replace('...', frmB(tNewBody, name));
+                 }
             }
-        }
-        else {
-             ABody = frmB(ABody, name);
-        }
-	}
+            else {
+                ABody = frmB(ABody, name);
+            }
+	    }
 		
-	else { 
-	    Private = 'var ' + dnap + ';'; 
-	}
-}
+		else { 
+		    Private += 'var ' + dnap + ';'; 
+	    }
+		
+    }
 	
 	if(Settings) { Settings = 'var ' + Settings; Private += Settings; } else bp = bp.replace(/options/g, '');
 	if(Mode) { 
