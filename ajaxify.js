@@ -53,52 +53,52 @@ for(var i = 1; i < dnas.length; i++) {
 		    var del = dnap.indexOf(')'); 
 		    Args = dnap.substr(1, del - 1);
             Args = Args.indexOf('$this') + 1 ? Args : (Args ? '$this, ' + Args : '$this');
-			Args0 = Args.replace('$this, ', ''); Args0 = Args == '$this' ? '' : Args0;
-			if(Settings) Args0 += Args0 == '' ? 'options' : ', options';	
+            Args0 = Args.replace('$this, ', ''); Args0 = Args == '$this' ? '' : Args0;
+            if(Settings) Args0 += Args0 == '' ? 'options' : ', options';	
             ABody = dnap.substr(del + 2, dnap.length - del - 2);
-			Mode = ABody.indexOf('$this') + 1;
+            Mode = ABody.indexOf('$this') + 1;
             Mode2 = ABody.indexOf('return') + 1 || ABody.indexOf('r=') + 1;
             if(ABody.indexOf(' : ') + 1) { 
                  var ABodies = ABody.split(' : ');
                  var Arg0 = Args0.indexOf(', ') + 1 ? Args0.split(', ')[0] : Args0;
-			     ABody = '';
+                 ABody = '';
                  for(var i = 0; i < ABodies.length - 1; i++) { var tBody = ABodies[i]; 
                      var tBody1 = ABodies[i + 1]; 
                      var tNewBody = tBody1.substr(0, tBody1.lastIndexOf(';'));
                      var sc = tBody.lastIndexOf(';');
                      tBody = sc + 1 ? tBody.substr(sc + 2, tBody.length - sc - 2) : tBody;
                      if(tBody.length == 1) {
-					     ABody += 'if('+Arg0+' ==="'+tBody+'") {...}\n';
-					 }
-					 else { 
-					     ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
-					 }
+                         ABody += 'if('+Arg0+' ==="'+tBody+'") {...}\n';
+                     }
+                     else { 
+                         ABody += 'if(typeof '+Arg0+' ==="'+tBody+'") {...}\n';
+                     }
                      ABody = ABody.replace('...', frmB(tNewBody, name));
                  }
             }
             else {
-                ABody = frmB(ABody, name);
-            }
-	    }
+                 ABody = frmB(ABody, name);
+           }
+       }
 		
-		else { 
-		    Private += 'var ' + dnap + ';'; 
-	    }
-		
+       else { 
+            Private += 'var ' + dnap + ';'; 
+       }
     }
 	
-	if(Settings) { Settings = 'var ' + Settings; Private += Settings; } else bp = bp.replace(/options/g, '');
-	if(Mode) { 
-	    bp = bp.replace(/fnn/g, 'fn.'+name);
+    if(Settings) { Settings = 'var ' + Settings; Private += Settings; } else bp = bp.replace(/options/g, '');
+    if(Mode) { 
+        bp = bp.replace(/fnn/g, 'fn.'+name);
         if(Mode2) bp = bp.replace(' return $this', ' return r');
     } 		
-	else { 
-	    bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', 'var $this = "";').replace(' return $this', ' return r');
+    else { 
+        bp = bp.replace(/fnn/g, name).replace('var $this = $(this); ', 'var $this = "";').replace(' return $this', ' return r');
     }
-	bp = bp.replace('aBody', ABody).replace(/name/g, name).replace(/Name/g, Name).replace('Private', Private).replace(/args/g, Args).replace('arg0', Args0);
+    
+    bp = bp.replace('aBody', ABody).replace(/name/g, name).replace(/Name/g, Name).replace('Private', Private).replace(/args/g, Args).replace('arg0', Args0);
    	
     //alert(bp);
-	try { eval(bp); } catch(e) { alert(e); }
+    try { eval(bp); } catch(e) { alert(e); }
 } 
  
 /*!
