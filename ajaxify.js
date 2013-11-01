@@ -21,7 +21,7 @@
  * -> presumably introduce an internal prefix?
  */
  
-var l=0; //Module global debugging level - used in frmB and $.log, therefore, I see no alternative of using it...
+var l=0; //Module global debugging level - used in frmB and $.log, therefore, I see no alternative to using it...
 function showArgs(a) { s=''; for(var i=0; i<a.length; i++) s+=(a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (!a[i].length || a[i].length <= 100) ? a[i] : typeof a[i]) + ' | '; return s }
 function frmB(b, name) { if(name!='log' && !(b.indexOf('$.log(')+1)) return 'var r=false; l++; $.log(l+" | Name | args | " + showArgs(arguments));' + b + "; l--; return r;"; else return b; }
  
