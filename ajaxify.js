@@ -142,8 +142,8 @@ pP('classAlways | (PK) $this.each(function(){ if($(this).attr("data-class") == "
 pP('sameScripts | (sN, PK) for(var i=0; i<sN.length; i++) if(sN[i][1] == 0) $.insertScript(sN[i][0], PK)');
 pP('newArray | (sN, sO, PK, pass) $this.each(function(){ sN.push([$(this).attr(PK), 0]); if(!pass) sO.push([$(this).attr(PK), 0]); })');
 pP('findCommon | (s, sN) for(var i=0; i<s.length; i++) { s[i][1] = 2; if($.findScript(s[i][0], sN)) s[i][1] = 1}');
-pP('freeOld | (s, PK) for(var i=0; i<s.length; i++) { if(s[i][1] == 2) { if(s[i][0]) $.removeScript(s[i][0], PK); } }');
-pP('realNew | (s, PK) for(var i=0; i<s.length; i++) { if(s[i][1] == 0) $.insertScript(s[i][0], PK); }');
+pP('freeOld | (s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 2 && s[i][0]) $.removeScript(s[i][0], PK)');
+pP('realNew | (s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 0) $.insertScript(s[i][0], PK)');
 
 var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) \
 if($this.allScripts("PK", deltas)) ; else { if(pass) $this.classAlways("PK");\
