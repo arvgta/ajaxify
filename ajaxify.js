@@ -21,7 +21,7 @@
  * -> presumably introduce an internal prefix?
  */
  
-var l=0;
+var l=0; //Module global debugging level - used in frmB and $.log, therefore, I see no alternative of using it...
 function showArgs(a) { s=''; for(var i=0; i<a.length; i++) s+=(a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (!a[i].length || a[i].length <= 100) ? a[i] : typeof a[i]) + ' | '; return s }
 function frmB(b, name) { if(name!='log' && !(b.indexOf('$.log(')+1)) return 'var r=false; l++; $.log(l+" | Name | args | " + showArgs(arguments));' + b + "; l--; return r;"; else return b; }
  
@@ -151,10 +151,10 @@ pP('detScripts | (same, $s) if(same) ; else { var links = $().getPage("link"), j
 '$s.s = jss.filter(function() { return $(this).attr("src"); });'+
 '$s.t = jss.filter(function(){ return !($(this).attr("src")); }) };');
 pP('_inline | (txt, s) var strs = s["inlinehints"], r = false; if(!strs) ; else { strs = strs.split(", "); for(var i=0; i<strs.length; i++) if(txt.indexOf(strs[i]) + 1) r = true;}');
-pP('addtxts | ($s, s) $s.t.each(function(){ var txt = $(this).html(); if(txt.indexOf(").ajaxify(")==-1 &&'+
+pP('addtxts | (s) $this.each(function(){ var txt = $(this).html(); if(txt.indexOf(").ajaxify(")==-1 &&'+
 '(s["inline"] || $(this).hasClass("ajaxy") || $._inline(txt, s))) { try { $.globalEval(txt); } catch(e) { alert(e); } } r=true; });');
-pP('addScripts | (same, $s, st) $s.c.addHrefs(same, st); $s.s.addSrcs(same, st); $.addtxts($s, st);'); 
-pP('scripts | $scripts = {}, pass = 0 | { "deltas": true } | (same) $.detScripts(same, $scripts); if(pass++) $.addScripts(same, $scripts, settings); else'+
+pP('addScripts | (same, $s, st) $s.c.addHrefs(same, st); $s.s.addSrcs(same, st); $s.t.addtxts(st);'); 
+pP('scripts | $scripts = $(), pass = 0 | { "deltas": true } | (same) $.detScripts(same, $scripts); if(pass++) $.addScripts(same, $scripts, settings); else'+
 '{ $scripts.c.addHrefs(same, settings); $scripts.s.addSrcs(same, settings);}');
 
 pP('cPage | { cb: null } | (o) undefined : $.scripts(null, settings); if(cb) cb(); boolean : $.scripts(o, settings); string : ;');
