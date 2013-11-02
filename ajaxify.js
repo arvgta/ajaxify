@@ -122,7 +122,9 @@ var div12 =  '<div class="ajy-$1"$2';
 pP('replD | (h) r=String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
 pP('_parseHTML | (h) r=$.trim($.replD(h))');
 pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) r=d[i][1]; object : d.push(h);');
-pP('memory | { memoryoff: false } | (h) d=memoryoff; if(!h || d==true) r=null; else if(d==false) r=h; else if(d.indexOf(", ") + 1) { d=d.split(", "); for(var i=0, r=h; i<d.length; i++) if(h==d[i]) r=null;} else r=h==d?null:h');
+pP('memory | { memoryoff: false } | (h) d=memoryoff; if(!h || d==true) r=null; else if(d==false) r=h; \
+else if(d.indexOf(", ")+1) { d=d.split(", "); for(var i=0, r=h; i<d.length; i++) \
+if(h==d[i]) r=null;} else r=h==d?null:h');
 pP('cache1 | (o, h) ? : r=d; + : d=$.memory(h); d=d?$.pages(d):null; ! : d=h;');
 pP('lDivs | () $this.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
 pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { \
@@ -146,7 +148,7 @@ pP('freeOld | (s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 2 && s[i][0]) 
 pP('realNew | (s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 0) $.insertScript(s[i][0], PK)');
 
 var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) \
-if($this.allScripts("PK", deltas)) ; else { if(pass) $this.classAlways("PK");\
+if(!$this.allScripts("PK", deltas)) { if(pass) $this.classAlways("PK");\
 if(same) $.sameScripts($scriptsN, "PK"); else { $scriptsN = []; $this.newArray($scriptsN, $scriptsO, "PK", pass);\
 pass++; $.findCommon($scriptsO, $scriptsN); $.freeOld($scriptsO, "PK"); $.realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice() } }';
 
@@ -157,17 +159,17 @@ pP('detScripts | (same, $s) if(!same) { var links = $().getPage("link"), jss = $
 $s.c = links.filter(function() { return $(this).attr("rel").indexOf("stylesheet")!=-1; });\
 $s.s = jss.filter(function() { return $(this).attr("src"); });\
 $s.t = jss.filter(function(){ return !($(this).attr("src")); }) };');
-pP('_inline | (txt, s) var strs = s["inlinehints"], r = false; if(!strs) ; else { strs = strs.split(", "); for(var i=0; i<strs.length; i++) if(txt.indexOf(strs[i]) + 1) r=true;}');
-pP('addtxts | (s) $this.each(function(){ var txt = $(this).html(); if(txt.indexOf(").ajaxify(")==-1 &&\
-(s["inline"] || $(this).hasClass("ajaxy") || $._inline(txt, s))) { try { $.globalEval(txt); } catch(e) { alert(e); } } r=true; });');
+pP('_inline | (txt, s) d = s["inlinehints"]; if(d) { d = d.split(", "); for(var i=0; i<d.length; i++) if(txt.indexOf(d[i])+1) r=true; }');
+pP('addtxts | (s) $this.each(function(){ d = $(this).html(); if(d.indexOf(").ajaxify(")==-1 &&\
+(s["inline"] || $(this).hasClass("ajaxy") || $._inline(d, s))) { try { $.globalEval(d); } catch(e) { alert(e); } } r=true; });');
 pP('addScripts | (same, $s, st) $s.c.addHrefs(same, st); $s.s.addSrcs(same, st); $s.t.addtxts(st);'); 
 pP('scripts | $scripts = $(), pass = 0 | { "deltas": true } | (same) $.detScripts(same, $scripts); if(pass++) $.addScripts(same, $scripts, settings); else \
 { $scripts.c.addHrefs(same, settings); $scripts.s.addSrcs(same, settings);}');
 
 pP('cPage | { cb: null } | (o) undefined : $.scripts(null, settings); if(cb) cb(); boolean : $.scripts(o, settings); string : ;');
-pP('initPage | (e) var href = location.href; $.cPage(e && e.same)');
-pP('initAjaxify | (s) var supported = window.history && window.history.pushState && window.history.replaceState; \
-if(!supported || !s["pluginon"]) ; else { $.memory(null, s); $.cPage("", s); r=true}');
+pP('initPage | (e) $.cPage(e && e.same)');
+pP('initAjaxify | (s) d = window.history && window.history.pushState && window.history.replaceState; \
+if(d && s["pluginon"]) { $.memory(null, s); $.cPage("", s); r=true}');
 
 pP('ajaxify | { selector: "a:not(.no-ajaxy)", requestKey: "pronto", requestDelay: 0, verbosity: 0, deltas: true, inline: false, memoryoff: false, cb: null, pluginon: true } \
 | () $(function () { $.log("Entering ajaxify...", settings); if($.initAjaxify(settings)) { $this.pronto(settings); $(window).on("pronto.render", $.initPage); $().getPage(location.href, $.cPage);}});');
