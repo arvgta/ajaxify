@@ -14,10 +14,8 @@
  *
  * Now a rather big function
  *
- * Todo: this could be a jQuery plugin itself, additionally accepting an anonymous function, to be the internal "a" function
- * - instead of pure "dna" string
- * Elegant would be the potential to accept both just a dna string and an optional anonymous "a" function for larger plugins
- * Also, I see the potential to avoid pollution of the jQuery namespace this way, but how? 
+ * Todo: this could be a jQuery plugin itself
+ * I see the potential to avoid pollution of the jQuery namespace this way, but how? 
  * -> presumably introduce an internal prefix?
  */
  
@@ -122,6 +120,12 @@ var docType = /<\!DOCTYPE[^>]*>/i;
 var tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi;
 var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
 var div12 =  '<div class="ajy-$1"$2';
+var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
+var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
+var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) \
+if(!$this.allScripts("PK", deltas)) { if(pass) $this.classAlways("PK");\
+if(same) ®$.sameScripts($scriptsN, "PK"); $scriptsN = []; $this.newArray($scriptsN, $scriptsO, "PK", pass);\
+pass++; $.findCommon($scriptsO, $scriptsN); $.freeOld($scriptsO, "PK"); $.realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice() }';
 
 pP('\
 all | (t, fn) $this.each( f{ t = t.split("*").join("$(this)"); t += ";"; eval(t); })\n\
@@ -138,13 +142,9 @@ if(!h || !$.isHtml(xhr)) { location = hin; } $.cache1("!",  $($._parseHTML(h)));
 pP('lPage | (hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("+", post?null:hin); if(!$.cache1("?")) ®$.lAjax(hin, p, post); p && p();');
 pP('getPage | (t, p, post) if(!t) ®$.cache1("?"); if(t.indexOf("/") != -1) ®$.lPage(t, p, post); if(t == "+") $.lPage(p);\
 else { if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") ®$this.lDivs(); ®$.cache1("?").find(".ajy-" + t); }');
-
-var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
 pP('insertScript | ($S, PK) $("head").append((PK=="href"?linki: scri).replace("*", $S))');
-var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 pP('removeScript | ($S, PK) $((PK=="href"?linkr:scrr).replace("!", $S)).remove()');
 pP('findScript  | ($S, $Scripts) if($S) for(var i=0; i<$Scripts.length; i++) if($Scripts[i][0] == $S) { $Scripts[i][1] = 1; ®true; }');
-
 pP('allScripts | (PK, deltas) if(!deltas) { $this.each( f{ $.insertScript($(this)[0], PK); }); ®true; }');
 pP('classAlways | (PK) $this.each( f{ if($(this).attr("data-class") == "always") { $.insertScript($(this).attr(PK), PK); $(this).remove(); } })');
 pP('sameScripts | (sN, PK) for(var i=0; i<sN.length; i++) if(sN[i][1] == 0) $.insertScript(sN[i][0], PK)');
@@ -152,11 +152,6 @@ pP('newArray | (sN, sO, PK, pass) $this.each( f{ sN.push([$(this).attr(PK), 0]);
 pP('findCommon | (s, sN) for(var i=0; i<s.length; i++) { s[i][1] = 2; if($.findScript(s[i][0], sN)) s[i][1] = 1}');
 pP('freeOld | (s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 2 && s[i][0]) $.removeScript(s[i][0], PK)');
 pP('realNew | (s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 0) $.insertScript(s[i][0], PK)');
-
-var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) \
-if(!$this.allScripts("PK", deltas)) { if(pass) $this.classAlways("PK");\
-if(same) ®$.sameScripts($scriptsN, "PK"); $scriptsN = []; $this.newArray($scriptsN, $scriptsO, "PK", pass);\
-pass++; $.findCommon($scriptsO, $scriptsN); $.freeOld($scriptsO, "PK"); $.realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice() }';
 
 pP('addHrefs | ' + addAll.replace(/PK/g, "href"));
 pP('addSrcs | ' + addAll.replace(/PK/g, "src"));
