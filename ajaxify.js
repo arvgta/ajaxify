@@ -31,6 +31,11 @@ if(dna.indexOf('\n')+1) {
     for(var i=0; i<d.length;i++) pP(d[i]);
     return;
 }
+
+if(dna.indexOf('<-')+1) { var s=dna.split('<-');
+   pP(s[0] + eval(s[1] + ';'));
+   return;
+}
  
 if(dna.indexOf(' | ')==-1) { dna = '_' + dna;
     var lb = dna.indexOf(')'), head = dna.substr(0, lb+1), fb = head.indexOf('('), name = head.substr(0, fb), args = head.substr(fb+1, head.length-fb-2), tail = dna.substr(lb+2, dna.length-lb-2);
@@ -49,7 +54,8 @@ dnas = dna.split(' | '), name = dnas[0], Name = name.substr(0, 1).toUpperCase() 
 Private = 'var d = [];';
 for(var i = 1; i < dnas.length; i++) {
 	    var dnap = dnas[i];
-		if(dnap.substr(0, 1) == '{') {
+        
+  	    if(dnap.substr(0, 1) == '{') {
 		    dnap = dnap.substr(2, dnap.length - 3);
 			Settings = 'settings = $.extend({' + dnap + '}, options);';
 			Settings += '\n';
@@ -114,6 +120,8 @@ for(var i = 1; i < dnas.length; i++) {
     try { eval(bp); } catch(e) { alert(e); }
 } 
  
+pP('log | con = window.console | { verbosity: 0 } | (m) l < verbosity && con && con.log(m)');
+ 
 /*!
  * hoverIntent r7 // 2013.03.11 // jQuery 1.9.1+
  * http://cherne.net/brian/resources/jquery.hoverIntent.html
@@ -130,14 +138,14 @@ var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
 var div12 =  '<div class="ajy-$1"$2';
 var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
-var addAll = '$scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) \
+var addAll = ' | $scriptsO = [], $scriptsN = [], pass = 0 | { "deltas": true } | (same) \
 if(!$this.allScripts("PK", deltas)) { if(pass) $this.classAlways("PK");\
 if(same) ®_sameScripts($scriptsN, "PK"); $scriptsN = []; $this.newArray($scriptsN, $scriptsO, "PK", pass);\
 pass++; _findCommon($scriptsO, $scriptsN); _freeOld($scriptsO, "PK"); _realNew($scriptsN, "PK"); $scriptsO = $scriptsN.slice() }';
 
 pP('\
+addAll(PK) ®addAll.replace(/PK/g, PK)\n\
 all | (t, fn) $this.each( f{ t = t.split("*").join("$(this)"); t += ";"; eval(t); })\n\
-log | con = window.console | { verbosity: 0 } | (m) l < verbosity && con && con.log(m)\n\
 isHtml(x) ®(d=x.getResponseHeader("Content-Type")), d&&(d.indexOf("text/html")+1||d.indexOf("text/xml")+1)\n\
 replD(h) ®String(h).replace(docType, "").replace(tagso, div12).replace(tagsc,"</div>")');
 pP('parseHTML(h) ®$.trim(_replD(h))');
@@ -145,8 +153,7 @@ pP('pages | (h) string : for(var i=0; i<d.length; i++) if(d[i][0]==h) ®d[i][1];
 pP('memory | { memoryoff: false } | (h) d=memoryoff; if(!h || d==true) ®null; if(d==false) ®h; if(d.indexOf(", ")+1) { d=d.split(", "); for(var i=0, r=h; i<d.length; i++) if(h==d[i]) ®null;} ®h==d?null:h');
 pP('cache1 | (o, h) ? : ®d; + : d = $.memory(h); d = d?$.pages(d):null; ! : d = h;');
 pP('lDivs | () $this.all("fn(*)", function(s) { s.html($.cache1("?").find("#" + s.attr("id")).html()); });');
-pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { \
-if(!h || !_isHtml(xhr)) { location = hin; } $.cache1("!",  $(_parseHTML(h))); $.cache1("?").find(".ignore").remove(); $.pages([hin, $.cache1("?")]); p && p(); } })');
+pP('lAjax | (hin, p, post) var xhr = $.ajax({url: hin, type: post?"POST":"GET", data:post?post.data:null, success: function(h) { if(!h || !_isHtml(xhr)) { location = hin; } $.cache1("!",  $(_parseHTML(h))); $.cache1("?").find(".ignore").remove(); $.pages([hin, $.cache1("?")]); p && p(); } })');
 pP('lPage(hin, p, post) if(hin.indexOf("#")+1) hin=hin.split("#")[0]; $.cache1("+", post?null:hin); if(!$.cache1("?")) ®$.lAjax(hin, p, post); p && p();');
 pP('getPage | (t, p, post) if(!t) ®$.cache1("?"); if(t.indexOf("/") != -1) ®_lPage(t, p, post); if(t == "+") _lPage(p);\
 else { if(t.charAt(0) == "#") { $.cache1("?").find(t).html(p); t = "-"; } if(t == "-") ®$this.lDivs(); ®$.cache1("?").find(".ajy-" + t); }');
@@ -160,28 +167,19 @@ pP('newArray | (sN, sO, PK, pass) $this.each( f{ sN.push([$(this).attr(PK), 0]);
 pP('findCommon(s, sN) for(var i=0; i<s.length; i++) { s[i][1] = 2; if(_findScript(s[i][0], sN)) s[i][1] = 1}');
 pP('freeOld(s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK)');
 pP('realNew(s, PK) for(var i=0; i<s.length; i++) if(s[i][1] == 0) _insertScript(s[i][0], PK)');
-
-pP('addHrefs | ' + addAll.replace(/PK/g, "href"));
-pP('addSrcs | ' + addAll.replace(/PK/g, "src"));
-
-pP('detScripts(same, $s) if(!same) { var links = $().getPage("link"), jss = $().getPage("script");\
-$s.c = links.filter( f{ ® $(this).attr("rel").indexOf("stylesheet")!=-1; });\
-$s.s = jss.filter( f{ ® $(this).attr("src"); });\
-$s.t = jss.filter( f{ ® !($(this).attr("src")); }) };');
+pP('addHrefs <- _addAll("href")');
+pP('addSrcs <- _addAll("src")');
+pP('detScripts(same, $s) if(!same) { var links = $().getPage("link"), jss = $().getPage("script"); $s.c = links.filter( f{ ® $(this).attr("rel").indexOf("stylesheet")!=-1; }); $s.s = jss.filter( f{ ® $(this).attr("src"); }); $s.t = jss.filter( f{ ® !($(this).attr("src")); }) };');
 pP('inline(txt, s) d = s["inlinehints"]; if(d) { d = d.split(", "); for(var i=0; i<d.length; i++) if(txt.indexOf(d[i])+1) ®true; }');
 pP('addtxts | (s) $this.each( f{ d = $(this).html(); if(d.indexOf(").ajaxify(")==-1 &&\
 (s["inline"] || $(this).hasClass("ajaxy") || _inline(d, s))) { try { $.globalEval(d); } catch(e) { alert(e); } } r=true; });');
 pP('addScripts(same, $s, st) $s.c.addHrefs(same, st); $s.s.addSrcs(same, st); $s.t.addtxts(st);'); 
 pP('scripts | $scripts = $(), pass = 0 | { "deltas": true } | (same) _detScripts(same, $scripts); if(pass++) _addScripts(same, $scripts, settings); else \
 { $scripts.c.addHrefs(same, settings); $scripts.s.addSrcs(same, settings);}');
-
 pP('cPage | { cb: null } | (o) undefined : $.scripts(null, settings); if(cb) cb(); boolean : $.scripts(o, settings); string : ;');
 pP('initPage(e) $.cPage(e && e.same)');
-pP('initAjaxify(s) d = window.history && window.history.pushState && window.history.replaceState; \
-if(d && s["pluginon"]) { $.memory(null, s); $.cPage("", s); ®true}');
-
-pP('ajaxify | { selector: "a:not(.no-ajaxy)", requestKey: "pronto", requestDelay: 0, verbosity: 0, deltas: true, inline: false, memoryoff: false, cb: null, pluginon: true } \
-| () $( f{ $.log("Entering ajaxify...", settings); if(_initAjaxify(settings)) { $this.pronto(settings); $(window).on("pronto.render", _initPage); $().getPage(location.href, $.cPage);}});');
+pP('initAjaxify(s) d = window.history && window.history.pushState && window.history.replaceState; if(d && s["pluginon"]) { $.memory(null, s); $.cPage("", s); ®true}');
+pP('ajaxify | { selector: "a:not(.no-ajaxy)", requestKey: "pronto", requestDelay: 0, verbosity: 0, deltas: true, inline: false, memoryoff: false, cb: null, pluginon: true } | () $( f{ $.log("Entering ajaxify...", settings); if(_initAjaxify(settings)) { $this.pronto(settings); $(window).on("pronto.render", _initPage); $().getPage(location.href, $.cPage);}});');
 
 /*
 * Pronto Plugin
