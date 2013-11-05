@@ -20,13 +20,12 @@
 })(jQuery);
 
 function _addAll(PK) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _addAll | PK | " + showArgs(arguments));
     return l--, addAll.replace(/PK/g, PK);
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -61,50 +60,45 @@ function _isHtml(x) {
     $.log(l + " | _isHtml | x | " + showArgs(arguments));
     return l--, (d = x.getResponseHeader("Content-Type")), d && (d.indexOf("text/html") + 1 || d.indexOf("text/xml") + 1);
     l--;
-    return r;;
+    return r;
 };
 
 function _replD(h) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _replD | h | " + showArgs(arguments));
     return l--, String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
     l--;
-    return r;;
+    return r;
 };
 
 function _parseHTML(h) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _parseHTML | h | " + showArgs(arguments));
     return l--, $.trim(_replD(h));
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
     var Pages = function () {
         var d = [];
         this.a = function ($this, h) {
+            var r = false;
+            l++;
+            $.log(l + " | pages | $this, h | " + showArgs(arguments));
             if (typeof h === "string") {
-                var r = false;
-                l++;
-                $.log(l + " | pages | $this, h | " + showArgs(arguments));
                 for (var i = 0; i < d.length; i++)
-                    if (d[i][0] == h) return l--, d[i][1];
-                l--;
-                return r;
+                    if (d[i][0] == h) return l--, d[i][1]
             }
             if (typeof h === "object") {
-                var r = false;
-                l++;
-                $.log(l + " | pages | $this, h | " + showArgs(arguments));
-                d.push(h);
-                l--;
-                return r;
-            };
+                d.push(h)
+            }
+
+            ;
+            l--;
+            return r;;
         };
     };
     $.pages = function (h) {
@@ -153,31 +147,23 @@ function _parseHTML(h) {
     var Cache1 = function () {
         var d = [];
         this.a = function ($this, o, h) {
+            var r = false;
+            l++;
+            $.log(l + " | cache1 | $this, o, h | " + showArgs(arguments));
             if (o === "?") {
-                var r = false;
-                l++;
-                $.log(l + " | cache1 | $this, o, h | " + showArgs(arguments));
-                return l--, d;
-                l--;
-                return r;
+                return l--, d
             }
             if (o === "+") {
-                var r = false;
-                l++;
-                $.log(l + " | cache1 | $this, o, h | " + showArgs(arguments));
                 d = $.memory(h);
-                d = d ? $.pages(d) : null;
-                l--;
-                return r;
+                d = d ? $.pages(d) : null
             }
             if (o === "!") {
-                var r = false;
-                l++;
-                $.log(l + " | cache1 | $this, o, h | " + showArgs(arguments));
-                d = h;
-                l--;
-                return r;
-            };
+                d = h
+            }
+
+            ;
+            l--;
+            return r;;
         };
     };
     $.cache1 = function (o, h) {
@@ -247,7 +233,6 @@ function _parseHTML(h) {
 })(jQuery);
 
 function _lPage(hin, p, post) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _lPage | hin, p, post | " + showArgs(arguments));
@@ -256,7 +241,7 @@ function _lPage(hin, p, post) {
     if (!$.cache1("?")) return l--, $.lAjax(hin, p, post);
     p && p();
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -291,27 +276,24 @@ function _lPage(hin, p, post) {
 })(jQuery);
 
 function _insertScript($S, PK) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _insertScript | $S, PK | " + showArgs(arguments));
     $("head").append((PK == "href" ? linki : scri).replace("*", $S));
     l--;
-    return r;;
+    return r;
 };
 
 function _removeScript($S, PK) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _removeScript | $S, PK | " + showArgs(arguments));
     $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
     l--;
-    return r;;
+    return r;
 };
 
 function _findScript($S, $Scripts) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _findScript | $S, $Scripts | " + showArgs(arguments));
@@ -322,7 +304,7 @@ function _findScript($S, $Scripts) {
                 return l--, true;
             };
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -378,14 +360,13 @@ function _findScript($S, $Scripts) {
 })(jQuery);
 
 function _sameScripts(sN, PK) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _sameScripts | sN, PK | " + showArgs(arguments));
     for (var i = 0; i < sN.length; i++)
         if (sN[i][1] == 0) _insertScript(sN[i][0], PK);
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -413,7 +394,6 @@ function _sameScripts(sN, PK) {
 })(jQuery);
 
 function _findCommon(s, sN) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _findCommon | s, sN | " + showArgs(arguments));
@@ -422,29 +402,27 @@ function _findCommon(s, sN) {
         if (_findScript(s[i][0], sN)) s[i][1] = 1
     };
     l--;
-    return r;;
+    return r;
 };
 
 function _freeOld(s, PK) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _freeOld | s, PK | " + showArgs(arguments));
     for (var i = 0; i < s.length; i++)
         if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
     l--;
-    return r;;
+    return r;
 };
 
 function _realNew(s, PK) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _realNew | s, PK | " + showArgs(arguments));
     for (var i = 0; i < s.length; i++)
         if (s[i][1] == 0) _insertScript(s[i][0], PK);
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -526,7 +504,6 @@ function _realNew(s, PK) {
 })(jQuery);
 
 function _detScripts(same, $s) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _detScripts | same, $s | " + showArgs(arguments));
@@ -544,7 +521,7 @@ function _detScripts(same, $s) {
         });
     };
     l--;
-    return r;;
+    return r;
 };
 
 function _inline(txt, s) {
@@ -559,11 +536,10 @@ function _inline(txt, s) {
             if (txt.indexOf(d[i]) + 1) return l--, true;
     };
     l--;
-    return r;;
+    return r;
 };
 
 function _addtext(t) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _addtext | t | " + showArgs(arguments));
@@ -573,7 +549,7 @@ function _addtext(t) {
         alert(e);
     };
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -604,7 +580,6 @@ function _addtext(t) {
 })(jQuery);
 
 function _addScripts(same, $s, st) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _addScripts | same, $s, st | " + showArgs(arguments));
@@ -612,7 +587,7 @@ function _addScripts(same, $s, st) {
     $s.s.addSrcs(same, st);
     $s.t.alltxts(st);
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
@@ -655,32 +630,21 @@ function _addScripts(same, $s, st) {
         }, options);
         cb = settings["cb"];
         this.a = function ($this, o) {
+            var r = false;
+            l++;
+            $.log(l + " | cPage | $this, o | " + showArgs(arguments));
             if (typeof o === "undefined") {
-                var r = false;
-                l++;
-                $.log(l + " | cPage | $this, o | " + showArgs(arguments));
                 $.scripts(null, settings);
-                if (cb) cb();
-                l--;
-                return r;
+                if (cb) cb()
             }
             if (typeof o === "boolean") {
-                var r = false;
-                l++;
-                $.log(l + " | cPage | $this, o | " + showArgs(arguments));
-                $.scripts(o, settings);
-                l--;
-                return r;
+                $.scripts(o, settings)
             }
-            if (typeof o === "string") {
-                var r = false;
-                l++;
-                $.log(l + " | cPage | $this, o | " + showArgs(arguments));
+            if (typeof o === "string") {}
 
-                ;
-                l--;
-                return r;
-            };
+            ;
+            l--;
+            return r;;
         };
     };
     $.cPage = function (o, options) {
@@ -693,18 +657,16 @@ function _addScripts(same, $s, st) {
 })(jQuery);
 
 function _initPage(e) {
-    var d = [];
     var r = false;
     l++;
     $.log(l + " | _initPage | e | " + showArgs(arguments));
     $.cPage(e && e.same);
     l--;
-    return r;;
+    return r;
 };
 
 function _outjs(s) {
-    var d = [];
-    if (s["outjs"]) $.log(jsout);
+    if (s["outjs"]) $.log(jsout)
 };
 
 function _initAjaxify(s) {
@@ -720,7 +682,7 @@ function _initAjaxify(s) {
         return l--, true
     };
     l--;
-    return r;;
+    return r;
 };
 
 (function ($) {
