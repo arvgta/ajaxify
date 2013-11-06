@@ -1049,6 +1049,3 @@ if (jQuery)(function ($) {
         return $this;
     };
 })(jQuery);
-
-
-$.globalEval(call_ajaxify);
