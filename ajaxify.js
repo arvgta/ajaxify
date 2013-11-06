@@ -1,3 +1,5 @@
+var $gthis;
+
 (function ($) {
     var Log = function (options) {
         var d = [];
@@ -15,6 +17,30 @@
         var $this = "";
         $.log.o = $.log.o ? $.log.o : new Log(options);
         r = $.log.o.a($this, m);
+        return r;
+    };
+})(jQuery);
+
+(function ($) {
+    var Preview = function () {
+        var d = [];
+        this.a = function ($this, op) {
+            if(op=='o') { 
+			    $().getPage(d);
+				$gthis.getPage('-');
+			}
+			else { $.log($gthis);
+			    d = location.href;
+				$().getPage(op);
+				$gthis.getPage('-');
+				//$.scripts(false);
+			}
+        };
+    };
+    $.fn.preview = function (op) {
+        var $this = $(this);
+        $.fn.preview.o = $.fn.preview.o ? $.fn.preview.o : new Preview();
+        r = $.fn.preview.o.a($this, op);
         return r;
     };
 })(jQuery);
@@ -214,8 +240,8 @@ function _parseHTML(h) {
                         location = hin;
                     }
                     $.cache1("!", $(_parseHTML(h)));
-                    $.cache1("?").find(".ignore").remove();
                     $.pages([hin, $.cache1("?")]);
+					$gthis.preview(hin);
                     p && p();
                 }
             });
@@ -253,7 +279,7 @@ function _lPage(hin, p, post) {
             $.log(l + " | getPage | $this, t, p, post | " + showArgs(arguments));
             if (!t) return l--, $.cache1("?");
             if (t.indexOf("/") != -1) return l--, _lPage(t, p, post);
-            if (t == "+") _lPage(p);
+            if (t == "+") { _lPage(p); $gthis.preview(p); }
             else {
                 if (t.charAt(0) == "#") {
                     $.cache1("?").find(t).html(p);
@@ -722,6 +748,7 @@ function _initAjaxify(s) {
     $.fn.ajaxify = function (options) {
         var r;
         var $this = $(this);
+		$gthis = $this;
         $.fn.ajaxify.o = $.fn.ajaxify.o ? $.fn.ajaxify.o : new Ajaxify(options);
         r = $.fn.ajaxify.o.a($this);
         return $this;
@@ -833,6 +860,7 @@ if (jQuery)(function ($) {
         requestDelay: 0,
         forms: true,
         turbo: true,
+		preview: true,
         scrollTop: false
     };
 
@@ -846,7 +874,10 @@ if (jQuery)(function ($) {
 
         $window.on("popstate", _onPop);
 
-        if (options.turbo) $(options.selector).hoverIntent(_prefetch);
+        if (options.turbo) $(options.selector).hoverIntent({
+            over: _prefetch,
+            out: _swap_back
+        });
         options.$body.on("click.pronto", options.selector, _click);
         ajaxify_forms();
     }
@@ -854,9 +885,14 @@ if (jQuery)(function ($) {
     function _prefetch(e) {
         var link = e.currentTarget;
         if (window.location.protocol !== link.protocol || window.location.host !== link.host) return;
-        $().getPage('+', link.href);
+        $(this).getPage('+', link.href);
+		if(options.preview) ; //$(this).preview(link.href);
     }
 
+	function _swap_back(e) {
+	    //if(options.preview) $(this).preview('o');
+	}
+	
     function b(m, n) {
         if (m.indexOf("?") > 0) {
             m = m.substring(0, m.indexOf("?"))
