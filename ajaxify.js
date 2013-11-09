@@ -1,5 +1,3 @@
-var $gthis;
-
 (function ($) {
     var Log = function (options) {
         var d = [];
@@ -21,53 +19,19 @@ var $gthis;
     };
 })(jQuery);
 
-(function ($) {
-    var Preview = function () {
-        var d = [];
-        this.a = function ($this, op) {
-            if(op=='o') { 
-			    $().getPage(d);
-				$gthis.getPage('-');
-			}
-			else { $.log($gthis);
-			    d = location.href;
-				$().getPage(op);
-				$gthis.getPage('-');
-				//$.scripts(false);
-			}
-        };
-    };
-    $.fn.preview = function (op) {
-        var $this = $(this);
-        $.fn.preview.o = $.fn.preview.o ? $.fn.preview.o : new Preview();
-        r = $.fn.preview.o.a($this, op);
-        return r;
-    };
-})(jQuery);
-
 function _addAll(PK) {
-    var r = false;
-    l++;
-    $.log(l + " | _addAll | PK | " + showArgs(arguments));
-    return l--, addAll.replace(/PK/g, PK);
-    l--;
-    return r;
+    return addAll.replace(/PK/g, PK)
 };
 
 (function ($) {
     var All = function () {
         var d = [];
         this.a = function ($this, t, fn) {
-            var r = false;
-            l++;
-            $.log(l + " | all | $this, t, fn | " + showArgs(arguments));
             $this.each(function () {
                 t = t.split("*").join("$(this)");
                 t += ";";
                 eval(t);
             });
-            l--;
-            return r;;
         };
     };
     $.fn.all = function (t, fn) {
@@ -81,50 +45,28 @@ function _addAll(PK) {
 
 function _isHtml(x) {
     var d = [];
-    var r = false;
-    l++;
-    $.log(l + " | _isHtml | x | " + showArgs(arguments));
-    return l--, (d = x.getResponseHeader("Content-Type")), d && (d.indexOf("text/html") + 1 || d.indexOf("text/xml") + 1);
-    l--;
-    return r;
+    return (d = x.getResponseHeader("Content-Type")), d && (d.indexOf("text/html") + 1 || d.indexOf("text/xml") + 1)
 };
 
 function _replD(h) {
-    var r = false;
-    l++;
-    $.log(l + " | _replD | h | " + showArgs(arguments));
-    return l--, String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
-    l--;
-    return r;
+    return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>")
 };
 
 function _parseHTML(h) {
-    var r = false;
-    l++;
-    $.log(l + " | _parseHTML | h | " + showArgs(arguments));
-    return l--, $.trim(_replD(h));
-    l--;
-    return r;
+    return $.trim(_replD(h))
 };
 
 (function ($) {
     var Pages = function () {
         var d = [];
         this.a = function ($this, h) {
-            var r = false;
-            l++;
-            $.log(l + " | pages | $this, h | " + showArgs(arguments));
             if (typeof h === "string") {
                 for (var i = 0; i < d.length; i++)
-                    if (d[i][0] == h) return l--, d[i][1]
+                    if (d[i][0] == h) return d[i][1]
             }
             if (typeof h === "object") {
                 d.push(h)
-            }
-
-            ;
-            l--;
-            return r;;
+            };
         };
     };
     $.pages = function (h) {
@@ -144,20 +86,15 @@ function _parseHTML(h) {
         }, options);
         memoryoff = settings["memoryoff"];
         this.a = function ($this, h) {
-            var r = false;
-            l++;
-            $.log(l + " | memory | $this, h | " + showArgs(arguments));
             d = memoryoff;
-            if (!h || d == true) return l--, null;
-            if (d == false) return l--, h;
+            if (!h || d == true) return null;
+            if (d == false) return h;
             if (d.indexOf(", ") + 1) {
                 d = d.split(", ");
                 for (var i = 0, r = h; i < d.length; i++)
-                    if (h == d[i]) return l--, null;
+                    if (h == d[i]) return null;
             }
-            return l--, h == d ? null : h;
-            l--;
-            return r;;
+            return h == d ? null : h;
         };
     };
     $.memory = function (h, options) {
@@ -173,11 +110,8 @@ function _parseHTML(h) {
     var Cache1 = function () {
         var d = [];
         this.a = function ($this, o, h) {
-            var r = false;
-            l++;
-            $.log(l + " | cache1 | $this, o, h | " + showArgs(arguments));
             if (o === "?") {
-                return l--, d
+                return d
             }
             if (o === "+") {
                 d = $.memory(h);
@@ -185,11 +119,7 @@ function _parseHTML(h) {
             }
             if (o === "!") {
                 d = h
-            }
-
-            ;
-            l--;
-            return r;;
+            };
         };
     };
     $.cache1 = function (o, h) {
@@ -205,14 +135,9 @@ function _parseHTML(h) {
     var LDivs = function () {
         var d = [];
         this.a = function ($this) {
-            var r = false;
-            l++;
-            $.log(l + " | lDivs | $this | " + showArgs(arguments));
             $this.all("fn(*)", function (s) {
-                s.html($.cache1("?").find("#" + s.attr("id")).html());
+                if ($.cache1("?")) s.html($.cache1("?").find("#" + s.attr("id")).html());
             });
-            l--;
-            return r;;
         };
     };
     $.fn.lDivs = function () {
@@ -228,9 +153,6 @@ function _parseHTML(h) {
     var LAjax = function () {
         var d = [];
         this.a = function ($this, hin, p, post) {
-            var r = false;
-            l++;
-            $.log(l + " | lAjax | $this, hin, p, post | " + showArgs(arguments));
             var xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
@@ -241,12 +163,9 @@ function _parseHTML(h) {
                     }
                     $.cache1("!", $(_parseHTML(h)));
                     $.pages([hin, $.cache1("?")]);
-					$gthis.preview(hin);
                     p && p();
                 }
             });
-            l--;
-            return r;;
         };
     };
     $.lAjax = function (hin, p, post) {
@@ -259,95 +178,65 @@ function _parseHTML(h) {
 })(jQuery);
 
 function _lPage(hin, p, post) {
-    var r = false;
-    l++;
-    $.log(l + " | _lPage | hin, p, post | " + showArgs(arguments));
     if (hin.indexOf("#") + 1) hin = hin.split("#")[0];
     $.cache1("+", post ? null : hin);
-    if (!$.cache1("?")) return l--, $.lAjax(hin, p, post);
-    p && p();
-    l--;
-    return r;
+    if (!$.cache1("?")) return $.lAjax(hin, p, post);
+    p && p()
 };
 
 (function ($) {
     var GetPage = function () {
         var d = [];
-        this.a = function ($this, t, p, post) {
-            var r = false;
-            l++;
-            $.log(l + " | getPage | $this, t, p, post | " + showArgs(arguments));
-            if (!t) return l--, $.cache1("?");
-            if (t.indexOf("/") != -1) return l--, _lPage(t, p, post);
-            if (t == "+") { _lPage(p); $gthis.preview(p); }
+        this.a = function ($this, t, p, p2) {
+            if (!t) return $.cache1("?");
+            if (t.indexOf("/") != -1) return _lPage(t, p, p2);
+            if (t == "+") _lPage(p, p2);
             else {
                 if (t.charAt(0) == "#") {
                     $.cache1("?").find(t).html(p);
                     t = "-";
                 }
-                if (t == "-") return l--, $this.lDivs();
-                return l--, $.cache1("?").find(".ajy-" + t).detach();
+                if (t == "-") return $this.lDivs();
+                return $.cache1("?").find(".ajy-" + t).detach();
             };
-            l--;
-            return r;;
         };
     };
-    $.fn.getPage = function (t, p, post) {
+    $.fn.getPage = function (t, p, p2) {
         var r;
         var $this = $(this);
         $.fn.getPage.o = $.fn.getPage.o ? $.fn.getPage.o : new GetPage();
-        r = $.fn.getPage.o.a($this, t, p, post);
+        r = $.fn.getPage.o.a($this, t, p, p2);
         return r;
     };
 })(jQuery);
 
 function _insertScript($S, PK) {
-    var r = false;
-    l++;
-    $.log(l + " | _insertScript | $S, PK | " + showArgs(arguments));
-    $("head").append((PK == "href" ? linki : scri).replace("*", $S));
-    l--;
-    return r;
+    $("head").append((PK == "href" ? linki : scri).replace("*", $S))
 };
 
 function _removeScript($S, PK) {
-    var r = false;
-    l++;
-    $.log(l + " | _removeScript | $S, PK | " + showArgs(arguments));
-    $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
-    l--;
-    return r;
+    $((PK == "href" ? linkr : scrr).replace("!", $S)).remove()
 };
 
 function _findScript($S, $Scripts) {
-    var r = false;
-    l++;
-    $.log(l + " | _findScript | $S, $Scripts | " + showArgs(arguments));
     if ($S)
         for (var i = 0; i < $Scripts.length; i++)
             if ($Scripts[i][0] == $S) {
                 $Scripts[i][1] = 1;
-                return l--, true;
-            };
-    l--;
-    return r;
+                return true;
+            }
 };
 
 (function ($) {
     var AllScripts = function () {
         var d = [];
         this.a = function ($this, PK, deltas) {
-            var r = false;
-            l++;
-            $.log(l + " | allScripts | $this, PK, deltas | " + showArgs(arguments));
             if (!deltas) {
                 $this.each(function () {
                     _insertScript($(this)[0], PK);
                 });
-                return l--, true;
+                return true;
             };
-            l--;
-            return r;;
         };
     };
     $.fn.allScripts = function (PK, deltas) {
@@ -363,17 +252,12 @@ function _findScript($S, $Scripts) {
     var ClassAlways = function () {
         var d = [];
         this.a = function ($this, PK) {
-            var r = false;
-            l++;
-            $.log(l + " | classAlways | $this, PK | " + showArgs(arguments));
             $this.each(function () {
                 if ($(this).attr("data-class") == "always") {
                     _insertScript($(this).attr(PK), PK);
                     $(this).remove();
                 }
             });
-            l--;
-            return r;;
         };
     };
     $.fn.classAlways = function (PK) {
@@ -386,28 +270,18 @@ function _findScript($S, $Scripts) {
 })(jQuery);
 
 function _sameScripts(sN, PK) {
-    var r = false;
-    l++;
-    $.log(l + " | _sameScripts | sN, PK | " + showArgs(arguments));
     for (var i = 0; i < sN.length; i++)
-        if (sN[i][1] == 0) _insertScript(sN[i][0], PK);
-    l--;
-    return r;
+        if (sN[i][1] == 0) _insertScript(sN[i][0], PK)
 };
 
 (function ($) {
     var NewArray = function () {
         var d = [];
         this.a = function ($this, sN, sO, PK, pass) {
-            var r = false;
-            l++;
-            $.log(l + " | newArray | $this, sN, sO, PK, pass | " + showArgs(arguments));
             $this.each(function () {
                 sN.push([$(this).attr(PK), 0]);
                 if (!pass) sO.push([$(this).attr(PK), 0]);
             });
-            l--;
-            return r;;
         };
     };
     $.fn.newArray = function (sN, sO, PK, pass) {
@@ -420,35 +294,20 @@ function _sameScripts(sN, PK) {
 })(jQuery);
 
 function _findCommon(s, sN) {
-    var r = false;
-    l++;
-    $.log(l + " | _findCommon | s, sN | " + showArgs(arguments));
     for (var i = 0; i < s.length; i++) {
         s[i][1] = 2;
         if (_findScript(s[i][0], sN)) s[i][1] = 1
-    };
-    l--;
-    return r;
+    }
 };
 
 function _freeOld(s, PK) {
-    var r = false;
-    l++;
-    $.log(l + " | _freeOld | s, PK | " + showArgs(arguments));
     for (var i = 0; i < s.length; i++)
-        if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
-    l--;
-    return r;
+        if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK)
 };
 
 function _realNew(s, PK) {
-    var r = false;
-    l++;
-    $.log(l + " | _realNew | s, PK | " + showArgs(arguments));
     for (var i = 0; i < s.length; i++)
-        if (s[i][1] == 0) _insertScript(s[i][0], PK);
-    l--;
-    return r;
+        if (s[i][1] == 0) _insertScript(s[i][0], PK)
 };
 
 (function ($) {
@@ -462,12 +321,9 @@ function _realNew(s, PK) {
         }, options);
         deltas = settings["deltas"];
         this.a = function ($this, same) {
-            var r = false;
-            l++;
-            $.log(l + " | addHrefs  | $this, same | " + showArgs(arguments));
             if (!$this.allScripts("href", deltas)) {
                 if (pass) $this.classAlways("href");
-                if (same) return l--, _sameScripts($scriptsN, "href");
+                if (same) return _sameScripts($scriptsN, "href");
                 $scriptsN = [];
                 $this.newArray($scriptsN, $scriptsO, "href", pass);
                 if (pass++) {
@@ -477,8 +333,6 @@ function _realNew(s, PK) {
                     $scriptsO = $scriptsN.slice()
                 }
             };
-            l--;
-            return r;;
         };
     };
     $.fn.addHrefs = function (same, options) {
@@ -501,12 +355,9 @@ function _realNew(s, PK) {
         }, options);
         deltas = settings["deltas"];
         this.a = function ($this, same) {
-            var r = false;
-            l++;
-            $.log(l + " | addSrcs  | $this, same | " + showArgs(arguments));
             if (!$this.allScripts("src", deltas)) {
                 if (pass) $this.classAlways("src");
-                if (same) return l--, _sameScripts($scriptsN, "src");
+                if (same) return _sameScripts($scriptsN, "src");
                 $scriptsN = [];
                 $this.newArray($scriptsN, $scriptsO, "src", pass);
                 if (pass++) {
@@ -516,8 +367,6 @@ function _realNew(s, PK) {
                     $scriptsO = $scriptsN.slice()
                 }
             };
-            l--;
-            return r;;
         };
     };
     $.fn.addSrcs = function (same, options) {
@@ -530,9 +379,6 @@ function _realNew(s, PK) {
 })(jQuery);
 
 function _detScripts(same, $s) {
-    var r = false;
-    l++;
-    $.log(l + " | _detScripts | same, $s | " + showArgs(arguments));
     if (!same) {
         var links = $().getPage("link"),
             jss = $().getPage("script");
@@ -545,46 +391,31 @@ function _detScripts(same, $s) {
         $s.t = jss.filter(function () {
             return !($(this).attr("src"));
         });
-    };
-    l--;
-    return r;
+    }
 };
 
 function _inline(txt, s) {
     var d = [];
-    var r = false;
-    l++;
-    $.log(l + " | _inline | txt, s | " + showArgs(arguments));
     d = s["inlinehints"];
     if (d) {
         d = d.split(", ");
         for (var i = 0; i < d.length; i++)
-            if (txt.indexOf(d[i]) + 1) return l--, true;
-    };
-    l--;
-    return r;
+            if (txt.indexOf(d[i]) + 1) return true;
+    }
 };
 
 function _addtext(t) {
-    var r = false;
-    l++;
-    $.log(l + " | _addtext | t | " + showArgs(arguments));
     try {
         $.globalEval(t);
     } catch (e) {
         alert(e);
-    };
-    l--;
-    return r;
+    }
 };
 
 (function ($) {
     var Alltxts = function () {
         var d = [];
         this.a = function ($this, s) {
-            var r = false;
-            l++;
-            $.log(l + " | alltxts | $this, s | " + showArgs(arguments));
             $this.each(function () {
                 d = $(this).html();
                 if (d.indexOf(").ajaxify(") == -1 && (s["inline"] || $(this).hasClass("ajaxy") || _inline(d, s))) {
@@ -592,8 +423,6 @@ function _addtext(t) {
                 }
                 r = true;
             });
-            l--;
-            return r;;
         };
     };
     $.fn.alltxts = function (s) {
@@ -606,14 +435,9 @@ function _addtext(t) {
 })(jQuery);
 
 function _addScripts(same, $s, st) {
-    var r = false;
-    l++;
-    $.log(l + " | _addScripts | same, $s, st | " + showArgs(arguments));
     $s.c.addHrefs(same, st);
     $s.s.addSrcs(same, st);
-    $s.t.alltxts(st);
-    l--;
-    return r;
+    $s.t.alltxts(st)
 };
 
 (function ($) {
@@ -626,17 +450,12 @@ function _addScripts(same, $s, st) {
         }, options);
         deltas = settings["deltas"];
         this.a = function ($this, same) {
-            var r = false;
-            l++;
-            $.log(l + " | scripts | $this, same | " + showArgs(arguments));
             _detScripts(same, $scripts);
             if (pass++) _addScripts(same, $scripts, settings);
             else {
                 $scripts.c.addHrefs(same, settings);
                 $scripts.s.addSrcs(same, settings);
             };
-            l--;
-            return r;;
         };
     };
     $.scripts = function (same, options) {
@@ -656,9 +475,6 @@ function _addScripts(same, $s, st) {
         }, options);
         cb = settings["cb"];
         this.a = function ($this, o) {
-            var r = false;
-            l++;
-            $.log(l + " | cPage | $this, o | " + showArgs(arguments));
             if (typeof o === "undefined") {
                 $.scripts(null, settings);
                 if (cb) cb()
@@ -666,11 +482,7 @@ function _addScripts(same, $s, st) {
             if (typeof o === "boolean") {
                 $.scripts(o, settings)
             }
-            if (typeof o === "string") {}
-
-            ;
-            l--;
-            return r;;
+            if (typeof o === "string") {};
         };
     };
     $.cPage = function (o, options) {
@@ -683,12 +495,7 @@ function _addScripts(same, $s, st) {
 })(jQuery);
 
 function _initPage(e) {
-    var r = false;
-    l++;
-    $.log(l + " | _initPage | e | " + showArgs(arguments));
-    $.cPage(e && e.same);
-    l--;
-    return r;
+    $.cPage(e && e.same)
 };
 
 function _outjs(s) {
@@ -697,18 +504,13 @@ function _outjs(s) {
 
 function _initAjaxify(s) {
     var d = [];
-    var r = false;
-    l++;
-    $.log(l + " | _initAjaxify | s | " + showArgs(arguments));
     d = window.history && window.history.pushState && window.history.replaceState;
     if (d && s["pluginon"]) {
         _outjs(s);
         $.memory(null, s);
         $.cPage("", s);
-        return l--, true
-    };
-    l--;
-    return r;
+        return true
+    }
 };
 
 (function ($) {
@@ -738,6 +540,7 @@ function _initAjaxify(s) {
             $(function () {
                 $.log("Entering ajaxify...", settings);
                 if (_initAjaxify(settings)) {
+                    $gthis = $this;
                     $this.pronto(settings);
                     $(window).on("pronto.render", _initPage);
                     $().getPage(location.href, $.cPage);
@@ -748,340 +551,290 @@ function _initAjaxify(s) {
     $.fn.ajaxify = function (options) {
         var r;
         var $this = $(this);
-		$gthis = $this;
         $.fn.ajaxify.o = $.fn.ajaxify.o ? $.fn.ajaxify.o : new Ajaxify(options);
         r = $.fn.ajaxify.o.a($this);
         return $this;
     };
-})(jQuery);﻿
-(function (e) {
-    e.fn.hoverIntent = function (t, n, r) {
-        var i = {
-            interval: 100,
-            sensitivity: 7,
-            timeout: 0
-        };
-        if (typeof t === "object") {
-            i = e.extend(i, t)
-        } else if (e.isFunction(n)) {
-            i = e.extend(i, {
-                over: t,
-                out: n,
-                selector: r
-            })
-        } else {
-            i = e.extend(i, {
-                over: t,
-                out: t,
-                selector: n
-            })
-        }
-        var s, o, u, a;
-        var f = function (e) {
-            s = e.pageX;
-            o = e.pageY
-        };
-        var l = function (t, n) {
-            n.hoverIntent_t = clearTimeout(n.hoverIntent_t);
-            if (Math.abs(u - s) + Math.abs(a - o) < i.sensitivity) {
-                e(n).off("mousemove.hoverIntent", f);
-                n.hoverIntent_s = 1;
-                return i.over.apply(n, [t])
-            } else {
-                u = s;
-                a = o;
-                n.hoverIntent_t = setTimeout(function () {
-                    l(t, n)
-                }, i.interval)
-            }
-        };
-        var c = function (e, t) {
-            t.hoverIntent_t = clearTimeout(t.hoverIntent_t);
-            t.hoverIntent_s = 0;
-            return i.out.apply(t, [e])
-        };
-        var h = function (t) {
-            var n = jQuery.extend({}, t);
-            var r = this;
-            if (r.hoverIntent_t) {
-                r.hoverIntent_t = clearTimeout(r.hoverIntent_t)
-            }
-            if (t.type == "mouseenter") {
-                u = n.pageX;
-                a = n.pageY;
-                e(r).on("mousemove.hoverIntent", f);
-                if (r.hoverIntent_s != 1) {
-                    r.hoverIntent_t = setTimeout(function () {
-                        l(n, r)
-                    }, i.interval)
-                }
-            } else {
-                e(r).off("mousemove.hoverIntent", f);
-                if (r.hoverIntent_s == 1) {
-                    r.hoverIntent_t = setTimeout(function () {
-                        c(n, r)
-                    }, i.timeout)
-                }
-            }
-        };
-        return this.on({
-            "mouseenter.hoverIntent": h,
-            "mouseleave.hoverIntent": h
-        }, i.selector)
-    }
-})(jQuery);
+})(jQuery);﻿(function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
 
-function showArgs(a) {
-    s = '';
-    for (var i = 0; i < a.length; i++) s += (a[i] != undefined && typeof a[i] != 'function' && typeof a[i] != 'object' && (typeof a[i] != 'string' || a[i].length <= 100) ? a[i] : (typeof a[i] == 'string' ? a[i].substr(0, 100) : typeof a[i])) + ' | ';
-    return s
-}
+function showArgs(a) { s=''; for(var i=0; i<a.length; i++) s+=(a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (typeof a[i]!='string' || a[i].length <= 100) ? a[i] : (typeof a[i]=='string' ? a[i].substr(0, 100) : typeof a[i]) ) + ' | '; return s }
 
-var l = 0;
+var l=0;
 var docType = /<\!DOCTYPE[^>]*>/i;
 var tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi;
 var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
-var div12 = '<div class="ajy-$1"$2';
-var linki = '<link rel="stylesheet" type="text/css" href="*" />',
-    scri = '<script type="text/javascript" src="*" />';
-var linkr = 'link[href*="!"]',
-    scrr = 'script[src*="!"]';
+var div12 =  '<div class="ajy-$1"$2';
+var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
+var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
-if (jQuery)(function ($) {
+/*
+* Pronto Plugin
+* @author Ben Plum, Arvind Gupta
+* @version 0.6.3
+*
+* Copyright © 2013 Ben Plum: mr@benplum.com, Arvind Gupta: arvgta@gmail.com
+* Released under the MIT License
+*/
+ 
+if (jQuery) (function($) {
 
-    var $this, $window = $(window),
-        currentURL = '',
-        requestTimer = null,
-        post = null;
+var $this, $window = $(window),
+currentURL = '',
+requestTimer = null,
+post = null;
 
-    var options = {
-        selector: "a",
-        requestKey: "pronto",
-        requestDelay: 0,
-        forms: true,
-        turbo: true,
-		preview: true,
-        scrollTop: false
-    };
+// Default Options
+var options = {
+    selector: "a",
+    requestKey: "pronto",
+    requestDelay: 0,
+    forms: true,
+    turbo: true,
+    preview: true,
+    scrollTop: false
+};
 
-    function _init(opts) {
-        $.extend(options, opts || {});
-        options.$body = $("body");
-        options.$container = $(options.container);
-        currentURL = window.location.href;
+// Private Methods
 
-        _saveState();
+// Init
+function _init(opts) { 
+     $.extend(options, opts || {});
+     options.$body = $("body");
+     options.$container = $(options.container);
 
-        $window.on("popstate", _onPop);
+     // Capture current url & state
+     currentURL = window.location.href;
 
-        if (options.turbo) $(options.selector).hoverIntent({
-            over: _prefetch,
-            out: _swap_back
-        });
-        options.$body.on("click.pronto", options.selector, _click);
-        ajaxify_forms();
+     // Set initial state
+     _saveState();
+
+     // Bind state events
+     $window.on("popstate", _onPop);
+
+     if(options.turbo) $(options.selector).hoverIntent( _prefetch );
+     options.$body.on("click.pronto", options.selector, _click);
+     ajaxify_forms();
+}
+
+function _prefetch(e) {
+     var link = e.currentTarget;
+     if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
+     
+	 var req2 = function(){ 	
+        if(options.preview) _click(e);
+     };
+	 
+	 $this.getPage('+', link.href, req2);
+     //if(options.preview) _click(e);
+}
+
+function b(m, n) {
+    if (m.indexOf("?") > 0) {
+        m = m.substring(0, m.indexOf("?"))
     }
+    
+    return m + "?" + n
+}
 
-    function _prefetch(e) {
-        var link = e.currentTarget;
-        if (window.location.protocol !== link.protocol || window.location.host !== link.host) return;
-        $(this).getPage('+', link.href);
-		if(options.preview) ; //$(this).preview(link.href);
-    }
-
-	function _swap_back(e) {
-	    //if(options.preview) $(this).preview('o');
-	}
-	
-    function b(m, n) {
-        if (m.indexOf("?") > 0) {
-            m = m.substring(0, m.indexOf("?"))
-        }
-
-        return m + "?" + n
-    }
-
-    function k(m) {
-        var o = m.serialize();
-        var n;
+function k(m) {
+    var o = m.serialize();
+    var n;
         n = $("input[name][type=submit]", m);
 
-        if (n.length == 0) {
-            $.log('Nothing found in function k() !');
-            return o
-        }
-
-        var p = n.attr("name") + "=" + n.val();
-        if (o.length > 0) {
-            o += "&" + p
-        } else {
-            o = p
-        }
-
-        return o
+    if (n.length == 0) { $.log('Nothing found in function k() !');
+        return o;
     }
-
-    function ajaxify_forms(s) {
-        if (!options.forms) return;
-
-        $('form').submit(function (q) {
-
-            var f = $(q.target);
-            if (!f.is("form")) {
-                f = f.filter("input[type=submit]").parents("form:first");
-                if (f.length == 0) {
-                    return true
-                }
-            }
-
-            var p = k(f);
-            var q = "get",
-                m = f.attr("method");
-            if (m.length > 0 && m.toLowerCase() == "post") q = "post";
-
-            var h, a = f.attr("action");
-            if (a != null && a.length > 0) h = a;
-            else h = currentURL;
-
-            if (q == "get") h = b(h, p);
-            else {
-                post = {};
-                post.data = p;
-            }
-
-            $.log('Action href : ' + h);
-            $window.trigger("pronto.submit", h);
-            _request(h);
-
-            return false;
-        });
+    
+    var p = n.attr("name") + "=" + n.val();
+    if (o.length > 0) {
+        o += "&" + p
+    } else {
+        o = p
     }
+    
+    return o;
+}
 
+function ajaxify_forms(s) { 
+if(!options.forms) return;
 
-    function _click(e) {
-        var link = e.currentTarget;
-        post = null;
+// capture submit
+$('form').submit(function(q) { 
 
-        if ((e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) || (window.location.protocol !== link.protocol || window.location.host !== link.host)) {
-            return;
-        }
-
-        if (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#') {
-            _saveState();
-            return;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (currentURL == link.href) {
-            _saveState();
-        } else {
-            _request(link.href);
+    var f = $(q.target);
+    if (!f.is("form")) {
+        f = f.filter("input[type=submit]").parents("form:first");
+        if (f.length == 0) {
+            return true
         }
     }
+   
+    var p = k(f);
+    var q = "get", m = f.attr("method");
+    if (m.length > 0 && m.toLowerCase() == "post") q = "post";
+    
+    var h, a = f.attr("action");
+    if ( a != null && a.length > 0) h = a;
+    else h = currentURL;
+    
+    if (q == "get") h = b(h, p);
+    else { post = {};  post.data = p; }
+    
+    $.log('Action href : ' + h);
+    $window.trigger("pronto.submit", h);
+    _request(h);
+     
+     // prevent submitting again
+     return false;
+});
+}
 
-    function _request(url) {
-        $window.trigger("pronto.request");
+// Handle link clicks
+function _click(e) {
+     var link = e.currentTarget; post = null;
 
-        var req2 = function () {
-            _render(url, 0, true);
-        };
+     // Ignore everything but normal click
+     if ( (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+     || (window.location.protocol !== link.protocol || window.location.host !== link.host)
+     ) {
+          return;
+     }
+     
+     // Update state on hash change
+     if (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#') {
+        _saveState();
+        return;
+     }
 
-        $().getPage(url, req2, post);
-    }
+     e.preventDefault();
+     e.stopPropagation();
 
-    function _onPop(e) {
-        var data = e.originalEvent.state;
+     if (currentURL == link.href) {
+         _saveState();
+     } else {
+         _request(link.href);
+     } 
+}
 
-        if (data !== null && data.url !== currentURL) {
-            $window.trigger("pronto.request");
-            var req3 = function () {
-                _render(data.url, data.scroll, false);
-            };
+// Request new url
+function _request(url) { 
+     // Fire request event
+     $window.trigger("pronto.request");
 
-            $().getPage(data.url, req3);
-        }
-    }
+     var req2 = function(){ 	
+         _render(url, 0, true);
+     };
+     
+     $this.getPage(url, req2, post);
+}
 
-    function _render(url, scrollTop, doPush) {
-        if (requestTimer !== null) {
-            clearTimeout(requestTimer);
-            requestTimer = null;
-        }
+// Handle back/forward navigation
+function _onPop(e) {
+     var data = e.originalEvent.state;
 
-        requestTimer = setTimeout(function () {
-            _doRender(url, scrollTop, doPush)
-        }, options.requestDelay);
-    }
+     // Check if data exists
+     if (data !== null && data.url !== currentURL) {
+         // Fire request event
+         $window.trigger("pronto.request");  
+         var req3 = function(){ 	
+             _render(data.url, data.scroll, false);
+         };
 
-    function _doPush(url, doPush) {
-        currentURL = url;
+         $this.getPage(data.url, req3);
+     }
+}
 
-        if (doPush) {
-            history.pushState(
-                (options.scrollTop ? {
+function _render(url, scrollTop, doPush) {      
+     if (requestTimer !== null) {
+          clearTimeout(requestTimer);
+          requestTimer = null;
+     }
+     
+     requestTimer = setTimeout(function() {
+       _doRender(url, scrollTop, doPush)
+     }, options.requestDelay);
+}
+
+function _doPush(url, doPush) {
+     // Update current url
+     currentURL = url;
+
+     // Push new states to the stack on new url
+     if (doPush) {
+          history.pushState(
+               (options.scrollTop ? {
                     url: currentURL,
                     scroll: 0
-                } : {
-                    url: currentURL
-                }), "state-" + currentURL, currentURL);
-        } else {
+          } : { url: currentURL}
+        ), "state-"+currentURL, currentURL);
+     } else {
+     
+     // Set state if moving back/forward
+     _saveState();
+     }
+}
+   
+// Render HTML
+function _doRender(url, scrollTop, doPush) { 
+     // Fire load event
+     $window.trigger("pronto.load");
 
-            _saveState();
-        }
-    }
+     // Trigger analytics page view
+     _gaCaptureView(url);
 
+     // Update current state
+     _saveState();
 
-    function _doRender(url, scrollTop, doPush) {
-        $window.trigger("pronto.load");
+     // Update title
+     $('title').html($this.getPage('title').html());
 
-        _gaCaptureView(url);
+     // Update DOM
+     $this.getPage('-');
+     ajaxify_forms();     
+     
+     // Scroll to hash if given
+     if(url.indexOf('#') + 1) { 
+         $('html, body').animate({
+            scrollTop: $( '#' + url.split('#')[1] ).offset().top
+         }, 500);
+     }
 
-        _saveState();
+     _doPush(url, doPush);
 
-        $('title').html($().getPage('title').html());
+     // Fire render event
+     var event = jQuery.Event("pronto.render");
+     event.same = post ? true : false;
+     $window.trigger(event);
 
-        $this.getPage('-');
-        ajaxify_forms();
+     //Set Scroll position
+     if(options.scrollTop) $window.scrollTop(scrollTop);
+}
 
-        if (url.indexOf('#') + 1) {
-            $('html, body').animate({
-                scrollTop: $('#' + url.split('#')[1]).offset().top
-            }, 500);
-        }
+// Save current state
+function _saveState() {
+     // Update state
+     if(options.scrollTop) {
+          history.replaceState({
+          url: currentURL,
+          scroll: $window.scrollTop()
+     }, "state-"+currentURL, currentURL);
+     } else {
+          history.replaceState({
+               url: currentURL
+          }, "state-"+currentURL, currentURL);
+     }
+}
 
-        _doPush(url, doPush);
+// Google Analytics support
+function _gaCaptureView(url) {
+     if (typeof _gaq === "undefined") _gaq = [];
+     _gaq.push(['_trackPageview'], url);
+}
 
-        var event = jQuery.Event("pronto.render");
-        event.same = post ? true : false;
-        $window.trigger(event);
-
-        if (options.scrollTop) $window.scrollTop(scrollTop);
-    }
-
-
-    function _saveState() {
-        if (options.scrollTop) {
-            history.replaceState({
-                url: currentURL,
-                scroll: $window.scrollTop()
-            }, "state-" + currentURL, currentURL);
-        } else {
-            history.replaceState({
-                url: currentURL
-            }, "state-" + currentURL, currentURL);
-        }
-    }
-
-    function _gaCaptureView(url) {
-        if (typeof _gaq === "undefined") _gaq = [];
-        _gaq.push(['_trackPageview'], url);
-    }
-
-    $.fn.pronto = function (opts) {
-        $this = $(this);
-        _init(opts);
-        return $this;
-    };
+// Define Plugin
+$.fn.pronto = function(opts) {
+     $this = $(this);
+     _init(opts);
+     return $this;
+};
 })(jQuery);
