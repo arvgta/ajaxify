@@ -607,7 +607,7 @@ function _prefetch(e) { post = null;
      if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
      
      var req2 = function(){  
-         if(options.preview) _click(e);
+         if(options.preview) _click(e, true);
      };
     	 
 	 $this.getPage('+', link.href, req2);
@@ -678,7 +678,7 @@ $('form').submit(function(q) {
 }
 
 // Handle link clicks
-function _click(e) {
+function _click(e, mode) {
      var link = e.currentTarget; post = null;
 
      // Ignore everything but normal click
@@ -700,17 +700,17 @@ function _click(e) {
      if (currentURL == link.href) {
          _saveState();
      } else {
-         _request(link.href);
+         _request(link.href, mode);
      } 
 }
 
 // Request new url
-function _request(url) { 
+function _request(url, mode) { 
      // Fire request event
      $window.trigger("pronto.request");
 
      var reqr = function(){ 	
-         _render(url, 0, true);
+         _render(url, 0, true, mode);
      };
      
      $this.getPage(url, reqr, post);
@@ -732,14 +732,14 @@ function _onPop(e) {
      }
 }
 
-function _render(url, scrollTop, doPush) {      
+function _render(url, scrollTop, doPush, mode) {      
      if (requestTimer !== null) {
           clearTimeout(requestTimer);
           requestTimer = null;
      }
      
      requestTimer = setTimeout(function() {
-       _doRender(url, scrollTop, doPush)
+       _doRender(url, scrollTop, doPush, mode)
      }, options.requestDelay);
 }
 
@@ -763,7 +763,7 @@ function _doPush(url, doPush) {
 }
    
 // Render HTML
-function _doRender(url, scrollTop, doPush) { 
+function _doRender(url, scrollTop, doPush, mode) { 
      // Fire load event
      $window.trigger("pronto.load");
 
@@ -781,7 +781,7 @@ function _doRender(url, scrollTop, doPush) {
      ajaxify_forms();     
      
      // Scroll to hash if given
-     if(url.indexOf('#') + 1) { 
+     if(url.indexOf('#') + 1 && !mode) { 
          $('html, body').animate({
             scrollTop: $( '#' + url.split('#')[1] ).offset().top
          }, 500);
