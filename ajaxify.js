@@ -5,15 +5,14 @@
             verbosity: 0
         }, options);
         var verbosity = settings["verbosity"];
-        this.a = function ($this, m) {
+        this.a = function (m) {
             l < verbosity && con && con.log(m);
         };
     };
     $.log = function (m, options) {
         var r;
-        var $this = "";
         $.log.o = $.log.o ? $.log.o : new Log(options);
-        r = $.log.o.a($this, m);
+        r = $.log.o.a(m);
         return r;
     };
 })(jQuery);
@@ -56,7 +55,7 @@ function _parseHTML(h) {
 
 (function ($) {
     var Pages = function () {
-        this.a = function ($this, h) {
+        this.a = function (h) {
             if (typeof h === "string") {
                 for (var i = 0; i < d.length; i++)
                     if (d[i][0] == h) return d[i][1]
@@ -68,9 +67,8 @@ function _parseHTML(h) {
     };
     $.pages = function (h) {
         var r;
-        var $this = "";
         $.pages.o = $.pages.o ? $.pages.o : new Pages();
-        r = $.pages.o.a($this, h);
+        r = $.pages.o.a(h);
         return r;
     };
 })(jQuery);
@@ -81,7 +79,7 @@ function _parseHTML(h) {
             memoryoff: false
         }, options);
         var memoryoff = settings["memoryoff"];
-        this.a = function ($this, h) {
+        this.a = function (h) {
             d = memoryoff;
             if (!h || d == true) return null;
             if (d == false) return h;
@@ -95,16 +93,15 @@ function _parseHTML(h) {
     };
     $.memory = function (h, options) {
         var r;
-        var $this = "";
         $.memory.o = $.memory.o ? $.memory.o : new Memory(options);
-        r = $.memory.o.a($this, h);
+        r = $.memory.o.a(h);
         return r;
     };
 })(jQuery);
 
 (function ($) {
     var Cache1 = function () {
-        this.a = function ($this, o, h) {
+        this.a = function (o, h) {
             if (o === "?") {
                 return d
             }
@@ -119,9 +116,8 @@ function _parseHTML(h) {
     };
     $.cache1 = function (o, h) {
         var r;
-        var $this = "";
         $.cache1.o = $.cache1.o ? $.cache1.o : new Cache1();
-        r = $.cache1.o.a($this, o, h);
+        r = $.cache1.o.a(o, h);
         return r;
     };
 })(jQuery);
@@ -145,7 +141,7 @@ function _parseHTML(h) {
 
 (function ($) {
     var LAjax = function () {
-        this.a = function ($this, hin, p, post) {
+        this.a = function (hin, p, post) {
             var xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
@@ -163,9 +159,8 @@ function _parseHTML(h) {
     };
     $.lAjax = function (hin, p, post) {
         var r;
-        var $this = "";
         $.lAjax.o = $.lAjax.o ? $.lAjax.o : new LAjax();
-        r = $.lAjax.o.a($this, hin, p, post);
+        r = $.lAjax.o.a(hin, p, post);
         return r;
     };
 })(jQuery);
@@ -437,7 +432,7 @@ function _addScripts(same, $s, st) {
             "deltas": true
         }, options);
         var deltas = settings["deltas"];
-        this.a = function ($this, same) {
+        this.a = function (same) {
             if (same == 'i') return true;
             _detScripts(same, $scripts);
             if (pass++) _addScripts(same, $scripts, settings);
@@ -449,9 +444,8 @@ function _addScripts(same, $s, st) {
     };
     $.scripts = function (same, options) {
         var r;
-        var $this = "";
         $.scripts.o = $.scripts.o ? $.scripts.o : new Scripts(options);
-        r = $.scripts.o.a($this, same);
+        r = $.scripts.o.a(same);
         return r;
     };
 })(jQuery);
