@@ -1,11 +1,10 @@
 (function ($) {
     var Log = function (options) {
-        var d = [];
         var con = window.console;
         var settings = $.extend({
             verbosity: 0
         }, options);
-        verbosity = settings["verbosity"];
+        var verbosity = settings["verbosity"];
         this.a = function ($this, m) {
             l < verbosity && con && con.log(m);
         };
@@ -25,7 +24,6 @@ function _addAll(PK) {
 
 (function ($) {
     var All = function () {
-        var d = [];
         this.a = function ($this, t, fn) {
             $this.each(function () {
                 t = t.split("*").join("$(this)");
@@ -58,7 +56,6 @@ function _parseHTML(h) {
 
 (function ($) {
     var Pages = function () {
-        var d = [];
         this.a = function ($this, h) {
             if (typeof h === "string") {
                 for (var i = 0; i < d.length; i++)
@@ -80,11 +77,10 @@ function _parseHTML(h) {
 
 (function ($) {
     var Memory = function (options) {
-        var d = [];
         var settings = $.extend({
             memoryoff: false
         }, options);
-        memoryoff = settings["memoryoff"];
+        var memoryoff = settings["memoryoff"];
         this.a = function ($this, h) {
             d = memoryoff;
             if (!h || d == true) return null;
@@ -108,7 +104,6 @@ function _parseHTML(h) {
 
 (function ($) {
     var Cache1 = function () {
-        var d = [];
         this.a = function ($this, o, h) {
             if (o === "?") {
                 return d
@@ -133,7 +128,6 @@ function _parseHTML(h) {
 
 (function ($) {
     var LDivs = function () {
-        var d = [];
         this.a = function ($this) {
             $this.all("fn(*)", function (s) {
                 if ($.cache1("?")) s.html($.cache1("?").find("#" + s.attr("id")).html());
@@ -151,7 +145,6 @@ function _parseHTML(h) {
 
 (function ($) {
     var LAjax = function () {
-        var d = [];
         this.a = function ($this, hin, p, post) {
             var xhr = $.ajax({
                 url: hin,
@@ -186,7 +179,6 @@ function _lPage(hin, p, post) {
 
 (function ($) {
     var GetPage = function () {
-        var d = [];
         this.a = function ($this, t, p, p2) {
             if (!t) return $.cache1("?");
             if (t.indexOf("/") != -1) return _lPage(t, p, p2);
@@ -232,7 +224,6 @@ function _findScript($S, $Scripts) {
 
 (function ($) {
     var AllScripts = function () {
-        var d = [];
         this.a = function ($this, PK, deltas) {
             if (!deltas) {
                 $this.each(function () {
@@ -253,7 +244,6 @@ function _findScript($S, $Scripts) {
 
 (function ($) {
     var ClassAlways = function () {
-        var d = [];
         this.a = function ($this, PK) {
             $this.each(function () {
                 if ($(this).attr("data-class") == "always") {
@@ -279,7 +269,6 @@ function _sameScripts(sN, PK) {
 
 (function ($) {
     var NewArray = function () {
-        var d = [];
         this.a = function ($this, sN, sO, PK, pass) {
             $this.each(function () {
                 sN.push([$(this).attr(PK), 0]);
@@ -315,14 +304,13 @@ function _realNew(s, PK) {
 
 (function ($) {
     var AddHrefs = function (options) {
-        var d = [];
         var $scriptsO = [],
             $scriptsN = [],
             pass = 0;
         var settings = $.extend({
             "deltas": true
         }, options);
-        deltas = settings["deltas"];
+        var deltas = settings["deltas"];
         this.a = function ($this, same) {
             if (!$this.allScripts("href", deltas)) {
                 if (pass) $this.classAlways("href");
@@ -349,14 +337,13 @@ function _realNew(s, PK) {
 
 (function ($) {
     var AddSrcs = function (options) {
-        var d = [];
         var $scriptsO = [],
             $scriptsN = [],
             pass = 0;
         var settings = $.extend({
             "deltas": true
         }, options);
-        deltas = settings["deltas"];
+        var deltas = settings["deltas"];
         this.a = function ($this, same) {
             if (!$this.allScripts("src", deltas)) {
                 if (pass) $this.classAlways("src");
@@ -417,7 +404,6 @@ function _addtext(t) {
 
 (function ($) {
     var Alltxts = function () {
-        var d = [];
         this.a = function ($this, s) {
             $this.each(function () {
                 d = $(this).html();
@@ -445,13 +431,12 @@ function _addScripts(same, $s, st) {
 
 (function ($) {
     var Scripts = function (options) {
-        var d = [];
         var $scripts = $(),
             pass = 0;
         var settings = $.extend({
             "deltas": true
         }, options);
-        deltas = settings["deltas"];
+        var deltas = settings["deltas"];
         this.a = function ($this, same) {
             if (same == 'i') return true;
             _detScripts(same, $scripts);
@@ -481,7 +466,6 @@ function _initScripts() {
 
 (function ($) {
     var InitAjaxify = function () {
-        var d = [];
         this.a = function ($this, s) {
             d = window.history && window.history.pushState && window.history.replaceState;
             if (d && s["pluginon"]) {
@@ -504,7 +488,6 @@ function _initScripts() {
 
 (function ($) {
     var Ajaxify = function (options) {
-        var d = [];
         var settings = $.extend({
             selector: "a:not(.no-ajaxy)",
             requestKey: "pronto",
@@ -516,15 +499,15 @@ function _initScripts() {
             cb: null,
             pluginon: true
         }, options);
-        selector = settings["selector"];
-        requestKey = settings["requestKey"];
-        requestDelay = settings["requestDelay"];
-        verbosity = settings["verbosity"];
-        deltas = settings["deltas"];
-        inline = settings["inline"];
-        memoryoff = settings["memoryoff"];
-        cb = settings["cb"];
-        pluginon = settings["pluginon"];
+        var selector = settings["selector"],
+            requestKey = settings["requestKey"],
+            requestDelay = settings["requestDelay"],
+            verbosity = settings["verbosity"],
+            deltas = settings["deltas"],
+            inline = settings["inline"],
+            memoryoff = settings["memoryoff"],
+            cb = settings["cb"],
+            pluginon = settings["pluginon"];
         this.a = function ($this) {
             $(function () {
                 $.log("Entering ajaxify...", settings);
@@ -542,8 +525,6 @@ function _initScripts() {
         return $this;
     };
 })(jQuery);﻿(function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
-
-function showArgs(a) { s=''; for(var i=0; i<a.length; i++) s+=(a[i]!=undefined && typeof a[i]!='function' && typeof a[i]!='object' && (typeof a[i]!='string' || a[i].length <= 100) ? a[i] : (typeof a[i]=='string' ? a[i].substr(0, 100) : typeof a[i]) ) + ' | '; return s }
 
 var l=0;
 var docType = /<\!DOCTYPE[^>]*>/i;
