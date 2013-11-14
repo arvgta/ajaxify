@@ -529,280 +529,284 @@ var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script 
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
 /*
- * Pronto Plugin
- * @author Ben Plum, Arvind Gupta
- * @version 0.6.3
- *
- * Copyright © 2013 Ben Plum: mr@benplum.com, Arvind Gupta: arvgta@gmail.com
- * Released under the MIT License
- */
-if (jQuery)(function ($) {
+* Pronto Plugin
+* @author Ben Plum, Arvind Gupta
+* @version 0.6.3
+*
+* Copyright © 2013 Ben Plum: mr@benplum.com, Arvind Gupta: arvgta@gmail.com
+* Released under the MIT License
+*/
+ 
+if (jQuery) (function($) {
 
-    var $this, $window = $(window),
-        currentURL = '',
-        requestTimer = null,
-        post = null;
+var $this, $window = $(window),
+currentURL = '',
+requestTimer = null,
+post = null;
 
-    // Default Options
-    var options = {
-        selector: "a",
-        requestKey: "pronto",
-        requestDelay: 0,
-        forms: true,
-        turbo: true,
-        preview: true,
-        scrollTop: false
-    };
+// Default Options
+var options = {
+    selector: "a",
+    requestKey: "pronto",
+    requestDelay: 0,
+    forms: true,
+    turbo: true,
+    preview: true,
+    scrollTop: false
+};
 
-    // Private Methods
+// Private Methods
 
-    // Init
-    function _init(opts) {
-        $.extend(options, opts || {});
-        options.$body = $("body");
-        options.$container = $(options.container);
+// Init
+function _init(opts) { 
+     $.extend(options, opts || {});
+     options.$body = $("body");
+     options.$container = $(options.container);
 
-        // Capture current url & state
-        currentURL = window.location.href;
+     // Capture current url & state
+     currentURL = window.location.href;
 
-        // Set initial state
-        _saveState();
+     // Set initial state
+     _saveState();
 
-        // Bind state events
-        $window.on("popstate", _onPop);
+     // Bind state events
+     $window.on("popstate", _onPop);
 
-        if (options.turbo) $(options.selector).hoverIntent(_prefetch, drain);
-        options.$body.on("click.pronto", options.selector, _click);
-        ajaxify_forms();
+     if(options.turbo) $(options.selector).hoverIntent( _prefetch, drain);
+     options.$body.on("click.pronto", options.selector, _click);
+     ajaxify_forms();
+}
+
+function _isInDivs(l) { 
+    var isInDiv = false;
+	$this.each(function () { 
+                try { if ($(l).parents("#" + $(this).attr("id")).length > 0) isInDiv = true; } catch(e) { alert(e); }
+            });
+     
+    return isInDiv;
+}
+
+function _prefetch(e) { post = null;
+     var link = e.currentTarget;
+     if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
+     
+     var req2 = function(){  
+         if(options.preview && !_isInDivs(link)) _click(e, true);
+     };
+    	 
+	 $this.getPage('+', link.href, req2);
+     
+}
+
+function drain() {}
+
+function b(m, n) {
+    if (m.indexOf("?") > 0) {
+        m = m.substring(0, m.indexOf("?"))
     }
+    
+    return m + "?" + n
+}
 
-    function _prefetch(e) {
-        post = null;
-        var link = e.currentTarget;
-        if (window.location.protocol !== link.protocol || window.location.host !== link.host) return;
-
-        var req2 = function () {
-            if (options.preview) _click(e, true);
-        };
-
-        $this.getPage('+', link.href, req2);
-
-    }
-
-    function drain() {}
-
-    function b(m, n) {
-        if (m.indexOf("?") > 0) {
-            m = m.substring(0, m.indexOf("?"))
-        }
-
-        return m + "?" + n
-    }
-
-    function k(m) {
-        var o = m.serialize();
-        var n;
+function k(m) {
+    var o = m.serialize();
+    var n;
         n = $("input[name][type=submit]", m);
 
-        if (n.length == 0) {
-            $.log('Nothing found in function k() !');
-            return o;
-        }
-
-        var p = n.attr("name") + "=" + n.val();
-        if (o.length > 0) {
-            o += "&" + p
-        } else {
-            o = p
-        }
-
+    if (n.length == 0) { $.log('Nothing found in function k() !');
         return o;
     }
-
-    function ajaxify_forms(s) {
-        if (!options.forms) return;
-
-        // capture submit
-        $('form').submit(function (q) {
-
-            var f = $(q.target);
-            if (!f.is("form")) {
-                f = f.filter("input[type=submit]").parents("form:first");
-                if (f.length == 0) {
-                    return true
-                }
-            }
-
-            var p = k(f);
-            var q = "get",
-                m = f.attr("method");
-            if (m.length > 0 && m.toLowerCase() == "post") q = "post";
-
-            var h, a = f.attr("action");
-            if (a != null && a.length > 0) h = a;
-            else h = currentURL;
-
-            if (q == "get") h = b(h, p);
-            else {
-                post = {};
-                post.data = p;
-            }
-
-            $.log('Action href : ' + h);
-            $window.trigger("pronto.submit", h);
-            _request(h);
-
-            // prevent submitting again
-            return false;
-        });
+    
+    var p = n.attr("name") + "=" + n.val();
+    if (o.length > 0) {
+        o += "&" + p
+    } else {
+        o = p
     }
+    
+    return o;
+}
 
-    // Handle link clicks
-    function _click(e, mode) {
-        var link = e.currentTarget;
-        post = null;
+function ajaxify_forms(s) { 
+if(!options.forms) return;
 
-        // Ignore everything but normal click
-        if ((e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) || (window.location.protocol !== link.protocol || window.location.host !== link.host)) {
-            return;
-        }
+// capture submit
+$('form').submit(function(q) { 
 
-        // Update state on hash change
-        if (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#') {
-            _saveState();
-            return;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (currentURL == link.href) {
-            _saveState();
-        } else {
-            _request(link.href, mode);
+    var f = $(q.target);
+    if (!f.is("form")) {
+        f = f.filter("input[type=submit]").parents("form:first");
+        if (f.length == 0) {
+            return true
         }
     }
+   
+    var p = k(f);
+    var q = "get", m = f.attr("method");
+    if (m.length > 0 && m.toLowerCase() == "post") q = "post";
+    
+    var h, a = f.attr("action");
+    if ( a != null && a.length > 0) h = a;
+    else h = currentURL;
+    
+    if (q == "get") h = b(h, p);
+    else { post = {};  post.data = p; }
+    
+    $.log('Action href : ' + h);
+    $window.trigger("pronto.submit", h);
+    _request(h);
+     
+     // prevent submitting again
+     return false;
+});
+}
 
-    // Request new url
-    function _request(url, mode) {
-        // Fire request event
-        $window.trigger("pronto.request");
+// Handle link clicks
+function _click(e, mode) {
+     var link = e.currentTarget; post = null;
 
-        var reqr = function () {
-            _render(url, 0, true, mode);
-        };
+     // Ignore everything but normal click
+     if ( (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+     || (window.location.protocol !== link.protocol || window.location.host !== link.host)
+     ) {
+          return;
+     }
+     
+     // Update state on hash change
+     if (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#') {
+        _saveState();
+        return;
+     }
 
-        $this.getPage(url, reqr, post);
-    }
+     e.preventDefault();
+     e.stopPropagation();
 
-    // Handle back/forward navigation
-    function _onPop(e) {
-        var data = e.originalEvent.state;
+     if (currentURL == link.href) {
+         _saveState();
+     } else {
+         _request(link.href, mode);
+     } 
+}
 
-        // Check if data exists
-        if (data !== null && data.url !== currentURL) {
-            // Fire request event
-            $window.trigger("pronto.request");
-            var req3 = function () {
-                _render(data.url, data.scroll, false);
-            };
+// Request new url
+function _request(url, mode) { 
+     // Fire request event
+     $window.trigger("pronto.request");
 
-            $this.getPage(data.url, req3);
-        }
-    }
+     var reqr = function(){ 	
+         _render(url, 0, true, mode);
+     };
+     
+     $this.getPage(url, reqr, post);
+}
 
-    function _render(url, scrollTop, doPush, mode) {
-        if (requestTimer !== null) {
-            clearTimeout(requestTimer);
-            requestTimer = null;
-        }
+// Handle back/forward navigation
+function _onPop(e) { 
+     var data = e.originalEvent.state;
 
-        requestTimer = setTimeout(function () {
-            _doRender(url, scrollTop, doPush, mode)
-        }, options.requestDelay);
-    }
+     // Check if data exists
+     if (data !== null && data.url !== currentURL) {
+         // Fire request event
+         $window.trigger("pronto.request");  
+         var req3 = function(){ 	
+             _render(data.url, data.scroll, false);
+         };
 
-    function _doPush(url, doPush) {
-        // Update current url
-        currentURL = url;
+		 $this.getPage(data.url, req3);
+     }
+}
 
-        // Push new states to the stack on new url
-        if (doPush) {
-            history.pushState(
-                (options.scrollTop ? {
+function _render(url, scrollTop, doPush, mode) {      
+     if (requestTimer !== null) {
+          clearTimeout(requestTimer);
+          requestTimer = null;
+     }
+     
+     requestTimer = setTimeout(function() {
+       _doRender(url, scrollTop, doPush, mode)
+     }, options.requestDelay);
+}
+
+function _doPush(url, doPush) {
+     // Update current url
+     currentURL = url;
+
+     // Push new states to the stack on new url
+     if (doPush) {
+          history.pushState(
+               (options.scrollTop ? {
                     url: currentURL,
                     scroll: 0
-                } : {
-                    url: currentURL
-                }), "state-" + currentURL, currentURL);
-        } else {
+          } : { url: currentURL}
+        ), "state-"+currentURL, currentURL);
+     } else {
+     
+     // Set state if moving back/forward
+     _saveState();
+     }
+}
+   
+// Render HTML
+function _doRender(url, scrollTop, doPush, mode) { 
+     // Fire load event
+     $window.trigger("pronto.load");
 
-            // Set state if moving back/forward
-            _saveState();
-        }
-    }
+     // Trigger analytics page view
+     _gaCaptureView(url);
 
-    // Render HTML
-    function _doRender(url, scrollTop, doPush, mode) {
-        // Fire load event
-        $window.trigger("pronto.load");
+     // Update current state
+     _saveState();
 
-        // Trigger analytics page view
-        _gaCaptureView(url);
+     // Update title
+     $('title').html($this.getPage('title').html());
 
-        // Update current state
-        _saveState();
+     // Update DOM
+     $this.getPage('-', post);
+     ajaxify_forms();     
+     
+     // Scroll to hash if given
+     if(url.indexOf('#') + 1 && !mode) { 
+         $('html, body').animate({
+            scrollTop: $( '#' + url.split('#')[1] ).offset().top
+         }, 500);
+     }
 
-        // Update title
-        $('title').html($this.getPage('title').html());
+     _doPush(url, doPush);
 
-        // Update DOM
-        $this.getPage('-', post);
-        ajaxify_forms();
+     // Fire render event
+     var event = jQuery.Event("pronto.render");
+     event.same = post ? true : false;
+     $window.trigger(event);
 
-        // Scroll to hash if given
-        if (url.indexOf('#') + 1 && !mode) {
-            $('html, body').animate({
-                scrollTop: $('#' + url.split('#')[1]).offset().top
-            }, 500);
-        }
+     //Set Scroll position
+     if(options.scrollTop) $window.scrollTop(scrollTop);
+}
 
-        _doPush(url, doPush);
+// Save current state
+function _saveState() {
+     // Update state
+     if(options.scrollTop) {
+          history.replaceState({
+          url: currentURL,
+          scroll: $window.scrollTop()
+     }, "state-"+currentURL, currentURL);
+     } else {
+          history.replaceState({
+               url: currentURL
+          }, "state-"+currentURL, currentURL);
+     }
+}
 
-        // Fire render event
-        var event = jQuery.Event("pronto.render");
-        event.same = post ? true : false;
-        $window.trigger(event);
+// Google Analytics support
+function _gaCaptureView(url) {
+     if (typeof _gaq === "undefined") _gaq = [];
+     _gaq.push(['_trackPageview'], url);
+}
 
-        //Set Scroll position
-        if (options.scrollTop) $window.scrollTop(scrollTop);
-    }
-
-    // Save current state
-    function _saveState() {
-        // Update state
-        if (options.scrollTop) {
-            history.replaceState({
-                url: currentURL,
-                scroll: $window.scrollTop()
-            }, "state-" + currentURL, currentURL);
-        } else {
-            history.replaceState({
-                url: currentURL
-            }, "state-" + currentURL, currentURL);
-        }
-    }
-
-    // Google Analytics support
-    function _gaCaptureView(url) {
-        if (typeof _gaq === "undefined") _gaq = [];
-        _gaq.push(['_trackPageview'], url);
-    }
-
-    // Define Plugin
-    $.fn.pronto = function (opts) {
-        $this = $(this);
-        _init(opts);
-        return $this;
-    };
+// Define Plugin
+$.fn.pronto = function(opts) {
+     $this = $(this);
+     _init(opts);
+     return $this;
+};
 })(jQuery);
