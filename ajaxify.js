@@ -551,7 +551,7 @@ var options = {
     requestDelay: 0,
     forms: true,
     turbo: true,
-    preview: true,
+    preview: false,
     scrollTop: false
 };
 
