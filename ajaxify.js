@@ -551,7 +551,7 @@ var options = {
     requestDelay: 0,
     forms: true,
     turbo: true,
-    preview: false,
+    previewoff: true,
     scrollTop: false
 };
 
@@ -591,7 +591,8 @@ function _prefetch(e) { post = null;
      if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
      
      var req2 = function(){  
-         if(options.preview && !_isInDivs(link)) _click(e, true);
+         if(options.previewoff===true) return;
+         if(options.previewoff===false || (!_isInDivs(link) && !$(link).closest(options.previewoff).length)) _click(e, true);
      };
     	 
 	 $this.getPage('+', link.href, req2);
