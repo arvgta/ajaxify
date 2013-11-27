@@ -799,9 +799,8 @@ function _saveState() {
 }
 
 // Google Analytics support
-function _gaCaptureView(url) {
-     if (typeof _gaq === "undefined") _gaq = [];
-     _gaq.push(['_trackPageview'], url);
+function _gaCaptureView(url) if ( typeof window.ga !== 'undefined' )
+    window.ga('send', 'pageview', url);
 }
 
 // Define Plugin
