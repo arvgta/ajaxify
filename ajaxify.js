@@ -441,10 +441,6 @@ function _outjs(s) {
     if (s["outjs"]) $.log(jsout)
 };
 
-function _initScripts() {
-    $.scripts(null)
-};
-
 (function ($) {
     var CPage = function (options) {
         var settings = $.extend({
@@ -479,6 +475,7 @@ function _initAjaxify(s) {
     d = window.history && window.history.pushState && window.history.replaceState;
     if (d && s["pluginon"]) {
         _outjs(s);
+		$.scripts("i");
         $.memory(null, s);
         $.cPage("i", s);
         return true
