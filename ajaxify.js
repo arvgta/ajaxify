@@ -5,8 +5,8 @@
             verbosity: 0
         }, options);
         var verbosity = settings["verbosity"];
-        this.a = function (m) {
-            l < verbosity && con && con.log(m);
+        this.a = function (m) { /*l < verbosity &&*/
+            con && con.log(m);
         };
     };
     $.log = function (m, options) {
@@ -122,22 +122,11 @@ function _parseHTML(h) {
     };
 })(jQuery);
 
-(function ($) {
-    var LDivs = function () {
-        this.a = function ($this) {
-            $this.all("fn(*)", function (s) {
-                if ($.cache1("?")) s.html($.cache1("?").find("#" + s.attr("id")).html());
-            });
-        };
-    };
-    $.fn.lDivs = function () {
-        var r;
-        var $this = $(this);
-        $.fn.lDivs.o = $.fn.lDivs.o ? $.fn.lDivs.o : new LDivs();
-        r = $.fn.lDivs.o.a($this);
-        return $this;
-    };
-})(jQuery);
+function _lDivs() {
+    $gthis.all("fn(*)", function (s) {
+        if ($.cache1("?")) s.html($.cache1("?").find("#" + s.attr("id")).html());
+    })
+};
 
 (function ($) {
     var LAjax = function () {
@@ -175,6 +164,7 @@ function _lPage(hin, p, post) {
 (function ($) {
     var GetPage = function () {
         this.a = function ($this, t, p, p2) {
+            $this;
             if (!t) return $.cache1("?");
             if (t.indexOf("/") != -1) return _lPage(t, p, p2);
             if (t == "+") _lPage(p, p2);
@@ -183,10 +173,7 @@ function _lPage(hin, p, post) {
                     $.cache1("?").find(t).html(p);
                     t = "-";
                 }
-                if (t == "-") {
-                    $this.lDivs();
-                    return $.scripts(p);
-                }
+                if (t == "-") return _lDivs();
                 return $.cache1("?").find(".ajy-" + t);
             };
         };
@@ -459,26 +446,44 @@ function _initScripts() {
 };
 
 (function ($) {
-    var InitAjaxify = function () {
-        this.a = function ($this, s) {
-            d = window.history && window.history.pushState && window.history.replaceState;
-            if (d && s["pluginon"]) {
-                _outjs(s);
-                $.scripts('i', s);
-                $.memory(null, s);
-                $this.getPage(location.href, _initScripts);
-                return true
-            };
+    var CPage = function (options) {
+        var settings = $.extend({
+            cb: null
+        }, options);
+        var cb = settings["cb"];
+        this.a = function (o) {
+            if (typeof o === "undefined") {
+                $.scripts(null, settings);
+                if (cb) cb()
+            }
+            if (typeof o === "boolean") {
+                $.scripts(o, settings)
+            }
+            if (typeof o === "string") {};
         };
     };
-    $.fn.initAjaxify = function (s) {
+    $.cPage = function (o, options) {
         var r;
-        var $this = $(this);
-        $.fn.initAjaxify.o = $.fn.initAjaxify.o ? $.fn.initAjaxify.o : new InitAjaxify();
-        r = $.fn.initAjaxify.o.a($this, s);
+        $.cPage.o = $.cPage.o ? $.cPage.o : new CPage(options);
+        r = $.cPage.o.a(o);
         return r;
     };
 })(jQuery);
+
+function _initPage(e) {
+    $.cPage(e && e.same);
+};
+
+function _initAjaxify(s) {
+    var d = [];
+    d = window.history && window.history.pushState && window.history.replaceState;
+    if (d && s["pluginon"]) {
+        _outjs(s);
+        $.memory(null, s);
+        $.cPage("i", s);
+        return true
+    }
+};
 
 (function ($) {
     var Ajaxify = function (options) {
@@ -505,8 +510,11 @@ function _initScripts() {
         this.a = function ($this) {
             $(function () {
                 $.log("Entering ajaxify...", settings);
-                if ($this.initAjaxify(settings)) {
+                $gthis = $this;
+                if (_initAjaxify(settings)) {
                     $this.pronto(settings);
+                    $(window).on("pronto.render", _initPage);
+                    $().getPage(location.href, $.cPage);
                 }
             });
         };
