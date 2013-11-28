@@ -475,7 +475,7 @@ function _initAjaxify(s) {
     d = window.history && window.history.pushState && window.history.replaceState;
     if (d && s["pluginon"]) {
         _outjs(s);
-		$.scripts("i");
+		$.scripts("i", s);
         $.memory(null, s);
         $.cPage("i", s);
         return true
