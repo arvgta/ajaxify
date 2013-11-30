@@ -130,14 +130,14 @@ function _lDivs() {
 
 (function ($) {
     var LAjax = function () {
-        this.a = function (hin, p, post) {
+        this.a = function (hin, p, post, pre) {
             var xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
                 data: post ? post.data : null,
                 success: function (h) {
                     if (!h || !_isHtml(xhr)) {
-                        location = hin;
+                        if(!pre) location = hin;
                     }
                     $.cache1("!", $(_parseHTML(h)));
                     $.pages([hin, $.cache1("?")]);
@@ -146,18 +146,18 @@ function _lDivs() {
             });
         };
     };
-    $.lAjax = function (hin, p, post) {
+    $.lAjax = function (hin, p, post, pre) {
         var r;
         $.lAjax.o = $.lAjax.o ? $.lAjax.o : new LAjax();
-        r = $.lAjax.o.a(hin, p, post);
+        r = $.lAjax.o.a(hin, p, post, pre);
         return r;
     };
 })(jQuery);
 
-function _lPage(hin, p, post) {
+function _lPage(hin, p, post, pre) {
     if (hin.indexOf("#") + 1) hin = hin.split("#")[0];
     $.cache1("+", post ? null : hin);
-    if (!$.cache1("?")) return $.lAjax(hin, p, post);
+    if (!$.cache1("?")) return $.lAjax(hin, p, post, pre);
     p && p();
 };
 
@@ -167,7 +167,7 @@ function _lPage(hin, p, post) {
             $this;
             if (!t) return $.cache1("?");
             if (t.indexOf("/") != -1) return _lPage(t, p, p2);
-            if (t == "+") _lPage(p, p2);
+            if (t == "+") _lPage(p, p2, false, true);
             else {
                 if (t.charAt(0) == "#") {
                     $.cache1("?").find(t).html(p);
