@@ -11,7 +11,7 @@
     };
     $.log = function (m, options) {
         var r;
-        $.log.o = $.log.o ? $.log.o : new Log(options);
+        if (!$.log.o) $.log.o = new Log(options);
         r = $.log.o.a(m);
         return r;
     };
@@ -34,7 +34,7 @@ function _addAll(PK) {
     $.fn.all = function (t, fn) {
         var r;
         var $this = $(this);
-        $.fn.all.o = $.fn.all.o ? $.fn.all.o : new All();
+        if (!$.fn.all.o) $.fn.all.o = new All();
         r = $.fn.all.o.a($this, t, fn);
         return $this;
     };
@@ -67,7 +67,7 @@ function _parseHTML(h) {
     };
     $.pages = function (h) {
         var r;
-        $.pages.o = $.pages.o ? $.pages.o : new Pages();
+        if (!$.pages.o) $.pages.o = new Pages();
         r = $.pages.o.a(h);
         return r;
     };
@@ -93,7 +93,7 @@ function _parseHTML(h) {
     };
     $.memory = function (h, options) {
         var r;
-        $.memory.o = $.memory.o ? $.memory.o : new Memory(options);
+        if (!$.memory.o) $.memory.o = new Memory(options);
         r = $.memory.o.a(h);
         return r;
     };
@@ -116,7 +116,7 @@ function _parseHTML(h) {
     };
     $.cache1 = function (o, h) {
         var r;
-        $.cache1.o = $.cache1.o ? $.cache1.o : new Cache1();
+        if (!$.cache1.o) $.cache1.o = new Cache1();
         r = $.cache1.o.a(o, h);
         return r;
     };
@@ -137,7 +137,7 @@ function _lDivs() {
                 data: post ? post.data : null,
                 success: function (h) {
                     if (!h || !_isHtml(xhr)) {
-                        if(!pre) location = hin;
+                        if (!pre) location = hin;
                     }
                     $.cache1("!", $(_parseHTML(h)));
                     $.pages([hin, $.cache1("?")]);
@@ -148,7 +148,7 @@ function _lDivs() {
     };
     $.lAjax = function (hin, p, post, pre) {
         var r;
-        $.lAjax.o = $.lAjax.o ? $.lAjax.o : new LAjax();
+        if (!$.lAjax.o) $.lAjax.o = new LAjax();
         r = $.lAjax.o.a(hin, p, post, pre);
         return r;
     };
@@ -181,7 +181,7 @@ function _lPage(hin, p, post, pre) {
     $.fn.getPage = function (t, p, p2) {
         var r;
         var $this = $(this);
-        $.fn.getPage.o = $.fn.getPage.o ? $.fn.getPage.o : new GetPage();
+        if (!$.fn.getPage.o) $.fn.getPage.o = new GetPage();
         r = $.fn.getPage.o.a($this, t, p, p2);
         return r;
     };
@@ -218,7 +218,7 @@ function _findScript($S, $Scripts) {
     $.fn.allScripts = function (PK, deltas) {
         var r;
         var $this = $(this);
-        $.fn.allScripts.o = $.fn.allScripts.o ? $.fn.allScripts.o : new AllScripts();
+        if (!$.fn.allScripts.o) $.fn.allScripts.o = new AllScripts();
         r = $.fn.allScripts.o.a($this, PK, deltas);
         return r;
     };
@@ -238,7 +238,7 @@ function _findScript($S, $Scripts) {
     $.fn.classAlways = function (PK) {
         var r;
         var $this = $(this);
-        $.fn.classAlways.o = $.fn.classAlways.o ? $.fn.classAlways.o : new ClassAlways();
+        if (!$.fn.classAlways.o) $.fn.classAlways.o = new ClassAlways();
         r = $.fn.classAlways.o.a($this, PK);
         return $this;
     };
@@ -261,7 +261,7 @@ function _sameScripts(sN, PK) {
     $.fn.newArray = function (sN, sO, PK, pass) {
         var r;
         var $this = $(this);
-        $.fn.newArray.o = $.fn.newArray.o ? $.fn.newArray.o : new NewArray();
+        if (!$.fn.newArray.o) $.fn.newArray.o = new NewArray();
         r = $.fn.newArray.o.a($this, sN, sO, PK, pass);
         return $this;
     };
@@ -311,7 +311,7 @@ function _realNew(s, PK) {
     $.fn.addHrefs = function (same, options) {
         var r;
         var $this = $(this);
-        $.fn.addHrefs.o = $.fn.addHrefs.o ? $.fn.addHrefs.o : new AddHrefs(options);
+        if (!$.fn.addHrefs.o) $.fn.addHrefs.o = new AddHrefs(options);
         r = $.fn.addHrefs.o.a($this, same);
         return r;
     };
@@ -344,7 +344,7 @@ function _realNew(s, PK) {
     $.fn.addSrcs = function (same, options) {
         var r;
         var $this = $(this);
-        $.fn.addSrcs.o = $.fn.addSrcs.o ? $.fn.addSrcs.o : new AddSrcs(options);
+        if (!$.fn.addSrcs.o) $.fn.addSrcs.o = new AddSrcs(options);
         r = $.fn.addSrcs.o.a($this, same);
         return r;
     };
@@ -356,6 +356,9 @@ function _detScripts(same, $s) {
             jss = $().getPage("script");
         $s.c = links.filter(function () {
             return $(this).attr("rel").indexOf("stylesheet") != -1;
+        });
+        $s.can = links.filter(function () {
+            return $(this).attr("rel").indexOf("canonical") != -1;
         });
         $s.s = jss.filter(function () {
             return $(this).attr("src");
@@ -399,7 +402,7 @@ function _addtext(t) {
     $.fn.alltxts = function (s) {
         var r;
         var $this = $(this);
-        $.fn.alltxts.o = $.fn.alltxts.o ? $.fn.alltxts.o : new Alltxts();
+        if (!$.fn.alltxts.o) $.fn.alltxts.o = new Alltxts();
         r = $.fn.alltxts.o.a($this, s);
         return r;
     };
@@ -420,7 +423,8 @@ function _addScripts(same, $s, st) {
         }, options);
         var deltas = settings["deltas"];
         this.a = function (same) {
-            if (same == 'i') return true;
+            if (same == "i") return true;
+            if (same == "c" && $scripts.can) return $scripts.can.attr("href");
             _detScripts(same, $scripts);
             if (pass++) _addScripts(same, $scripts, settings);
             else {
@@ -431,7 +435,7 @@ function _addScripts(same, $s, st) {
     };
     $.scripts = function (same, options) {
         var r;
-        $.scripts.o = $.scripts.o ? $.scripts.o : new Scripts(options);
+        if (!$.scripts.o) $.scripts.o = new Scripts(options);
         r = $.scripts.o.a(same);
         return r;
     };
@@ -449,18 +453,18 @@ function _outjs(s) {
         var cb = settings["cb"];
         this.a = function (o) {
             if (typeof o === "undefined") {
-                $.scripts(null, settings);
+                $.scripts(null);
                 if (cb) cb()
             }
             if (typeof o === "boolean") {
-                $.scripts(o, settings)
+                $.scripts(o)
             }
             if (typeof o === "string") {};
         };
     };
     $.cPage = function (o, options) {
         var r;
-        $.cPage.o = $.cPage.o ? $.cPage.o : new CPage(options);
+        if (!$.cPage.o) $.cPage.o = new CPage(options);
         r = $.cPage.o.a(o);
         return r;
     };
@@ -475,7 +479,7 @@ function _initAjaxify(s) {
     d = window.history && window.history.pushState && window.history.replaceState;
     if (d && s["pluginon"]) {
         _outjs(s);
-		$.scripts("i", s);
+        $.scripts("i", s);
         $.memory(null, s);
         $.cPage("i", s);
         return true
@@ -492,6 +496,7 @@ function _initAjaxify(s) {
             deltas: true,
             inline: false,
             memoryoff: false,
+            canonical: true,
             cb: null,
             pluginon: true
         }, options);
@@ -502,6 +507,7 @@ function _initAjaxify(s) {
             deltas = settings["deltas"],
             inline = settings["inline"],
             memoryoff = settings["memoryoff"],
+            canonical = settings["canonical"],
             cb = settings["cb"],
             pluginon = settings["pluginon"];
         this.a = function ($this) {
@@ -519,299 +525,389 @@ function _initAjaxify(s) {
     $.fn.ajaxify = function (options) {
         var r;
         var $this = $(this);
-        $.fn.ajaxify.o = $.fn.ajaxify.o ? $.fn.ajaxify.o : new Ajaxify(options);
+        if (!$.fn.ajaxify.o) $.fn.ajaxify.o = new Ajaxify(options);
         r = $.fn.ajaxify.o.a($this);
         return $this;
     };
-})(jQuery);﻿(function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
+})(jQuery);﻿
+(function (e) {
+    e.fn.hoverIntent = function (t, n, r) {
+        var i = {
+            interval: 100,
+            sensitivity: 7,
+            timeout: 0
+        };
+        if (typeof t === "object") {
+            i = e.extend(i, t)
+        } else if (e.isFunction(n)) {
+            i = e.extend(i, {
+                over: t,
+                out: n,
+                selector: r
+            })
+        } else {
+            i = e.extend(i, {
+                over: t,
+                out: t,
+                selector: n
+            })
+        }
+        var s, o, u, a;
+        var f = function (e) {
+            s = e.pageX;
+            o = e.pageY
+        };
+        var l = function (t, n) {
+            n.hoverIntent_t = clearTimeout(n.hoverIntent_t);
+            if (Math.abs(u - s) + Math.abs(a - o) < i.sensitivity) {
+                e(n).off("mousemove.hoverIntent", f);
+                n.hoverIntent_s = 1;
+                return i.over.apply(n, [t])
+            } else {
+                u = s;
+                a = o;
+                n.hoverIntent_t = setTimeout(function () {
+                    l(t, n)
+                }, i.interval)
+            }
+        };
+        var c = function (e, t) {
+            t.hoverIntent_t = clearTimeout(t.hoverIntent_t);
+            t.hoverIntent_s = 0;
+            return i.out.apply(t, [e])
+        };
+        var h = function (t) {
+            var n = jQuery.extend({}, t);
+            var r = this;
+            if (r.hoverIntent_t) {
+                r.hoverIntent_t = clearTimeout(r.hoverIntent_t)
+            }
+            if (t.type == "mouseenter") {
+                u = n.pageX;
+                a = n.pageY;
+                e(r).on("mousemove.hoverIntent", f);
+                if (r.hoverIntent_s != 1) {
+                    r.hoverIntent_t = setTimeout(function () {
+                        l(n, r)
+                    }, i.interval)
+                }
+            } else {
+                e(r).off("mousemove.hoverIntent", f);
+                if (r.hoverIntent_s == 1) {
+                    r.hoverIntent_t = setTimeout(function () {
+                        c(n, r)
+                    }, i.timeout)
+                }
+            }
+        };
+        return this.on({
+            "mouseenter.hoverIntent": h,
+            "mouseleave.hoverIntent": h
+        }, i.selector)
+    }
+})(jQuery);
 
-var $gthis, l=0;
+var $gthis, l = 0;
 var docType = /<\!DOCTYPE[^>]*>/i;
 var tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi;
 var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
-var div12 =  '<div class="ajy-$1"$2';
-var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
-var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
+var div12 = '<div class="ajy-$1"$2';
+var linki = '<link rel="stylesheet" type="text/css" href="*" />',
+    scri = '<script type="text/javascript" src="*" />';
+var linkr = 'link[href*="!"]',
+    scrr = 'script[src*="!"]';
 
 /*
-* Pronto Plugin
-* @author Ben Plum, Arvind Gupta
-* @version 0.6.3
-*
-* Copyright © 2013 Ben Plum: mr@benplum.com, Arvind Gupta: arvgta@gmail.com
-* Released under the MIT License
-*/
- 
-if (jQuery) (function($) {
+ * Pronto Plugin
+ * @author Ben Plum, Arvind Gupta
+ * @version 0.6.3
+ *
+ * Copyright Â© 2013 Ben Plum: mr@benplum.com, Arvind Gupta: arvgta@gmail.com
+ * Released under the MIT License
+ */
 
-var $this, $window = $(window),
-currentURL = '',
-requestTimer = null,
-post = null;
+if (jQuery)(function ($) {
 
-// Default Options
-var options = {
-    selector: "a",
-    requestKey: "pronto",
-    requestDelay: 0,
-    forms: true,
-    turbo: true,
-    previewoff: true,
-    scrollTop: false
-};
+    var $this, $window = $(window),
+        currentURL = '',
+        requestTimer = null,
+        post = null;
 
-// Private Methods
+    // Default Options
+    var options = {
+        selector: "a",
+        requestKey: "pronto",
+        requestDelay: 0,
+        forms: true,
+        turbo: true,
+        previewoff: true,
+        canonical: true,
+        scrollTop: false
+    };
 
-// Init
-function _init(opts) { 
-     $.extend(options, opts || {});
-     options.$body = $("body");
-     options.$container = $(options.container);
+    // Private Methods
 
-     // Capture current url & state
-     currentURL = window.location.href;
+    // Init
+    function _init(opts) {
+        $.extend(options, opts || {});
+        options.$body = $("body");
+        options.$container = $(options.container);
 
-     // Set initial state
-     _saveState();
+        // Capture current url & state
+        currentURL = window.location.href;
 
-     // Bind state events
-     $window.on("popstate", _onPop);
+        // Set initial state
+        _saveState();
 
-     if(options.turbo) $(options.selector).hoverIntent( _prefetch, drain);
-     options.$body.on("click.pronto", options.selector, _click);
-     ajaxify_forms();
-}
+        // Bind state events
+        $window.on("popstate", _onPop);
 
-function _isInDivs(l) { 
-    var isInDivs = false;
-        $this.each(function () { 
-                try { if ($(l).parents("#" + $(this).attr("id")).length > 0) isInDivs = true; } catch(e) { alert(e); }
-            });
-    
-    return isInDivs;
-}
-
-function _prefetch(e) { post = null;
-     var link = e.currentTarget;
-     if(window.location.protocol !== link.protocol || window.location.host !== link.host) return;
-     
-     var req2 = function(){ 
-         if(options.previewoff===true) return;
-         if(!_isInDivs(link) && (options.previewoff===false || !$(link).closest(options.previewoff).length)) _click(e, true); 
-     };
-    	 
-	 $this.getPage('+', link.href, req2);
-}
-
-function drain() {}
-
-function b(m, n) {
-    if (m.indexOf("?") > 0) {
-        m = m.substring(0, m.indexOf("?"))
+        if (options.turbo) $(options.selector).hoverIntent(_prefetch, drain);
+        options.$body.on("click.pronto", options.selector, _click);
+        ajaxify_forms();
     }
-    
-    return m + "?" + n
-}
 
-function k(m) {
-    var o = m.serialize();
-    var n;
+    function _isInDivs(l) {
+        var isInDivs = false;
+        $this.each(function () {
+            try {
+                if ($(l).parents("#" + $(this).attr("id")).length > 0) isInDivs = true;
+            } catch (e) {
+                alert(e);
+            }
+        });
+
+        return isInDivs;
+    }
+
+    function _prefetch(e) {
+        post = null;
+        var link = e.currentTarget;
+        if (window.location.protocol !== link.protocol || window.location.host !== link.host) return;
+
+        var req2 = function () {
+            if (options.previewoff === true) return;
+            if (!_isInDivs(link) && (options.previewoff === false || !$(link).closest(options.previewoff).length)) _click(e, true);
+        };
+
+        $this.getPage('+', link.href, req2);
+
+    }
+
+    function drain() {}
+
+    function b(m, n) {
+        if (m.indexOf("?") > 0) {
+            m = m.substring(0, m.indexOf("?"))
+        }
+
+        return m + "?" + n
+    }
+
+    function k(m) {
+        var o = m.serialize();
+        var n;
         n = $("input[name][type=submit]", m);
 
-    if (n.length == 0) { $.log('Nothing found in function k() !');
+        if (n.length == 0) {
+            $.log('Nothing found in function k() !');
+            return o;
+        }
+
+        var p = n.attr("name") + "=" + n.val();
+        if (o.length > 0) {
+            o += "&" + p
+        } else {
+            o = p
+        }
+
         return o;
     }
-    
-    var p = n.attr("name") + "=" + n.val();
-    if (o.length > 0) {
-        o += "&" + p
-    } else {
-        o = p
+
+    function ajaxify_forms(s) {
+        if (!options.forms) return;
+
+        // capture submit
+        $('form').submit(function (q) {
+
+            var f = $(q.target);
+            if (!f.is("form")) {
+                f = f.filter("input[type=submit]").parents("form:first");
+                if (f.length == 0) {
+                    return true
+                }
+            }
+
+            var p = k(f);
+            var q = "get",
+                m = f.attr("method");
+            if (m.length > 0 && m.toLowerCase() == "post") q = "post";
+
+            var h, a = f.attr("action");
+            if (a != null && a.length > 0) h = a;
+            else h = currentURL;
+
+            if (q == "get") h = b(h, p);
+            else {
+                post = {};
+                post.data = p;
+            }
+
+            $.log('Action href : ' + h);
+            $window.trigger("pronto.submit", h);
+            _request(h);
+
+            // prevent submitting again
+            return false;
+        });
     }
-    
-    return o;
-}
 
-function ajaxify_forms(s) { 
-if(!options.forms) return;
+    // Handle link clicks
+    function _click(e, mode) {
+        var link = e.currentTarget;
+        post = null;
 
-// capture submit
-$('form').submit(function(q) { 
+        // Ignore everything but normal click
+        if ((e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) || (window.location.protocol !== link.protocol || window.location.host !== link.host)) {
+            return;
+        }
 
-    var f = $(q.target);
-    if (!f.is("form")) {
-        f = f.filter("input[type=submit]").parents("form:first");
-        if (f.length == 0) {
-            return true
+        // Update state on hash change
+        if (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#') {
+            _saveState();
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (currentURL == link.href) {
+            _saveState();
+        } else {
+            _request(link.href, mode);
         }
     }
-   
-    var p = k(f);
-    var q = "get", m = f.attr("method");
-    if (m.length > 0 && m.toLowerCase() == "post") q = "post";
-    
-    var h, a = f.attr("action");
-    if ( a != null && a.length > 0) h = a;
-    else h = currentURL;
-    
-    if (q == "get") h = b(h, p);
-    else { post = {};  post.data = p; }
-    
-    $.log('Action href : ' + h);
-    $window.trigger("pronto.submit", h);
-    _request(h);
-     
-     // prevent submitting again
-     return false;
-});
-}
 
-// Handle link clicks
-function _click(e, mode) {
-     var link = e.currentTarget; post = null;
+    // Request new url
+    function _request(url, mode) {
+        // Fire request event
+        $window.trigger("pronto.request");
 
-     // Ignore everything but normal click
-     if ( (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
-     || (window.location.protocol !== link.protocol || window.location.host !== link.host)
-     ) {
-          return;
-     }
-     
-     // Update state on hash change
-     if (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#') {
-        _saveState();
-        return;
-     }
+        var reqr = function () {
+            _render(url, 0, true, mode);
+        };
 
-     e.preventDefault();
-     e.stopPropagation();
+        $this.getPage(url, reqr, post);
+    }
 
-     if (currentURL == link.href) {
-         _saveState();
-     } else {
-         _request(link.href, mode);
-     } 
-}
+    // Handle back/forward navigation
+    function _onPop(e) {
+        var data = e.originalEvent.state;
 
-// Request new url
-function _request(url, mode) { 
-     // Fire request event
-     $window.trigger("pronto.request");
+        // Check if data exists
+        if (data !== null && data.url !== currentURL) {
+            // Fire request event
+            $window.trigger("pronto.request");
+            var req3 = function () {
+                _render(data.url, data.scroll, false);
+            };
 
-     var reqr = function(){ 	
-         _render(url, 0, true, mode);
-     };
-     
-     $this.getPage(url, reqr, post);
-}
+            $this.getPage(data.url, req3);
+        }
+    }
 
-// Handle back/forward navigation
-function _onPop(e) { 
-     var data = e.originalEvent.state;
+    function _render(url, scrollTop, doPush, mode) {
+        if (requestTimer !== null) {
+            clearTimeout(requestTimer);
+            requestTimer = null;
+        }
 
-     // Check if data exists
-     if (data !== null && data.url !== currentURL) {
-         // Fire request event
-         $window.trigger("pronto.request");  
-         var req3 = function(){ 	
-             _render(data.url, data.scroll, false);
-         };
+        requestTimer = setTimeout(function () {
+            _doRender(url, scrollTop, doPush, mode)
+        }, options.requestDelay);
+    }
 
-		 $this.getPage(data.url, req3);
-     }
-}
+    function _doPush(url, doPush) {
+        // Update current url
+        currentURL = url;
 
-function _render(url, scrollTop, doPush, mode) {      
-     if (requestTimer !== null) {
-          clearTimeout(requestTimer);
-          requestTimer = null;
-     }
-     
-     requestTimer = setTimeout(function() {
-       _doRender(url, scrollTop, doPush, mode)
-     }, options.requestDelay);
-}
-
-function _doPush(url, doPush) {
-     // Update current url
-     currentURL = url;
-
-     // Push new states to the stack on new url
-     if (doPush) {
-          history.pushState(
-               (options.scrollTop ? {
+        // Push new states to the stack on new url
+        if (doPush) {
+            history.pushState(
+                (options.scrollTop ? {
                     url: currentURL,
                     scroll: 0
-          } : { url: currentURL}
-        ), "state-"+currentURL, currentURL);
-     } else {
-     
-     // Set state if moving back/forward
-     _saveState();
-     }
-}
-   
-// Render HTML
-function _doRender(url, scrollTop, doPush, mode) { 
-     // Fire load event
-     $window.trigger("pronto.load");
+                } : {
+                    url: currentURL
+                }), "state-" + currentURL, currentURL);
+        } else {
 
-     // Trigger analytics page view
-     _gaCaptureView(url);
+            // Set state if moving back/forward
+            _saveState();
+        }
+    }
 
-     // Update current state
-     _saveState();
+    // Render HTML
+    function _doRender(url, scrollTop, doPush, mode) {
+        // Fire load event
+        $window.trigger("pronto.load");
 
-     // Update title
-     $('title').html($this.getPage('title').html());
+        // Trigger analytics page view
+        _gaCaptureView(url);
 
-     // Update DOM
-     $this.getPage('-', post);
-     ajaxify_forms();     
-     
-     // Scroll to hash if given
-     if(url.indexOf('#') + 1 && !mode) { 
-         $('html, body').animate({
-            scrollTop: $( '#' + url.split('#')[1] ).offset().top
-         }, 500);
-     }
+        // Update current state
+        _saveState();
 
-     _doPush(url, doPush);
+        // Update title
+        $('title').html($this.getPage('title').html());
 
-     // Fire render event
-     var event = jQuery.Event("pronto.render");
-     event.same = post ? true : false;
-     $window.trigger(event);
+        // Update DOM
+        $this.getPage('-', post);
+        ajaxify_forms();
 
-     //Set Scroll position
-     if(options.scrollTop) $window.scrollTop(scrollTop);
-}
+        // Scroll to hash if given
+        if (url.indexOf('#') + 1 && !mode) {
+            $('html, body').animate({
+                scrollTop: $('#' + url.split('#')[1]).offset().top
+            }, 500);
+        }
 
-// Save current state
-function _saveState() {
-     // Update state
-     if(options.scrollTop) {
-          history.replaceState({
-          url: currentURL,
-          scroll: $window.scrollTop()
-     }, "state-"+currentURL, currentURL);
-     } else {
-          history.replaceState({
-               url: currentURL
-          }, "state-"+currentURL, currentURL);
-     }
-}
+        _doPush(url, doPush);
 
-// Google Analytics support
-function _gaCaptureView(url) { 
-    if ( typeof window.ga !== 'undefined' )
-        window.ga('send', 'pageview', url);
-}
+        // Fire render event
+        var event = jQuery.Event("pronto.render");
+        event.same = post ? true : false;
+        $window.trigger(event);
 
-// Define Plugin
-$.fn.pronto = function(opts) {
-     $this = $(this);
-     _init(opts);
-     return $this;
-};
+        //Set Scroll position
+        if (options.scrollTop) $window.scrollTop(scrollTop);
+    }
+
+    // Save current state
+    function _saveState() {
+        // Update state
+        if (options.scrollTop) {
+            history.replaceState({
+                url: currentURL,
+                scroll: $window.scrollTop()
+            }, "state-" + currentURL, currentURL);
+        } else {
+            history.replaceState({
+                url: currentURL
+            }, "state-" + currentURL, currentURL);
+        }
+    }
+
+    // Google Analytics support
+    function _gaCaptureView(url) {
+        if (typeof window.ga !== 'undefined')
+            window.ga('send', 'pageview', url);
+    }
+
+    // Define Plugin
+    $.fn.pronto = function (opts) {
+        $this = $(this);
+        _init(opts);
+        return $this;
+    };
 })(jQuery);
