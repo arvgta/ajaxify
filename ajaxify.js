@@ -81,62 +81,6 @@
     };
 })(jQuery);
 
-var _lSel = function (p, $t) {
-    pass++;
-    _lDivs($t);
-    $.scripts(p);
-    $.scripts("a");
-    return $.scripts("c")
-};
-
-var _lPage = function (hin, p, post, pre) {
-    if (hin.iO("#")) hin = hin.split("#")[0];
-    if (!$.cache(hin)) return _lAjax(hin, p, post, pre);
-    p && p();
-};
-
-var _lDivs = function ($t) {
-    if ($.cache()) _all($t, "fn(*)", function (s) {
-        s.html($.cache().find("#" + s.attr("id")).html());
-    })
-};
-
-var _all = function ($t, t, fn) {
-    $t.each(function () {
-        t = t.split("*").join("$(this)");
-        t += ";";
-        eval(t);
-    })
-};
-
-var _lAjax = function (hin, p, post, pre) {
-    var xhr = $.ajax({
-        url: hin,
-        type: post ? "POST" : "GET",
-        data: post ? post.data : null,
-        success: function (h) {
-            if (!h || !_isHtml(xhr)) {
-                if (!pre) location = hin;
-            }
-            $.cache($(_parseHTML(h)));
-            $.pages([hin, $.cache()]);
-            p && p();
-        }
-    })
-};
-
-var _isHtml = function (x) {
-    return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"))
-};
-
-var _parseHTML = function (h) {
-    return $.trim(_replD(h))
-};
-
-var _replD = function (h) {
-    return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>")
-};
-
 (function ($) {
     var GetPage = function () {
         this.a = function (t, p, p2) {
@@ -203,19 +147,6 @@ var _replD = function (h) {
     };
 })(jQuery);
 
-var _init = function (s) {
-    if (!api || !s.pluginon) return false;
-    _outjs(s);
-    $().allScripts('', s);
-    $.scripts("i", s);
-    $.memory(0, s);
-    return true
-};
-
-var _outjs = function (s) {
-    if (s.outjs) $.log(jsout)
-};
-
 (function ($) {
     var Ajaxify = function (options) {
         var settings = $.extend({
@@ -255,36 +186,6 @@ var _outjs = function (s) {
         return $this;
     };
 })(jQuery);
-
-var _alltxts = function ($s) {
-    $s.each(function () {
-        d = $(this).html();
-        if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d, s))) _addtext(d);
-        r = true;
-    });
-};
-
-var _addtext = function (t) {
-    try {
-        $.globalEval(t);
-    } catch (e) {
-        alert(e);
-    };
-};
-
-var _inline = function (txt, s) {
-    var d = inlinehints;
-    if (d) {
-        d = d.split(", ");
-        for (var i = 0; i < d.length; i++)
-            if (txt.iO(d[i])) return true;
-    }
-};
-
-var _addScripts = function (same, $s, st) {
-    $s.c.addHrefs(same, st);
-    $s.s.addSrcs(same, st)
-};
 
 (function ($) {
     var Scripts = function (options) {
@@ -338,12 +239,6 @@ var _addScripts = function (same, $s, st) {
         return r;
     };
 })(jQuery);
-
-var _rel = function (lk, v) {
-    return $(lk).filter(function () {
-        return $(this).attr("rel").iO(v);
-    })
-};
 
 (function ($) {
     var DetScripts = function () {
