@@ -1,13 +1,12 @@
 (function ($) {
     var Log = function (options) {
-        var d = [];
         var con = window.console;
         var settings = $.extend({
             verbosity: 0
         }, options);
         var verbosity = settings["verbosity"];
-        this.a = function (m) { /*l < verbosity &&*/
-            con && con.log(m);
+        this.a = function (m) {
+            l < verbosity && con && con.log(m);
         };
     };
     $.log = function (m, options) {
@@ -20,10 +19,11 @@
 
 (function ($) {
     var Cache = function () {
+        var d = false;
         this.a = function (o) {
             if (!o) return d;
             if (typeof o == 'string') return d = $.pages($.memory(o));
-            if (typeof o == 'object') d = o;;
+            if (typeof o == 'object') d = o;
         };
     };
     $.cache = function (o) {
@@ -36,6 +36,7 @@
 
 (function ($) {
     var Memory = function (options) {
+        var d = false;
         var settings = $.extend({
             memoryoff: false
         }, options);
@@ -63,6 +64,7 @@
 
 (function ($) {
     var Pages = function () {
+        var d = [];
         this.a = function (h) {
             if (typeof h === "string") {
                 for (var i = 0; i < d.length; i++)
@@ -99,7 +101,7 @@
         };
         var _lPage = function (hin, p, post, pre) {
             if (hin.iO("#")) hin = hin.split("#")[0];
-            if (!$.cache(hin)) return _lAjax(hin, p, post, pre);
+            if (post || !$.cache(hin)) return _lAjax(hin, p, post, pre);
             p && p();
         };
         var _lDivs = function ($t) {
@@ -130,6 +132,7 @@
             })
         };
         var _isHtml = function (x) {
+            var d;
             return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"))
         };
         var _parseHTML = function (h) {
@@ -169,7 +172,6 @@
         var _init = function (s) {
             if (!api || !s.pluginon) return false;
             _outjs(s);
-            $().allScripts('', s);
             $.scripts("i", s);
             $.memory(0, s);
             return true
@@ -201,13 +203,16 @@
         this.a = function (same) {
             if (same == "i") return true;
             if (same == "a") return _alltxts($s.t);
-            if (same == "c" && $s.can) return $s.can.attr("href");
+            if (same == "c") {
+                if (canonical && $s.can) return $s.can.attr("href");
+                else return false;
+            };
             if (!same) $.detScripts($s);
             _addScripts(same, $s, settings);;
         };
         var _alltxts = function ($s) {
             $s.each(function () {
-                d = $(this).html();
+                var d = $(this).html();
                 if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d, s))) _addtext(d);
                 r = true;
             });
@@ -228,8 +233,8 @@
             }
         };
         var _addScripts = function (same, $s, st) {
-            $s.c.addHrefs(same, st);
-            $s.s.addSrcs(same, st)
+            $s.c.addAll(same, "href", st);
+            $s.s.addAll(same, "src", st)
         };
     };
     $.scripts = function (same, options) {
@@ -272,132 +277,101 @@
 })(jQuery);
 
 (function ($) {
-    var AddHrefs = function () {
-        var $scriptsO = [],
-            $scriptsN = [];
-        this.a = function ($this, same) {
-            if ($this.allScripts("href")) return true;
-            if (pass) _classAlways($this, "href");
-            if (same) return _sameScripts($scriptsN, "href");
-            $scriptsN = [];
-            _newArray($this, $scriptsN, $scriptsO, "href");
-            if (pass) {
-                _findCommon($scriptsO, $scriptsN);
-                _freeOld($scriptsO, "href");
-                _sameScripts($scriptsN, "href");
-                $scriptsO = $scriptsN.slice()
-            };
-        };
-    };
-    $.fn.addHrefs = function (same) {
-        var r;
-        var $this = $(this);
-        if (!$.fn.addHrefs.o) $.fn.addHrefs.o = new AddHrefs();
-        r = $.fn.addHrefs.o.a($this, same);
-        return r;
-    };
-})(jQuery);
-
-(function ($) {
-    var AddSrcs = function () {
-        var $scriptsO = [],
-            $scriptsN = [];
-        this.a = function ($this, same) {
-            if ($this.allScripts("src")) return true;
-            if (pass) _classAlways($this, "src");
-            if (same) return _sameScripts($scriptsN, "src");
-            $scriptsN = [];
-            _newArray($this, $scriptsN, $scriptsO, "src");
-            if (pass) {
-                _findCommon($scriptsO, $scriptsN);
-                _freeOld($scriptsO, "src");
-                _sameScripts($scriptsN, "src");
-                $scriptsO = $scriptsN.slice()
-            };
-        };
-    };
-    $.fn.addSrcs = function (same) {
-        var r;
-        var $this = $(this);
-        if (!$.fn.addSrcs.o) $.fn.addSrcs.o = new AddSrcs();
-        r = $.fn.addSrcs.o.a($this, same);
-        return r;
-    };
-})(jQuery);
-
-(function ($) {
-    var AllScripts = function (options) {
+    var AddAll = function (options) {
+        var $scriptsO, $scriptsN, $sCssO = [],
+            $sCssN = [],
+            $sO = [],
+            $sN = [];
         var settings = $.extend({
             deltas: true
         }, options);
         var deltas = settings["deltas"];
-        this.a = function ($this, PK) {
+        this.a = function ($this, same, PK) {
+            if (PK == "href") {
+                $scriptsO = $sCssO;
+                $scriptsN = $sCssN;
+            } else {
+                $scriptsO = $sO;
+                $scriptsN = $sN;
+            } if (_allScripts($this, PK)) return true;
+            if (pass) _classAlways($this, PK);
+            if (same) return _sameScripts($scriptsN, PK);
+            $scriptsN = [];
+            _newArray($this, $scriptsN, $scriptsO, PK);
+            if (pass) {
+                _findCommon($scriptsO, $scriptsN);
+                _freeOld($scriptsO, PK);
+                _sameScripts($scriptsN, PK);
+                $scriptsO = $scriptsN.slice();
+            }
+            if (PK == "href") {
+                $sCssO = $scriptsO;
+                $sCssN = $scriptsN;
+            } else {
+                $sO = $scriptsO;
+                $sN = $scriptsN;
+            };
+        };
+        var _allScripts = function ($t, PK) {
             if (deltas) return false;
-            $this.each(function () {
+            $t.each(function () {
                 _iScript($(this)[0], PK);
             });
-            return true;;
+            return true;
+        };
+        var _classAlways = function ($t, PK) {
+            $t.each(function () {
+                if ($(this).attr("data-class") == "always") {
+                    _iScript($(this).attr(PK), PK);
+                    $(this).remove();
+                }
+            })
+        };
+        var _sameScripts = function (s, PK) {
+            for (var i = 0; i < s.length; i++)
+                if (s[i][1] == 0) _iScript(s[i][0], PK)
+        };
+        var _iScript = function ($S, PK) {
+            $("head").append((PK == "href" ? linki : scri).replace("*", $S))
+        };
+        var _newArray = function ($t, sN, sO, PK) {
+            var d;
+            $t.each(function () {
+                d = [$(this).attr(PK), 0];
+                sN.push(d);
+                if (!pass) sO.push(d);
+            })
+        };
+        var _findCommon = function (s, sN) {
+            for (var i = 0; i < s.length; i++) {
+                s[i][1] = 2;
+                if (_findScript(s[i][0], sN)) s[i][1] = 1;
+            }
+        };
+        var _findScript = function ($S, s) {
+            if ($S)
+                for (var i = 0; i < s.length; i++)
+                    if (s[i][0] == $S) {
+                        s[i][1] = 1;
+                        return true;
+                    }
+        };
+        var _freeOld = function (s, PK) {
+            for (var i = 0; i < s.length; i++)
+                if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK)
+        };
+        var _removeScript = function ($S, PK) {
+            $((PK == "href" ? linkr : scrr).replace("!", $S)).remove()
         };
     };
-    $.fn.allScripts = function (PK, options) {
+    $.fn.addAll = function (same, PK, options) {
         var r;
         var $this = $(this);
-        if (!$.fn.allScripts.o) $.fn.allScripts.o = new AllScripts(options);
-        r = $.fn.allScripts.o.a($this, PK);
+        if (!$.fn.addAll.o) $.fn.addAll.o = new AddAll(options);
+        r = $.fn.addAll.o.a($this, same, PK);
         return r;
     };
-})(jQuery);
-
-var _classAlways = function ($t, PK) {
-    $t.each(function () {
-        if ($(this).attr("data-class") == "always") {
-            _iScript($(this).attr(PK), PK);
-            $(this).remove();
-        }
-    })
-};
-
-var _sameScripts = function (s, PK) {
-    for (var i = 0; i < s.length; i++)
-        if (s[i][1] == 0) _iScript(s[i][0], PK)
-};
-
-var _iScript = function ($S, PK) {
-    $("head").append((PK == "href" ? linki : scri).replace("*", $S))
-};
-
-var _newArray = function ($t, sN, sO, PK) {
-    $t.each(function () {
-        d = [$(this).attr(PK), 0];
-        sN.push(d);
-        if (!pass) sO.push(d);
-    })
-};
-
-var _findCommon = function (s, sN) {
-    for (var i = 0; i < s.length; i++) {
-        s[i][1] = 2;
-        if (_findScript(s[i][0], sN)) s[i][1] = 1;
-    }
-};
-
-var _findScript = function ($S, s) {
-    if ($S)
-        for (var i = 0; i < s.length; i++)
-            if (s[i][0] == $S) {
-                s[i][1] = 1;
-                return true;
-            }
-};
-
-var _freeOld = function (s, PK) {
-    for (var i = 0; i < s.length; i++)
-        if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK)
-};
-
-var _removeScript = function ($S, PK) {
-    $((PK == "href" ? linkr : scrr).replace("!", $S)).remove()
-};﻿
+})(jQuery);﻿
 String.prototype.iO = function (s) {
     return this.toString().indexOf(s) + 1;
 };
