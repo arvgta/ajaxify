@@ -10,10 +10,8 @@
         };
     };
     $.log = function (m, options) {
-        var r;
         if (!$.log.o) $.log.o = new Log(options);
-        r = $.log.o.a(m);
-        return r;
+        return $.log.o.a(m);
     };
 })(jQuery);
 
@@ -27,10 +25,8 @@
         };
     };
     $.cache = function (o) {
-        var r;
         if (!$.cache.o) $.cache.o = new Cache();
-        r = $.cache.o.a(o);
-        return r;
+        return $.cache.o.a(o);
     };
 })(jQuery);
 
@@ -55,10 +51,8 @@
         };
     };
     $.memory = function (h, options) {
-        var r;
         if (!$.memory.o) $.memory.o = new Memory(options);
-        r = $.memory.o.a(h);
-        return r;
+        return $.memory.o.a(h);
     };
 })(jQuery);
 
@@ -76,10 +70,8 @@
         };
     };
     $.pages = function (h) {
-        var r;
         if (!$.pages.o) $.pages.o = new Pages();
-        r = $.pages.o.a(h);
-        return r;
+        return $.pages.o.a(h);
     };
 })(jQuery);
 
@@ -143,10 +135,8 @@
         };
     };
     $.getPage = function (t, p, p2) {
-        var r;
         if (!$.getPage.o) $.getPage.o = new GetPage();
-        r = $.getPage.o.a(t, p, p2);
-        return r;
+        return $.getPage.o.a(t, p, p2);
     };
 })(jQuery);
 
@@ -167,12 +157,13 @@
                     $this.pronto(settings);
                     $.getPage(location.href, $.scripts);
                 }
-            });
+            });;
         };
         var _init = function (s) {
-            if (!api || !s.pluginon) return false;
+            if (!api || !pluginon) return false;
             _outjs(s);
             $.scripts("i", s);
+            $.cache(0, s);
             $.memory(0, s);
             return true
         };
@@ -181,11 +172,9 @@
         };
     };
     $.fn.ajaxify = function (options) {
-        var r;
         var $this = $(this);
         if (!$.fn.ajaxify.o) $.fn.ajaxify.o = new Ajaxify(options);
-        r = $.fn.ajaxify.o.a($this);
-        return $this;
+        return $.fn.ajaxify.o.a($this);
     };
 })(jQuery);
 
@@ -213,7 +202,7 @@
         var _alltxts = function ($s) {
             $s.each(function () {
                 var d = $(this).html();
-                if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d, s))) _addtext(d);
+                if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d))) _addtext(d);
                 r = true;
             });
         };
@@ -224,7 +213,7 @@
                 alert(e);
             };
         };
-        var _inline = function (txt, s) {
+        var _inline = function (txt) {
             var d = inlinehints;
             if (d) {
                 d = d.split(", ");
@@ -238,10 +227,8 @@
         };
     };
     $.scripts = function (same, options) {
-        var r;
         if (!$.scripts.o) $.scripts.o = new Scripts(options);
-        r = $.scripts.o.a(same);
-        return r;
+        return $.scripts.o.a(same);
     };
 })(jQuery);
 
@@ -269,10 +256,8 @@
         };
     };
     $.detScripts = function ($s) {
-        var r;
         if (!$.detScripts.o) $.detScripts.o = new DetScripts();
-        r = $.detScripts.o.a($s);
-        return r;
+        return $.detScripts.o.a($s);
     };
 })(jQuery);
 
@@ -365,11 +350,9 @@
         };
     };
     $.fn.addAll = function (same, PK, options) {
-        var r;
         var $this = $(this);
         if (!$.fn.addAll.o) $.fn.addAll.o = new AddAll(options);
-        r = $.fn.addAll.o.a($this, same, PK);
-        return r;
+        return $.fn.addAll.o.a($this, same, PK);
     };
 })(jQuery);﻿
 String.prototype.iO = function (s) {
@@ -712,7 +695,7 @@ if (jQuery)(function ($) {
 
         // Update DOM
         canURL = options.fn('-', post, $this);
-        if (canURL && canURL != url) url = canURL;
+        if (canURL && canURL != url && !url.iO('#')) url = canURL;
         ajaxify_forms();
 
         // Scroll to hash if given
