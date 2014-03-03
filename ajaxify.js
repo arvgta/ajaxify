@@ -12,7 +12,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
 
 
-﻿(function ($) {
+(function ($) {
     var Log = function (options) {
         var con = window.console;
         var settings = $.extend({
@@ -529,7 +529,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         function _click(e, mode) {
             var link = e.currentTarget;
             post = null;
-            if (_exoticKey(e) || _diffHost(link)) return false;
+            if (_exoticKey(e) || _diffHost(link)) return;
             if (_hashChange(link)) {
                 _saveState();
                 return true;
