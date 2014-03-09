@@ -594,7 +594,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             _saveState();
             $('title').html(fn('title').html());
             canURL = fn('-', post, $gthis);
-            if (canURL && canURL != url && !url.iO('#')) url = canURL;
+            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
             _ajaxify_forms();
             if (url.iO('#') && !mode) {
                 $('html, body').animate({
