@@ -433,7 +433,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             previewoff = settings.previewoff,
             fn = settings.fn;
         
-        // Define Plugin
+        // Main plugin function
         this.a = function ($this) {
             $gthis = $this;
             _init_p();
@@ -639,6 +639,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
         }
     };
+
+    // Define Plugin
     $.fn.pronto = function (options) {
         var $this = $(this);
         if (!$.fn.pronto.o) $.fn.pronto.o = new Pronto(options);
