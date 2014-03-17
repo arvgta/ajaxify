@@ -546,7 +546,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         }
 
         // Request new url
-		function _request(url, mode) {
+        function _request(url, mode) {
             $window.trigger("pronto.request"); // Fire request event
              var reqr = function () { //Callback - continue with _render()
                 _render(url, true, mode);
@@ -605,7 +605,10 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             _saveState(); // Update current state
             $('title').html(fn('title').html()); // Update title
             canURL = fn('-', post, $gthis); // Update DOM and fetch canonical URL - important for handling re-directs
-            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL; //Set current URL to canonical if no hash or parameters in current URl
+
+            //Set current URL to canonical if no hash or parameters in current URl
+            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
+
             _ajaxify_forms();
             
             //If hash in URL animate scroll to it
