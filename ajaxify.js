@@ -34,13 +34,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var d = false;
         this.a = function (o) {
             if (!o) {
-                return d
+                return d;
             }
             if (typeof o === "string") {
-                return d = $.pages($.memory(o))
+                return d = $.pages($.memory(o));
             }
             if (typeof o === "object") {
-                return d = o
+                return d = o;
             };
         };
     };
@@ -81,13 +81,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         this.a = function (h) {
             if (typeof h === "string") {
                 for (var i = 0; i < d.length; i++)
-                    if (d[i][0] == h) return d[i][1]
+                    if (d[i][0] == h) return d[i][1];
             }
             if (typeof h === "object") {
-                d.push(h)
+                d.push(h);
             }
             if (typeof h === "boolean") {
-                return false
+                return false;
             };
         };
     };
@@ -101,16 +101,16 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     var GetPage = function () {
         this.a = function (o, p, p2) {
             if (!o) {
-                return $.cache()
+                return $.cache();
             }
             if (o.iO("/")) {
-                return _lPage(o, p, p2)
+                return _lPage(o, p, p2);
             }
             if (o === "+") {
-                return _lPage(p, p2, false, true)
+                return _lPage(p, p2, false, true);
             }
             if (o === "-") {
-                return _lSel(p, p2)
+                return _lSel(p, p2);
             }
             return $.cache().find(".ajy-" + o);
         };
@@ -161,15 +161,15 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _isHtml(x) {
             var d;
-            return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"))
+            return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
         };
 
         function _parseHTML(h) {
-            return $.trim(_replD(h))
+            return $.trim(_replD(h));
         };
 
         function _replD(h) {
-            return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>")
+            return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
         };
     };
     $.getPage = function (o, p, p2) {
@@ -199,15 +199,10 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _init(s) {
             if (!api || !pluginon) return false;
-            _outjs(s);
             $.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
             return true
-        };
-
-        function _outjs(s) {
-            if (s.outjs) $.log(jsout)
         };
     };
     $.fn.ajaxify = function (options) {
@@ -230,14 +225,14 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             inlinehints = settings["inlinehints"];
         this.a = function (o) {
             if (o === "i") {
-                return true
+                return true;
             }
             if (o === "a") {
-                return _alltxts($s.t)
+                return _alltxts($s.t);
             }
             if (o === "c") {
                 if (canonical && $s.can) return $s.can.attr("href");
-                else return false
+                else return false;
             }
             $.detScripts($s);
             _addScripts(o, $s, settings);
@@ -270,7 +265,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _addScripts(same, $s, st) {
             $s.c.addAll(same, "href", st);
-            $s.s.addAll(same, "src", st)
+            $s.s.addAll(same, "src", st);
         };
     };
     $.scripts = function (o, options) {
@@ -364,11 +359,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _sameScripts(s, PK) {
             for (var i = 0; i < s.length; i++)
-                if (s[i][1] == 0) _iScript(s[i][0], PK)
+                if (s[i][1] == 0) _iScript(s[i][0], PK);
         };
 
         function _iScript($S, PK) {
-            $("head").append((PK == "href" ? linki : scri).replace("*", $S))
+            $("head").append((PK == "href" ? linki : scri).replace("*", $S));
         };
 
         function _newArray($t, sN, sO, PK) {
@@ -398,11 +393,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _freeOld(s, PK) {
             for (var i = 0; i < s.length; i++)
-                if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK)
+                if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
         };
 
         function _removeScript($S, PK) {
-            $((PK == "href" ? linkr : scrr).replace("!", $S)).remove()
+            $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
         };
     };
     $.fn.addAll = function (same, PK, options) {
@@ -448,12 +443,10 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             $window.on("popstate", _onPop);
             if (turbo) $(selector).hoverIntent(_prefetch, _drain);
             settings.$body.on("click.pronto", selector, _click);
-            _ajaxify_forms()
+            _ajaxify_forms();
         };
 
-        function _drain() {
-
-        };
+        function _drain() {};
 
         function _prefetch(e) {
             post = null;
@@ -464,7 +457,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 if (previewoff === true) return false;
                 if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
             };
-            fn('+', link.href, req2)
+            fn('+', link.href, req2);
         };
 
         function _isInDivs(link) {
@@ -476,14 +469,14 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                     alert(e);
                 }
             });
-            return isInDivs
+            return isInDivs;
         };
 
         function _b(m, n) {
             if (m.indexOf("?") > 0) {
-                m = m.substring(0, m.indexOf("?"))
+                m = m.substring(0, m.indexOf("?"));
             }
-            return m + "?" + n
+            return m + "?" + n;
         };
 
         function _k() {
@@ -492,9 +485,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (n.length == 0) return o;
             var p = n.attr("name") + "=" + n.val();
             if (o.length > 0) {
-                o += "&" + p
+                o += "&" + p;
             } else {
-                o = p
+                o = p;
             }
             return o;
         };
@@ -546,7 +539,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             var reqr = function () {
                 _render(url, true, mode);
             };
-            fn(url, reqr, post)
+            fn(url, reqr, post);
         };
 
         function _render(url, doPush, mode) {
@@ -606,19 +599,19 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         };
 
         function _gaCaptureView(url) {
-            if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url)
+            if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         };
 
         function _diffHost(link) {
-            return (window.location.protocol !== link.protocol || window.location.host !== link.host)
+            return (window.location.protocol !== link.protocol || window.location.host !== link.host);
         };
 
         function _exoticKey(e) {
-            return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+            return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
         };
 
         function _hashChange(link) {
-            return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#')
+            return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
         };
     };
     $.fn.pronto = function (options) {
@@ -628,4 +621,4 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
-jQuery.log("Entering ajaxify...", {verbosity: 8});
+jQuery.log("Ajaxify loaded...", {verbosity: 8});
