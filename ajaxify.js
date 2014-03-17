@@ -18,9 +18,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var settings = $.extend({
             verbosity: 0
         }, options);
-        var verbosity = settings["verbosity"];
+        var verbosity = settings.verbosity;
         this.a = function (m) {
-            l < verbosity && con && con.log(m);
+            if(l < verbosity && con) con.log(m);
         };
     };
     $.log = function (m, options) {
@@ -37,11 +37,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 return d;
             }
             if (typeof o === "string") {
-                return d = $.pages($.memory(o));
+                d = $.pages($.memory(o));
+                return d;
             }
             if (typeof o === "object") {
-                return d = o;
-            };
+                d = o;
+                return d;
+            }
         };
     };
     $.cache = function (o) {
@@ -56,11 +58,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var settings = $.extend({
             memoryoff: false
         }, options);
-        var memoryoff = settings["memoryoff"];
+        var memoryoff = settings.memoryoff;
         this.a = function (h) {
             d = memoryoff;
-            if (!h || d == true) return false;
-            if (d == false) return h;
+            if (!h || d === true) return false;
+            if (d === false) return h;
             if (d.iO(", ")) {
                 d = d.split(", ");
                 r = h;
@@ -88,7 +90,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             }
             if (typeof h === "boolean") {
                 return false;
-            };
+            }
         };
     };
     $.pages = function (h) {
@@ -120,28 +122,28 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             _lDivs($t);
             $.scripts(p);
             $.scripts("a");
-            return $.scripts("c")
-        };
+            return $.scripts("c");
+        }
 
         function _lPage(h, p, post, pre) {
             if (h.iO("#")) h = h.split("#")[0];
             if (post || !$.cache(h)) return _lAjax(h, p, post, pre);
-            p && p();
-        };
+            if(p) p();
+        }
 
         function _lDivs($t) {
             if ($.cache()) _all($t, "fn(*)", function (s) {
                 s.html($.cache().find("#" + s.attr("id")).html());
-            })
-        };
+            });
+        }
 
         function _all($t, t, fn) {
             $t.each(function () {
                 t = t.split("*").join("$(this)");
                 t += ";";
                 eval(t);
-            })
-        };
+            });
+        }
 
         function _lAjax(hin, p, post, pre) {
             var xhr = $.ajax({
@@ -154,23 +156,23 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                     }
                     $.cache($(_parseHTML(h)));
                     $.pages([hin, $.cache()]);
-                    p && p();
+                    if(p) p();
                 }
-            })
-        };
+            });
+        }
 
         function _isHtml(x) {
             var d;
             return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
-        };
+        }
 
         function _parseHTML(h) {
             return $.trim(_replD(h));
-        };
+        }
 
         function _replD(h) {
             return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
-        };
+        }
     };
     $.getPage = function (o, p, p2) {
         if (!$.getPage.o) $.getPage.o = new GetPage();
@@ -185,16 +187,14 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             pluginon: true,
             fn: $.getPage
         }, options);
-        var cb = settings["cb"],
-            pluginon = settings["pluginon"],
-            fn = settings["fn"];
+        var pluginon = settings.pluginon;
         this.a = function ($this) {
             $(function () {
                 if (_init(settings)) {
                     $this.pronto(settings);
                     $.getPage(location.href, $.scripts);
                 }
-            });;
+            });
         };
 
         function _init(s) {
@@ -202,8 +202,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             $.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
-            return true
-        };
+            return true;
+        }
     };
     $.fn.ajaxify = function (options) {
         var $this = $(this);
@@ -220,9 +220,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             inline: true,
             inlinehints: false
         }, options);
-        var canonical = settings["canonical"],
-            inline = settings["inline"],
-            inlinehints = settings["inlinehints"];
+        var canonical = settings.canonical,
+            inline = settings.inline,
+            inlinehints = settings.inlinehints;
         this.a = function (o) {
             if (o === "i") {
                 return true;
@@ -242,17 +242,16 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             $s.each(function () {
                 var d = $(this).html();
                 if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d))) _addtext(d);
-                r = true;
             });
-        };
+        }
 
         function _addtext(t) {
             try {
                 $.globalEval(t);
             } catch (e) {
                 alert(e);
-            };
-        };
+            }
+        }
 
         function _inline(txt) {
             var d = inlinehints;
@@ -261,12 +260,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 for (var i = 0; i < d.length; i++)
                     if (txt.iO(d[i])) return true;
             }
-        };
+        }
 
         function _addScripts(same, $s, st) {
             $s.c.addAll(same, "href", st);
             $s.s.addAll(same, "src", st);
-        };
+        }
     };
     $.scripts = function (o, options) {
         if (!$.scripts.o) $.scripts.o = new Scripts(options);
@@ -294,8 +293,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         function _rel(lk, v) {
             return $(lk).filter(function () {
                 return $(this).attr("rel").iO(v);
-            })
-        };
+            });
+        }
     };
     $.detScripts = function ($s) {
         if (!$.detScripts.o) $.detScripts.o = new DetScripts();
@@ -312,7 +311,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var settings = $.extend({
             deltas: true
         }, options);
-        var deltas = settings["deltas"];
+        var deltas = settings.deltas;
         this.a = function ($this, same, PK) {
             if (PK == "href") {
                 $scriptsO = $sCssO;
@@ -337,7 +336,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             } else {
                 $sO = $scriptsO;
                 $sN = $scriptsN;
-            };
+            }
         };
 
         function _allScripts($t, PK) {
@@ -346,7 +345,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 _iScript($(this)[0], PK);
             });
             return true;
-        };
+        }
 
         function _classAlways($t, PK) {
             $t.each(function () {
@@ -354,17 +353,17 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                     _iScript($(this).attr(PK), PK);
                     $(this).remove();
                 }
-            })
-        };
+            });
+        }
 
         function _sameScripts(s, PK) {
             for (var i = 0; i < s.length; i++)
-                if (s[i][1] == 0) _iScript(s[i][0], PK);
-        };
+                if (s[i][1] === 0) _iScript(s[i][0], PK);
+        }
 
         function _iScript($S, PK) {
             $("head").append((PK == "href" ? linki : scri).replace("*", $S));
-        };
+        }
 
         function _newArray($t, sN, sO, PK) {
             var d;
@@ -372,15 +371,15 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 d = [$(this).attr(PK), 0];
                 sN.push(d);
                 if (!pass) sO.push(d);
-            })
-        };
+            });
+        }
 
         function _findCommon(s, sN) {
             for (var i = 0; i < s.length; i++) {
                 s[i][1] = 2;
                 if (_findScript(s[i][0], sN)) s[i][1] = 1;
             }
-        };
+        }
 
         function _findScript($S, s) {
             if ($S)
@@ -389,16 +388,16 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                         s[i][1] = 1;
                         return true;
                     }
-        };
+        }
 
         function _freeOld(s, PK) {
             for (var i = 0; i < s.length; i++)
                 if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
-        };
+        }
 
         function _removeScript($S, PK) {
             $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
-        };
+        }
     };
     $.fn.addAll = function (same, PK, options) {
         var $this = $(this);
@@ -416,20 +415,18 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             $gthis, fm;
         var settings = $.extend({
             selector: "a:not(.no-ajaxy)",
-            requestKey: "pronto",
             requestDelay: 0,
             forms: true,
             turbo: true,
             previewoff: true,
             fn: false
         }, options);
-        var selector = settings["selector"],
-            requestKey = settings["requestKey"],
-            requestDelay = settings["requestDelay"],
-            forms = settings["forms"],
-            turbo = settings["turbo"],
-            previewoff = settings["previewoff"],
-            fn = settings["fn"];
+        var selector = settings.selector,
+            requestDelay = settings.requestDelay,
+            forms = settings.forms,
+            turbo = settings.turbo,
+            previewoff = settings.previewoff,
+            fn = settings.fn;
         this.a = function ($this) {
             $gthis = $this;
             _init_p();
@@ -444,9 +441,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (turbo) $(selector).hoverIntent(_prefetch, _drain);
             settings.$body.on("click.pronto", selector, _click);
             _ajaxify_forms();
-        };
+        }
 
-        function _drain() {};
+        function _drain() {}
 
         function _prefetch(e) {
             post = null;
@@ -458,7 +455,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
             };
             fn('+', link.href, req2);
-        };
+        }
 
         function _isInDivs(link) {
             var isInDivs = false;
@@ -470,19 +467,19 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 }
             });
             return isInDivs;
-        };
+        }
 
         function _b(m, n) {
             if (m.indexOf("?") > 0) {
                 m = m.substring(0, m.indexOf("?"));
             }
             return m + "?" + n;
-        };
-
+        }
+		
         function _k() {
             var o = fm.serialize();
             var n = $("input[name][type=submit]", fm);
-            if (n.length == 0) return o;
+            if (n.length === 0) return o;
             var p = n.attr("name") + "=" + n.val();
             if (o.length > 0) {
                 o += "&" + p;
@@ -490,7 +487,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 o = p;
             }
             return o;
-        };
+        }
 
         function _ajaxify_forms() {
             if (!forms) return false;
@@ -498,17 +495,17 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 fm = $(q.target);
                 if (!fm.is("form")) {
                     fm = fm.filter("input[type=submit]").parents("form:first");
-                    if (fm.length == 0) {
+                    if (fm.length === 0) {
                         return true;
                     }
                 }
                 var p = _k();
-                var q = "get",
+                var g = "get",
                     m = fm.attr("method");
-                if (m.length > 0 && m.toLowerCase() == "post") q = "post";
+                if (m.length > 0 && m.toLowerCase() == "post") g = "post";
                 var h, a = fm.attr("action");
-                if (a != null && a.length > 0) h = a;
-                else h = currentURL; if (q == "get") h = _b(h, p);
+                if (a !== null && a.length > 0) h = a;
+                else h = currentURL; if (g == "get") h = _b(h, p);
                 else {
                     post = {};
                     post.data = p;
@@ -516,8 +513,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 $window.trigger("pronto.submit", h);
                 _request(h);
                 return false;
-            })
-        };
+            });
+        }
 
         function _click(e, mode) {
             var link = e.currentTarget;
@@ -532,7 +529,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (currentURL == link.href) {
                 _saveState();
             } else _request(link.href, mode);
-        };
+        }
 
         function _request(url, mode) {
             $window.trigger("pronto.request");
@@ -540,7 +537,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 _render(url, true, mode);
             };
             fn(url, reqr, post);
-        };
+        }
 
         function _render(url, doPush, mode) {
             if (requestTimer !== null) {
@@ -548,15 +545,15 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 requestTimer = null;
             }
             requestTimer = setTimeout(function () {
-                _doRender(url, doPush, mode)
-            }, requestDelay)
-        };
+                _doRender(url, doPush, mode);
+            }, requestDelay);
+        }
 
         function _saveState() {
             history.replaceState({
                 url: currentURL
-            }, "state-" + currentURL, currentURL)
-        };
+            }, "state-" + currentURL, currentURL);
+        }
 
         function _onPop(e) {
             var data = e.originalEvent.state;
@@ -567,7 +564,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 };
                 fn(data.url, req3);
             }
-        };
+        }
 
         function _doPush(url, doPush) {
             currentURL = url;
@@ -578,7 +575,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             } else {
                 _saveState();
             }
-        };
+        }
 
         function _doRender(url, doPush, mode) {
             var canURL;
@@ -595,24 +592,24 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 }, 500);
             }
             _doPush(url, doPush);
-            $window.trigger("pronto.render")
-        };
+            $window.trigger("pronto.render");
+        }
 
         function _gaCaptureView(url) {
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
-        };
+        }
 
         function _diffHost(link) {
             return (window.location.protocol !== link.protocol || window.location.host !== link.host);
-        };
+        }
 
         function _exoticKey(e) {
             return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
-        };
+        }
 
         function _hashChange(link) {
             return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
-        };
+        }
     };
     $.fn.pronto = function (options) {
         var $this = $(this);
