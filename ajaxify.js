@@ -1,3 +1,11 @@
+/* 
+ * Ajaxify.js 
+ * Ajaxify your site out of the box, instantly.
+ * http://4nf.org/ 
+ * 
+ * Copyright 2014 Arvind Gupta; MIT Licensed 
+ */ 
+
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
@@ -406,6 +414,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             requestTimer = null,
             post = null,
             $gthis, fm;
+
+        // Default Options
         var settings = $.extend({
             selector: "a:not(.no-ajaxy)",
             requestDelay: 0,
@@ -414,35 +424,45 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             previewoff: true,
             fn: false
         }, options);
+
+        //Shorthands
         var selector = settings.selector,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
             turbo = settings.turbo,
             previewoff = settings.previewoff,
             fn = settings.fn;
+        
+        // Define Plugin
         this.a = function ($this) {
             $gthis = $this;
             _init_p();
             return $this;
         };
 
+        // Private Methods
         function _init_p() {
             settings.$body = $("body");
-            currentURL = window.location.href;
-            _saveState();
-            $window.on("popstate", _onPop);
-            if (turbo) $(selector).hoverIntent(_prefetch, _drain);
-            settings.$body.on("click.pronto", selector, _click);
+            currentURL = window.location.href; // Capture current url & state
+            _saveState(); // Set initial state
+            $window.on("popstate", _onPop); //Set handler for popState
+            if (turbo) $(selector).hoverIntent(_prefetch, _drain); //If "turbo" option defined then set handler to "prefetch" on hoverIntent
+            settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
         }
 
+        //Dummy function for hoverIntent
         function _drain() {}
 
+        //Prefetch target page on hoverIntent
         function _prefetch(e) {
-            post = null;
+            post = null; // Assume not a POST
             var link = e.currentTarget;
-            if (_diffHost(link)) return false;
+            
+			//Validate link internal and not the same URL
+			if (_diffHost(link)) return false;
             if (currentURL == link.href) return false;
+			
             var req2 = function () {
                 if (previewoff === true) return false;
                 if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
@@ -509,12 +529,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             });
         }
 
+        // Handle link clicks
         function _click(e, mode) {
             var link = e.currentTarget;
             post = null;
-            if (_exoticKey(e) || _diffHost(link)) return;
-            if (_hashChange(link)) {
-                _saveState();
+            if (_exoticKey(e) || _diffHost(link)) return; // Ignore everything but normal click and internal URLs
+            if (_hashChange(link)) { // Only the hash part has changed
+                _saveState(); // Update state on hash change
                 return true;
             }
             e.preventDefault();
@@ -524,12 +545,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             } else _request(link.href, mode);
         }
 
-        function _request(url, mode) {
-            $window.trigger("pronto.request");
-            var reqr = function () {
+        // Request new url
+		function _request(url, mode) {
+            $window.trigger("pronto.request"); // Fire request event
+             var reqr = function () { //Callback - continue with _render()
                 _render(url, true, mode);
             };
-            fn(url, reqr, post);
+            fn(url, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
         }
 
         function _render(url, doPush, mode) {
@@ -542,23 +564,28 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             }, requestDelay);
         }
 
+        // Save current state
         function _saveState() {
-            history.replaceState({
+            history.replaceState({ // Update state
                 url: currentURL
             }, "state-" + currentURL, currentURL);
         }
 
+        // Handle back/forward navigation
         function _onPop(e) {
             var data = e.originalEvent.state;
+            
+            // Check if data exists
             if (data !== null && data.url !== currentURL) {
-                $window.trigger("pronto.request");
-                var req3 = function () {
+                $window.trigger("pronto.request"); // Fire request event
+                var req3 = function () { //Callback - continue with _render()
                     _render(data.url, false, false);
                 };
-                fn(data.url, req3);
+                fn(data.url, req3); //Call "fn" - handler of parent, passing URL
             }
         }
 
+        // Push new states to the stack on new url
         function _doPush(url, doPush) {
             currentURL = url;
             if (doPush) {
@@ -570,25 +597,30 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             }
         }
 
-        function _doRender(url, doPush, mode) {
-            var canURL;
-            $window.trigger("pronto.load");
-            _gaCaptureView(url);
-            _saveState();
-            $('title').html(fn('title').html());
-            canURL = fn('-', post, $gthis);
-            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
+        // Render HTML
+       function _doRender(url, doPush, mode) {
+            var canURL; //Canonical URL
+            $window.trigger("pronto.load");  // Fire load event
+            _gaCaptureView(url); // Trigger analytics page view
+            _saveState(); // Update current state
+            $('title').html(fn('title').html()); // Update title
+            canURL = fn('-', post, $gthis); // Update DOM and fetch canonical URL - important for handling re-directs
+            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL; //Set current URL to canonical if no hash or parameters in current URl
             _ajaxify_forms();
+            
+            //If hash in URL animate scroll to it
             if (url.iO('#') && !mode) {
                 $('html, body').animate({
                     scrollTop: $('#' + url.split('#')[1]).offset().top
                 }, 500);
             }
-            _doPush(url, doPush);
-            $window.trigger("pronto.render");
+
+            _doPush(url, doPush); // Push new states to the stack on new url
+            $window.trigger("pronto.render"); // Fire render event
         }
 
-        function _gaCaptureView(url) {
+        // Google Analytics support
+        function _gaCaptureView(url) { 
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
 
