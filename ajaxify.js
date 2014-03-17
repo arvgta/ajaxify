@@ -446,7 +446,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             currentURL = window.location.href; // Capture current url & state
             _saveState(); // Set initial state
             $window.on("popstate", _onPop); //Set handler for popState
-            if (turbo) $(selector).hoverIntent(_prefetch, _drain); //If "turbo" option defined then set handler to "prefetch" on hoverIntent
+            if (turbo) $(selector).hoverIntent(_prefetch, _drain); //If "turbo" option defined then set handler to "_prefetch" on hoverIntent
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
         }
@@ -459,8 +459,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             post = null; // Assume not a POST
             var link = e.currentTarget;
             
-			//Validate link internal and not the same URL
-			if (_diffHost(link)) return false;
+            //Validate link internal and not the same URL
+            if (_diffHost(link)) return false;
             if (currentURL == link.href) return false;
 			
             var req2 = function () {
@@ -604,7 +604,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             _gaCaptureView(url); // Trigger analytics page view
             _saveState(); // Update current state
             $('title').html(fn('title').html()); // Update title
-            canURL = fn('-', post, $gthis); // Update DOM and fetch canonical URL - important for handling re-directs
+            
+            // Update DOM and fetch canonical URL - important for handling re-directs
+            canURL = fn('-', post, $gthis); 
 
             //Set current URL to canonical if no hash or parameters in current URl
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
