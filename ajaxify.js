@@ -1,6 +1,6 @@
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 
-(function(e){e.fn.hoverIntent=function(t,n,r){var i={interval:100,sensitivity:7,timeout:0};if(typeof t==="object"){i=e.extend(i,t)}else if(e.isFunction(n)){i=e.extend(i,{over:t,out:n,selector:r})}else{i=e.extend(i,{over:t,out:t,selector:n})}var s,o,u,a;var f=function(e){s=e.pageX;o=e.pageY};var l=function(t,n){n.hoverIntent_t=clearTimeout(n.hoverIntent_t);if(Math.abs(u-s)+Math.abs(a-o)<i.sensitivity){e(n).off("mousemove.hoverIntent",f);n.hoverIntent_s=1;return i.over.apply(n,[t])}else{u=s;a=o;n.hoverIntent_t=setTimeout(function(){l(t,n)},i.interval)}};var c=function(e,t){t.hoverIntent_t=clearTimeout(t.hoverIntent_t);t.hoverIntent_s=0;return i.out.apply(t,[e])};var h=function(t){var n=jQuery.extend({},t);var r=this;if(r.hoverIntent_t){r.hoverIntent_t=clearTimeout(r.hoverIntent_t)}if(t.type=="mouseenter"){u=n.pageX;a=n.pageY;e(r).on("mousemove.hoverIntent",f);if(r.hoverIntent_s!=1){r.hoverIntent_t=setTimeout(function(){l(n,r)},i.interval)}}else{e(r).off("mousemove.hoverIntent",f);if(r.hoverIntent_s==1){r.hoverIntent_t=setTimeout(function(){c(n,r)},i.timeout)}}};return this.on({"mouseenter.hoverIntent":h,"mouseleave.hoverIntent":h},i.selector)}})(jQuery); 
+(function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
 var l=0, pass=0, api=window.history && window.history.pushState && window.history.replaceState;
 var docType = /<\!DOCTYPE[^>]*>/i;
@@ -10,7 +10,7 @@ var div12 =  '<div class="ajy-$1"$2';
 var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
-
+/*global jQuery*/ //Tell JSHint, not to moan about "jQuery" being undefined
 
 (function ($) {
     var Log = function (options) {
@@ -65,8 +65,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (d === false) return h;
             if (d.iO(", ")) {
                 d = d.split(", ");
-                r = h;
                 if (d.iO(h)) return false;
+				else return h;
             }
             return h == d ? false : h;
         };
@@ -132,16 +132,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         }
 
         function _lDivs($t) {
-            if ($.cache()) _all($t, "fn(*)", function (s) {
-                s.html($.cache().find("#" + s.attr("id")).html());
-            });
-        }
-
-        function _all($t, t, fn) {
-            $t.each(function () {
-                t = t.split("*").join("$(this)");
-                t += ";";
-                eval(t);
+            if ($.cache()) $t.each(function () { 
+                $(this).html($.cache().find("#" + $(this).attr("id")).html());
             });
         }
 
@@ -152,7 +144,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 data: post ? post.data : null,
                 success: function (h) {
                     if (!h || !_isHtml(xhr)) {
-                        if (!pre) location = hin;
+                        if (!pre) location.href = hin;
+                        return;
                     }
                     $.cache($(_parseHTML(h)));
                     $.pages([hin, $.cache()]);
