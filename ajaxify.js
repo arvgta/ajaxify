@@ -6,21 +6,31 @@
  * Copyright 2014 Arvind Gupta; MIT Licensed 
  */ 
 
+ //Intuitively better understandable shorthand for String.indexOf() - String.iO()
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 
+//Minified hoverIntent plugin that satisfies JSHint
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
+//Module global variables
 var l=0, pass=0, api=window.history && window.history.pushState && window.history.replaceState;
+
+//Regexes for escaping fetched HTML of a whole page - best of Balupton's "Ajaxify"
+//Makes it possible to pre-fetch an entire page
 var docType = /<\!DOCTYPE[^>]*>/i;
 var tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi;
 var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
+
+//Helper strings
 var div12 =  '<div class="ajy-$1"$2';
 var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
 var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
 /*global jQuery*/ //Tell JSHint, not to moan about "jQuery" being undefined
 
-(function ($) {
+// The stateful Log plugin - initialised in Ajaxify at the bottom of the file
+// Usage: $.log(<string>); anywhere in Ajaxify where you would like to peek into
+(function ($) { 
     var Log = function (options) {
         var con = window.console;
         var settings = $.extend({
@@ -37,6 +47,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The stateful Cache plugin
+// Usage: 
+// 1) $.cache() - returns currently cached page
+// 2) $.cache(<URL>) - returns page with specified URL
+// 3) $.cache(<jQuery object>) - saves the page in cache
 (function ($) {
     var Cache = function () {
         var d = false;
@@ -60,6 +75,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The stateful Memory plugin
+// Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 (function ($) {
     var Memory = function (options) {
         var d = false;
@@ -85,6 +102,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The stateful Pages plugin
+// Usage: 
+// 1) $.pages(<URL>) - returns page with specified URL from internal array
+// 2) $.pages(<jQuery object>) - saves the passed page in internal array
+// 3) $.pages(false) - returns false
 (function ($) {
     var Pages = function () {
         var d = [];
@@ -107,6 +129,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The GetPage plugin
+// First parameter is a switch: 
+// empty - returns cache
+// <URL> - loads HTML via Ajax
+// "+" - pre-fetches page
+// "-" - loads page into DOM and handle scripts
+// otherwise - returns selection of current page to client
 (function ($) {
     var GetPage = function () {
         this.a = function (o, p, p2) {
@@ -125,7 +154,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             return $.cache().find(".ajy-" + o);
         };
 
-        function _lSel(p, $t) {
+        function _lSel(p, $t) { //load page into DOM and handle scripts
             pass++;
             _lDivs($t);
             $.scripts(p);
@@ -133,19 +162,19 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             return $.scripts("c");
         }
 
-        function _lPage(h, p, post, pre) {
+        function _lPage(h, p, post, pre) { //fire Ajax load, check for hash first
             if (h.iO("#")) h = h.split("#")[0];
             if (post || !$.cache(h)) return _lAjax(h, p, post, pre);
             if(p) p();
         }
 
-        function _lDivs($t) {
+        function _lDivs($t) { //load target divs into DOM
             if ($.cache()) $t.each(function () { 
                 $(this).html($.cache().find("#" + $(this).attr("id")).html());
             });
         }
 
-        function _lAjax(hin, p, post, pre) {
+        function _lAjax(hin, p, post, pre) { //execute Ajax load
             var xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
@@ -162,16 +191,16 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             });
         }
 
-        function _isHtml(x) {
+        function _isHtml(x) { //restrict interesting MIME types - only HTML / XML
             var d;
             return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
         }
 
-        function _parseHTML(h) {
+        function _parseHTML(h) { //process fetched HTML
             return $.trim(_replD(h));
         }
 
-        function _replD(h) {
+        function _replD(h) { //pre-process HTML so it can be loaded by jQuery
             return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
         }
     };
@@ -181,6 +210,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The main plugin - Ajaxify
+// Is passed the global options 
+// Checks for necessary pre-conditions - otherwise gracefully degrades
+// Initialises sub-plugins
+// Calls Pronto
 (function ($) {
     var Ajaxify = function (options) {
         var settings = $.extend({
@@ -213,6 +247,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The stateful Scripts plugin
+// First parameter is switch:
+// "i" - initailise options
+// "a" - handle inline scripts
+// "c" - fetch canonical URL
+// otherwise - delta loading
 (function ($) {
     var Scripts = function (options) {
         var $s = $();
@@ -235,8 +275,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 if (canonical && $s.can) return $s.can.attr("href");
                 else return false;
             }
-            $.detScripts($s);
-            _addScripts(o, $s, settings);
+            $.detScripts($s); //fetch all scripts
+            _addScripts(o, $s, settings); //delta-loading
         };
 
         function _alltxts($s) {
@@ -274,6 +314,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
+// The DetScripts plugin - stands for "detach scripts"
+// Works on "$s" jQuery object that is passed in and fills it
+// Fetches all stylesheets in the head
+// Fetches the canonical URL
+// Fetches all external scripts in the head
+// Fetches all inline scripts in the head
 (function ($) {
     var DetScripts = function () {
         var head, lk, j;
