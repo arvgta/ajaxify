@@ -218,7 +218,6 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 (function ($) {
     var Ajaxify = function (options) {
         var settings = $.extend({
-            cb: 0,
             pluginon: true,
             fn: $.getPage
         }, options);
@@ -468,7 +467,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             forms: true,
             turbo: true,
             previewoff: true,
-            fn: false
+            fn: false,
+            cb: 0
         }, options);
 
         //Shorthands
@@ -477,6 +477,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             forms = settings.forms,
             turbo = settings.turbo,
             previewoff = settings.previewoff,
+            cb = settings.cb,
             fn = settings.fn;
         
         // Main plugin function
@@ -668,6 +669,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
             _doPush(url, doPush); // Push new states to the stack on new url
             $window.trigger("pronto.render"); // Fire render event
+            if(cb) cb();
         }
 
         // Google Analytics support
