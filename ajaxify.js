@@ -317,8 +317,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 // Works on "$s" jQuery object that is passed in and fills it
 // Fetches all stylesheets in the head
 // Fetches the canonical URL
-// Fetches all external scripts in the head
-// Fetches all inline scripts in the head
+// Fetches all external scripts on the page
+// Fetches all inline scripts on the page
 (function ($) {
     var DetScripts = function () {
         var head, lk, j;
