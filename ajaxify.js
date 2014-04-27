@@ -168,9 +168,18 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if(p) p();
         }
 
-        function _lDivs($t) { //load target divs into DOM
+        function _ld($t, $h) {
+            $h.find(".ajy-script").each(function(){
+			     if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).html() + '</script>');
+				 else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
+			});
+            
+			$t.html($h.html());
+        }
+	   
+		function _lDivs($t) { //load target divs into DOM
             if ($.cache()) $t.each(function () { 
-                $(this).html($.cache().find("#" + $(this).attr("id")).html());
+                _ld($(this), $.cache().find("#" + $(this).attr("id")));
             });
         }
 
@@ -589,25 +598,26 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             e.stopPropagation();
             if (currentURL == link.href) {
                 _saveState();
-            } else _request(link.href, mode);
+            } else _request(e, mode);
         }
 
         // Request new url
-        function _request(url, mode) {
-            $window.trigger("pronto.request"); // Fire request event
+        function _request(e, mode) {
+            var link = e.currentTarget;
+            $window.trigger("pronto.request", e); // Fire request event
              var reqr = function () { //Callback - continue with _render()
-                _render(url, true, mode);
+                _render(e, true, mode);
             };
-            fn(url, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
+            fn(link.href, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
         }
 
-        function _render(url, doPush, mode) {
+        function _render(e, doPush, mode) {
             if (requestTimer !== null) {
                 clearTimeout(requestTimer);
                 requestTimer = null;
             }
             requestTimer = setTimeout(function () {
-                _doRender(url, doPush, mode);
+                _doRender(e, doPush, mode);
             }, requestDelay);
         }
 
@@ -645,9 +655,10 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         }
 
         // Render HTML
-       function _doRender(url, doPush, mode) {
-            var canURL; //Canonical URL
-            $window.trigger("pronto.load");  // Fire load event
+       function _doRender(e, doPush, mode) {
+            var url, canURL; //Canonical URL
+            url = e.currentTarget.href;
+            $window.trigger("pronto.load", e);  // Fire load event
             _gaCaptureView(url); // Trigger analytics page view
             _saveState(); // Update current state
             $('title').html(fn('title').html()); // Update title
@@ -668,7 +679,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
-            $window.trigger("pronto.render"); // Fire render event
+            $window.trigger("pronto.render", e); // Fire render event
             if(cb) cb();
         }
 
