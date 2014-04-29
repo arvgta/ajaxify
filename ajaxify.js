@@ -634,9 +634,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             
             // Check if data exists
             if (data !== null && data.url !== currentURL) {
-                $window.trigger("pronto.request"); // Fire request event
+                $window.trigger("pronto.request", e); // Fire request event
                 var req3 = function () { //Callback - continue with _render()
-                    _render(data.url, false, false);
+					_render(e, false, false);
                 };
                 fn(data.url, req3); //Call "fn" - handler of parent, passing URL
             }
@@ -657,7 +657,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         // Render HTML
        function _doRender(e, doPush, mode) {
             var url, canURL; //Canonical URL
-            url = e.currentTarget.href;
+            url = e.currentTarget.href || e.originalEvent.state.url;
             $window.trigger("pronto.load", e);  // Fire load event
             _gaCaptureView(url); // Trigger analytics page view
             _saveState(); // Update current state
