@@ -170,13 +170,13 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _ld($t, $h) {
             $h.find(".ajy-script").each(function(){
-			     if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).html() + '</script>');
-				 else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
+                 if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).html() + '</script>');
+                 else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
 			});
             
 			$t.html($h.html());
         }
-	   
+
 		function _lDivs($t) { //load target divs into DOM
             if ($.cache()) $t.each(function () { 
                 _ld($(this), $.cache().find("#" + $(this).attr("id")));
