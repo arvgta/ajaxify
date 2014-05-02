@@ -317,7 +317,6 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         }
 		
         function _addstyle(t) {
-            $.log("Adding style tag: " + t);
 			$("head").append('<style type="text/css">' + t + '</style>');
         }
 
