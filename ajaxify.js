@@ -158,6 +158,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             pass++;
             _lDivs($t);
             $.scripts(p);
+            $.scripts("s");
             $.scripts("a");
             return $.scripts("c");
         }
@@ -267,16 +268,21 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var settings = $.extend({
             canonical: true,
             inline: true,
-            inlinehints: false
-        }, options);
+            inlinehints: false,
+            style: true
+			}, options);
         var canonical = settings.canonical,
             inline = settings.inline,
-            inlinehints = settings.inlinehints;
+            inlinehints = settings.inlinehints,
+            style = settings.style;
         this.a = function (o) {
             if (o === "i") {
                 return true;
             }
-            if (o === "a") {
+            if (o === "s") {
+                return _allstyle($s.y);
+            }
+			if (o === "a") {
                 return _alltxts($s.t);
             }
             if (o === "c") {
@@ -287,7 +293,14 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             _addScripts(o, $s, settings); //delta-loading
         };
 
-        function _alltxts($s) {
+        function _allstyle($s) {
+            $s.each(function () {
+                var d = $(this).html();
+                if (style) _addstyle(d);
+            });
+        }
+		
+		function _alltxts($s) {
             $s.each(function () {
                 var d = $(this).html();
                 if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d))) _addtext(d);
@@ -300,6 +313,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             } catch (e) {
                 alert(e);
             }
+        }
+		
+        function _addstyle(t) {
+            $.log("Adding style tag: " + t);
+			$("head").append('<style type="text/css">' + t + '</style>');
         }
 
         function _inline(txt) {
@@ -336,6 +354,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             lk = head.find(".ajy-link");
             j = $.getPage("script");
             $s.c = _rel(lk, "stylesheet");
+			$s.y = head.find("style");
             $s.can = _rel(lk, "canonical");
             $s.s = j.filter(function () {
                 return $(this).attr("src");
