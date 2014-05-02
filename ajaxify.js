@@ -294,7 +294,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         };
 
         function _allstyle($s) {
-            $s.each(function () {
+            $("head").find("style").remove();
+			$s.each(function () {
                 var d = $(this).html();
                 if (style) _addstyle(d);
             });
