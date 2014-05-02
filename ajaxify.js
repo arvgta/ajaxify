@@ -294,10 +294,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         };
 
         function _allstyle($s) {
-            $("head").find("style").remove();
+            if (!style) return;
+			$("head").find("style").remove();
 			$s.each(function () {
                 var d = $(this).html();
-                if (style) _addstyle(d);
+                _addstyle(d);
             });
         }
 		
