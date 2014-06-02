@@ -60,7 +60,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 return d;
             }
             if (typeof o === "string") {
-                d = $.pages($.memory(o));
+                if(o === "f") { 
+                    $.pages("f");
+                    d = undefined;
+                } else d = $.pages($.memory(o));
+                
                 return d;
             }
             if (typeof o === "object") {
@@ -112,7 +116,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var d = [];
         this.a = function (h) {
             if (typeof h === "string") {
-                for (var i = 0; i < d.length; i++)
+                if(h === "f") d = [];
+                else for (var i = 0; i < d.length; i++)
                     if (d[i][0] == h) return d[i][1];
             }
             if (typeof h === "object") {
@@ -699,7 +704,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
-            $window.trigger("pronto.render", e); // Fire render event
+			$window.trigger("pronto.render", e); // Fire render event
             if(cb) cb();
         }
 
