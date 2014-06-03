@@ -628,12 +628,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         // Request new url
         function _request(e, mode) {
-            var link = e.currentTarget;
+            var href = typeof(e) !== "string" ? e.currentTarget.href : e;
             $window.trigger("pronto.request", e); // Fire request event
              var reqr = function () { //Callback - continue with _render()
                 _render(e, true, mode);
             };
-            fn(link.href, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
+            fn(href, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
         }
 
         function _render(e, doPush, mode) {
@@ -682,7 +682,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         // Render HTML
        function _doRender(e, doPush, mode) {
             var url, canURL; //Canonical URL
-            url = e.currentTarget.href || e.originalEvent.state.url;
+            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;
             $window.trigger("pronto.load", e);  // Fire load event
             _gaCaptureView(url); // Trigger analytics page view
             _saveState(); // Update current state
