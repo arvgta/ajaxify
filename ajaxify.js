@@ -156,7 +156,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (o === "-") {
                 return _lSel(p, p2);
             }
-            return $.cache().find(".ajy-" + o);
+            if($.cache()) return $.cache().find(".ajy-" + o);
         };
 
         function _lSel(p, $t) { //load page into DOM and handle scripts
@@ -176,7 +176,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _ld($t, $h) {
             $h.find(".ajy-script").each(function(){
-                 if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).html() + '</script>');
+                 if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
                  else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
 			});
             
@@ -302,14 +302,14 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (!style) return;
 			$("head").find("style").remove();
 			$s.each(function () {
-                var d = $(this).html();
+                var d = $(this).text();
                 _addstyle(d);
             });
         }
 		
 		function _alltxts($s) {
             $s.each(function () {
-                var d = $(this).html();
+                var d = $(this).text();
                 if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d))) _addtext(d);
             });
         }
