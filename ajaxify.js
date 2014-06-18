@@ -62,7 +62,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (typeof o === "string") {
                 if(o === "f") { 
                     $.pages("f");
-                    d = undefined;
+                    //d = undefined;
+                    $.log("Cache flushed");
                 } else d = $.pages($.memory(o));
                 
                 return d;
