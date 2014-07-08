@@ -276,7 +276,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             inline: true,
             inlinehints: false,
             style: true
-			}, options);
+        }, options);
         var canonical = settings.canonical,
             inline = settings.inline,
             inlinehints = settings.inlinehints,
