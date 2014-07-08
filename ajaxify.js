@@ -96,7 +96,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (d.iO(", ")) {
                 d = d.split(", ");
                 if (d.iO(h)) return false;
-				else return h;
+                else return h;
             }
             return h == d ? false : h;
         };
@@ -179,12 +179,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             $h.find(".ajy-script").each(function(){
                  if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
                  else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
-			});
+            });
             
-			$t.html($h.html());
+            $t.html($h.html());
         }
 
-		function _lDivs($t) { //load target divs into DOM
+        function _lDivs($t) { //load target divs into DOM
             if ($.cache()) $t.each(function () { 
                 _ld($(this), $.cache().find("#" + $(this).attr("id")));
             });
@@ -288,7 +288,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (o === "s") {
                 return _allstyle($s.y);
             }
-			if (o === "a") {
+            if (o === "a") {
                 return _alltxts($s.t);
             }
             if (o === "c") {
@@ -301,14 +301,14 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         function _allstyle($s) {
             if (!style) return;
-			$("head").find("style").remove();
-			$s.each(function () {
+            $("head").find("style").remove();
+            $s.each(function () {
                 var d = $(this).text();
                 _addstyle(d);
             });
         }
 		
-		function _alltxts($s) {
+        function _alltxts($s) {
             $s.each(function () {
                 var d = $(this).text();
                 if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d))) _addtext(d);
@@ -324,7 +324,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         }
 		
         function _addstyle(t) {
-			$("head").append('<style type="text/css">' + t + '</style>');
+            $("head").append('<style type="text/css">' + t + '</style>');
         }
 
         function _inline(txt) {
@@ -361,7 +361,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             lk = head.find(".ajy-link");
             j = $.getPage("script");
             $s.c = _rel(lk, "stylesheet");
-			$s.y = head.find("style");
+            $s.y = head.find("style");
             $s.can = _rel(lk, "canonical");
             $s.s = j.filter(function () {
                 return $(this).attr("src");
@@ -400,7 +400,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             } else {
                 $scriptsO = $sO;
                 $scriptsN = $sN;
-            } if (_allScripts($this, PK)) return true;
+            } 
+            if (_allScripts($this, PK)) return true;
             if (pass) _classAlways($this, PK);
             if (same) return _sameScripts($scriptsN, PK);
             $scriptsN = [];
