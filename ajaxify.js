@@ -663,7 +663,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             if (data !== null && data.url !== currentURL) {
                 $window.trigger("pronto.request", e); // Fire request event
                 var req3 = function () { //Callback - continue with _render()
-					_render(e, false, false);
+                    _render(e, false, false);
                 };
                 fn(data.url, req3); //Call "fn" - handler of parent, passing URL
             }
