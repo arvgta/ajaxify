@@ -736,4 +736,4 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
     };
 })(jQuery);
 
-jQuery.log("Ajaxify loaded...", {verbosity: 8});
+jQuery.log("Ajaxify loaded...", {verbosity: 2});
