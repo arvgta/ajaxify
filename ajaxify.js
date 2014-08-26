@@ -1,5 +1,5 @@
 /* 
- * Ajaxify.js 
+ * ajaxify.js 
  * Ajaxify your site out of the box, instantly.
  * http://4nf.org/ 
  * 
@@ -160,12 +160,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         };
 
         function _lSel(p, $t) { //load page into DOM and handle scripts
-            pass++;
+			pass++;
             _lDivs($t);
             $.scripts(p);
             $.scripts("s");
             $.scripts("a");
-            return $.scripts("c");
+			return $.scripts("c");
         }
 
         function _lPage(h, p, post, pre) { //fire Ajax load, check for hash first
@@ -197,11 +197,19 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 success: function (h) {
                     if (!h || !_isHtml(xhr)) {
                         if (!pre) location.href = hin;
-                        return;
                     }
                     $.cache($(_parseHTML(h)));
                     $.pages([hin, $.cache()]);
                     if(p) p();
+                },
+                error: function(jqXHR, status, error) {
+				    // Try to parse response text
+                    try { 
+                        $.log('Response text : ' + jqXHR.responseText);
+						$.cache($(_parseHTML(jqXHR.responseText)));
+                        $.pages([hin, $.cache()]); 
+                        if(p) p(error);
+                    } catch (e) {}
                 }
             });
         }
@@ -299,7 +307,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         };
 
         function _allstyle($s) {
-            if (!style) return;
+            if (!style || !$s) return;
             $("head").find("style").remove();
             $s.each(function () {
                 var d = $(this).text();
@@ -393,7 +401,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         }, options);
         var deltas = settings.deltas;
         this.a = function ($this, same, PK) {
-            if (PK == "href") {
+            if(!$this.length) return;
+			if (PK == "href") {
                 $scriptsO = $sCssO;
                 $scriptsN = $sCssN;
             } else {
@@ -631,7 +640,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         function _request(e, mode) {
             var href = typeof(e) !== "string" ? e.currentTarget.href : e;
             $window.trigger("pronto.request", e); // Fire request event
-             var reqr = function () { //Callback - continue with _render()
+            var reqr = function (err) { //Callback - continue with _render()
+                if (err) { 
+                    $.log('Error : ' + err); 
+                    $window.trigger("pronto.error", err); 
+                    //return; 
+                }
                 _render(e, true, mode);
             };
             fn(href, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
@@ -705,7 +719,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
-			$window.trigger("pronto.render", e); // Fire render event
+            $window.trigger("pronto.render", e); // Fire render event
             if(cb) cb();
         }
 
