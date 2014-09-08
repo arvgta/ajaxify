@@ -509,7 +509,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             selector: "a:not(.no-ajaxy)",
             requestDelay: 0,
             forms: true,
-            turbo: true,
+            prefetch: true,
             previewoff: true,
             fn: false,
             cb: 0
@@ -519,7 +519,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         var selector = settings.selector,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
-            turbo = settings.turbo,
+            prefetch = settings.prefetch,
             previewoff = settings.previewoff,
             cb = settings.cb,
             fn = settings.fn;
@@ -537,7 +537,11 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             currentURL = window.location.href; // Capture current url & state
             _saveState(); // Set initial state
             $window.on("popstate", _onPop); //Set handler for popState
-            if (turbo) $(selector).hoverIntent(_prefetch, _drain); //If "turbo" option defined then set handler to "_prefetch" on hoverIntent
+            if (prefetch) {
+                $(selector).hoverIntent(_prefetch, _drain); //If "prefetch" option defined then set handler to "_prefetch" on hoverIntent
+                $(selector).on("touchstart", _prefetch); //for touchscreens
+            }
+            
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
         }
