@@ -17,7 +17,7 @@
 "performance",
 "speed"
 ],
-"version": "4.8.0",
+"version": "4.8.1",
 "author": {
 "name": "Arvind Gupta",
 "url": "http://4nf.org/more/about/"
@@ -30,7 +30,7 @@
 ],
 "bugs": "https://github.com/arvgta/ajaxify/issues?state=open",
 "homepage": "http://4nf.org/",
-"demo": "http://4nf.org/",
+"demo": "http://4nf.org/demos/",
 "docs": "http://4nf.org/ajaxify-overview/",
 "download": "http://4nf.org/ajaxify.min.js",
 "dependencies": {
