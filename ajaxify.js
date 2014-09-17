@@ -13,18 +13,20 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
 //Module global variables
-var l=0, pass=0, api=window.history && window.history.pushState && window.history.replaceState;
+var l=0, pass=0, api=window.history && window.history.pushState && window.history.replaceState,
 
-//Regexes for escaping fetched HTML of a whole page - best of Balupton's "Ajaxify"
+//Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
-var docType = /<\!DOCTYPE[^>]*>/i;
-var tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi;
-var tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi;
+docType = /<\!DOCTYPE[^>]*>/i,
+tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi,
+tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi,
 
 //Helper strings
-var div12 =  '<div class="ajy-$1"$2';
-var linki = '<link rel="stylesheet" type="text/css" href="*" />', scri='<script type="text/javascript" src="*" />';
-var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
+div12 = '<div class="ajy-$1"$2',
+linki = '<link rel="stylesheet" type="text/css" href="*" />',
+scri = '<script type="text/javascript" src="*" />',
+linkr = 'link[href*="!"]', 
+scrr = 'script[src*="!"]';
 
 /*global jQuery*/ //Tell JSHint, not to moan about "jQuery" being undefined
 
@@ -160,12 +162,12 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         };
 
         function _lSel(p, $t) { //load page into DOM and handle scripts
-			pass++;
+            pass++;
             _lDivs($t);
             $.scripts(p);
             $.scripts("s");
             $.scripts("a");
-			return $.scripts("c");
+            return $.scripts("c");
         }
 
         function _lPage(h, p, post, pre) { //fire Ajax load, check for hash first
@@ -507,6 +509,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         // Default Options
         var settings = $.extend({
             selector: "a:not(.no-ajaxy)",
+			fade: 100,
             requestDelay: 0,
             forms: true,
             prefetch: true,
@@ -517,6 +520,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
 
         //Shorthands
         var selector = settings.selector,
+		    fade = settings.fade,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
             prefetch = settings.prefetch,
@@ -644,7 +648,7 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
         function _request(e, mode) {
             var href = typeof(e) !== "string" ? e.currentTarget.href : e;
             $window.trigger("pronto.request", e); // Fire request event
-            var reqr = function (err) { //Callback - continue with _render()
+			var reqr = function (err) { //Callback - continue with _render()
                 if (err) { 
                     $.log('Error : ' + err); 
                     $window.trigger("pronto.error", err); 
@@ -652,8 +656,9 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 }
                 _render(e, true, mode);
             };
+			
             fn(href, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
-        }
+            }
 
         function _render(e, doPush, mode) {
             if (requestTimer !== null) {
@@ -661,8 +666,17 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
                 requestTimer = null;
             }
             requestTimer = setTimeout(function () {
-                _doRender(e, doPush, mode);
+                _render2(e, doPush, mode);
             }, requestDelay);
+        }
+		
+		 function _render2(e, doPush, mode) {
+            var afterFade = function () { //Callback - continue with _fn()
+                _doRender(e, doPush, mode); //Call "fn" - handler of parent, informing whether POST or not
+            };
+			
+            if(fade) $gthis.fadeOut(fade, afterFade);
+			else afterFade();
         }
 
         // Save current state
@@ -708,7 +722,8 @@ var linkr = 'link[href*="!"]', scrr = 'script[src*="!"]';
             $('title').html(fn('title').html()); // Update title
             
             // Update DOM and fetch canonical URL - important for handling re-directs
-            canURL = fn('-', post, $gthis); 
+            canURL = fn('-', post, $gthis);
+            if(fade) $gthis.fadeIn(fade);			
 
             //Set current URL to canonical if no hash or parameters in current URl
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
