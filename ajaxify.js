@@ -509,7 +509,8 @@ scrr = 'script[src*="!"]';
         // Default Options
         var settings = $.extend({
             selector: "a:not(.no-ajaxy)",
-			fade: 100,
+            fade: 0,
+            pop: 0,
             requestDelay: 0,
             forms: true,
             prefetch: true,
@@ -520,7 +521,8 @@ scrr = 'script[src*="!"]';
 
         //Shorthands
         var selector = settings.selector,
-		    fade = settings.fade,
+            fade = settings.fade,
+            pop = settings.pop,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
             prefetch = settings.prefetch,
@@ -670,13 +672,13 @@ scrr = 'script[src*="!"]';
             }, requestDelay);
         }
 		
-		 function _render2(e, doPush, mode) {
-            var afterFade = function () { //Callback - continue with _fn()
-                _doRender(e, doPush, mode); //Call "fn" - handler of parent, informing whether POST or not
+        function _render2(e, doPush, mode) {
+            var afterFade = function () {
+                _doRender(e, doPush, mode);
             };
 			
             if(fade) $gthis.fadeOut(fade, afterFade);
-			else afterFade();
+            else afterFade();
         }
 
         // Save current state
@@ -723,8 +725,11 @@ scrr = 'script[src*="!"]';
             
             // Update DOM and fetch canonical URL - important for handling re-directs
             canURL = fn('-', post, $gthis);
-            if(fade) $gthis.fadeIn(fade);			
-
+            if(fade) $gthis.fadeIn(fade);
+			if(pop) { 
+			    var d = $gthis; d.css({'opacity': 1 }).effect("scale", {origin:['middle','center'], from:{width:d.width()/2,height:d.height()/2}, percent: 100, direction: 'both' }, pop);
+            }
+			
             //Set current URL to canonical if no hash or parameters in current URl
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
 
