@@ -205,10 +205,10 @@ scrr = 'script[src*="!"]';
                     if(p) p();
                 },
                 error: function(jqXHR, status, error) {
-				    // Try to parse response text
+                    // Try to parse response text
                     try { 
                         $.log('Response text : ' + jqXHR.responseText);
-						$.cache($(_parseHTML(jqXHR.responseText)));
+                        $.cache($(_parseHTML(jqXHR.responseText)));
                         $.pages([hin, $.cache()]); 
                         if(p) p(error);
                     } catch (e) {}
@@ -251,14 +251,14 @@ scrr = 'script[src*="!"]';
         deltas = settings.deltas;
         this.a = function ($this, o) {
             if(!o) {
-			    $(function () { //on DOMReady
-                    if (_init(settings)) {
-                        $this.pronto(0, settings);
-                        if(deltas) $.getPage(location.href, $.scripts);
+                $(function () { //on DOMReady
+                    if (_init(settings)) { //sub-plugins initialisation
+                        $this.pronto(0, settings); //Pronto initialisation
+                        if(deltas) $.getPage(location.href, $.scripts); //delta-loading initialisation
                     }
                 });
-			}
-			else return $().pronto(o);
+            }
+            else return $().pronto(o);
         };
 
         function _init(s) {
@@ -408,7 +408,7 @@ scrr = 'script[src*="!"]';
         var deltas = settings.deltas;
         this.a = function ($this, same, PK) {
             if(!$this.length) return;
-			if (PK == "href") {
+            if (PK == "href") {
                 $scriptsO = $sCssO;
                 $scriptsN = $sCssN;
             } else {
@@ -515,7 +515,7 @@ scrr = 'script[src*="!"]';
             selector: "a:not(.no-ajaxy)",
             fade: 0,
             pop: 0,
-			squeeze: 0,
+            squeeze: 0,
             requestDelay: 0,
             forms: true,
             prefetch: true,
@@ -528,7 +528,7 @@ scrr = 'script[src*="!"]';
         var selector = settings.selector,
             fade = settings.fade,
             pop = settings.pop,
-			squeeze = settings.squeeze,
+            squeeze = settings.squeeze,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
             prefetch = settings.prefetch,
@@ -542,11 +542,11 @@ scrr = 'script[src*="!"]';
                 $gthis = $this;
                 _init_p();
                 return $this;
-			}
-			else if(h.iO("/")) { 
-			    _request(h, true);
-			     return 'OK';
-			}
+            }
+            else if(h.iO("/")) { 
+                _request(h, true);
+                 return 'OK';
+            }
         };
 
         // Private Methods
