@@ -247,13 +247,16 @@ scrr = 'script[src*="!"]';
             fn: $.getPage
         }, options);
         var pluginon = settings.pluginon;
-        this.a = function ($this) {
-            $(function () {
-                if (_init(settings)) {
-                    $this.pronto(settings);
-                    $.getPage(location.href, $.scripts);
-                }
-            });
+        this.a = function ($this, o) {
+            if(!o) {
+			    $(function () { //on DOMReady
+                    if (_init(settings)) {
+                        $this.pronto(0, settings);
+                        $.getPage(location.href, $.scripts);
+                    }
+                });
+			}
+			else return $().pronto(o);
         };
 
         function _init(s) {
@@ -267,7 +270,7 @@ scrr = 'script[src*="!"]';
     $.fn.ajaxify = function (options) {
         var $this = $(this);
         if (!$.fn.ajaxify.o) $.fn.ajaxify.o = new Ajaxify(options);
-        return $.fn.ajaxify.o.a($this);
+        return typeof(options) =='string' ? $.fn.ajaxify.o.a($this, options) : $.fn.ajaxify.o.a($this);
     };
 })(jQuery);
 
@@ -326,7 +329,7 @@ scrr = 'script[src*="!"]';
 
         function _addtext(t) {
             try {
-                $.globalEval(t);
+                eval(t);
             } catch (e) {
                 alert(e);
             }
@@ -511,6 +514,7 @@ scrr = 'script[src*="!"]';
             selector: "a:not(.no-ajaxy)",
             fade: 0,
             pop: 0,
+			squeeze: 0,
             requestDelay: 0,
             forms: true,
             prefetch: true,
@@ -523,6 +527,7 @@ scrr = 'script[src*="!"]';
         var selector = settings.selector,
             fade = settings.fade,
             pop = settings.pop,
+			squeeze = settings.squeeze,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
             prefetch = settings.prefetch,
@@ -531,10 +536,16 @@ scrr = 'script[src*="!"]';
             fn = settings.fn;
         
         // Main plugin function
-        this.a = function ($this) {
-            $gthis = $this;
-            _init_p();
-            return $this;
+        this.a = function ($this, h) {
+            if(!h) {
+                $gthis = $this;
+                _init_p();
+                return $this;
+			}
+			else if(h.iO("/")) { 
+			    _request(h, true);
+			     return 'OK';
+			}
         };
 
         // Private Methods
@@ -654,7 +665,6 @@ scrr = 'script[src*="!"]';
                 if (err) { 
                     $.log('Error : ' + err); 
                     $window.trigger("pronto.error", err); 
-                    //return; 
                 }
                 _render(e, true, mode);
             };
@@ -673,12 +683,20 @@ scrr = 'script[src*="!"]';
         }
 		
         function _render2(e, doPush, mode) {
-            var afterFade = function () {
+            var afterEffect = function () {
                 _doRender(e, doPush, mode);
             };
 			
-            if(fade) $gthis.fadeOut(fade, afterFade);
-            else afterFade();
+            if(fade) $gthis.fadeOut(fade, afterEffect);
+            else if(squeeze) {
+                 $gthis.each( function() { 
+                    var $this = $("#" + $(this).attr("id"));
+                    $this.data( "oldwidth", $this.width());
+                    $this.animate({width: 0, opacity: 0, marginRight: $this.width()}, squeeze, afterEffect);
+                 });
+            }
+			
+            else afterEffect();
         }
 
         // Save current state
@@ -726,8 +744,13 @@ scrr = 'script[src*="!"]';
             // Update DOM and fetch canonical URL - important for handling re-directs
             canURL = fn('-', post, $gthis);
             if(fade) $gthis.fadeIn(fade);
-			if(pop) { 
-			    var d = $gthis; d.css({'opacity': 1 }).effect("scale", {origin:['middle','center'], from:{width:d.width()/2,height:d.height()/2}, percent: 100, direction: 'both' }, pop);
+            if(pop) { 
+                var d = $gthis; d.css({'opacity': 1 }).effect("scale", {from:{width:d.width()/2,height:d.height()/2}, percent: 100}, pop);
+            } else if(squeeze) {
+                $gthis.each( function() { 
+                    var $this = $("#" + $(this).attr("id"));
+                    $this.animate({width: $this.data("oldwidth"), opacity: 1, marginRight: 0}, squeeze);
+                });
             }
 			
             //Set current URL to canonical if no hash or parameters in current URl
@@ -736,7 +759,7 @@ scrr = 'script[src*="!"]';
             _ajaxify_forms();
             
             //If hash in URL animate scroll to it
-            if (url.iO('#') && !mode) {
+            if (url.iO('#') && mode !== true) {
                 $('html, body').animate({
                     scrollTop: $('#' + url.split('#')[1]).offset().top
                 }, 500);
@@ -766,10 +789,10 @@ scrr = 'script[src*="!"]';
     };
 
     // Define Plugin
-    $.fn.pronto = function (options) {
+    $.fn.pronto = function (h, options) {
         var $this = $(this);
         if (!$.fn.pronto.o) $.fn.pronto.o = new Pronto(options);
-        return $.fn.pronto.o.a($this);
+        return $.fn.pronto.o.a($this, h);
     };
 })(jQuery);
 
