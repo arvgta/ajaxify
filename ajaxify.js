@@ -244,15 +244,17 @@ scrr = 'script[src*="!"]';
     var Ajaxify = function (options) {
         var settings = $.extend({
             pluginon: true,
+            deltas: true,
             fn: $.getPage
         }, options);
-        var pluginon = settings.pluginon;
+        var pluginon = settings.pluginon,
+        deltas = settings.deltas;
         this.a = function ($this, o) {
             if(!o) {
 			    $(function () { //on DOMReady
                     if (_init(settings)) {
                         $this.pronto(0, settings);
-                        $.getPage(location.href, $.scripts);
+                        if(deltas) $.getPage(location.href, $.scripts);
                     }
                 });
 			}
@@ -402,7 +404,6 @@ scrr = 'script[src*="!"]';
             $sO = [],
             $sN = [];
         var settings = $.extend({
-            deltas: true
         }, options);
         var deltas = settings.deltas;
         this.a = function ($this, same, PK) {
