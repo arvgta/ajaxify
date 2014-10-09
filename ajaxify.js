@@ -192,6 +192,7 @@ scrr = 'script[src*="!"]';
         }
 
         function _lAjax(hin, p, post, pre) { //execute Ajax load
+            $.log("Ajax request : " + hin);
             var xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
@@ -215,7 +216,7 @@ scrr = 'script[src*="!"]';
                 }
             });
         }
-
+        
         function _isHtml(x) { //restrict interesting MIME types - only HTML / XML
             var d;
             return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
@@ -249,6 +250,7 @@ scrr = 'script[src*="!"]';
         }, options);
         var pluginon = settings.pluginon,
         deltas = settings.deltas;
+        
         this.a = function ($this, o) {
             if(!o) {
                 $(function () { //on DOMReady
@@ -517,7 +519,7 @@ scrr = 'script[src*="!"]';
             pop: 0,
             squeeze: 0,
             requestDelay: 0,
-            forms: true,
+            forms: "form:not(.no-ajaxy)",
             prefetch: true,
             previewoff: true,
             fn: false,
@@ -615,9 +617,12 @@ scrr = 'script[src*="!"]';
             return o;
         }
 
-        function _ajaxify_forms() {
+        function _ajaxify_forms(mode) { 
             if (!forms) return false;
-            $('form').submit(function (q) {
+            
+            var divs;
+            divs = mode ? $gthis : $("body");
+            divs.find(forms).submit(function (q) {
                 fm = $(q.target);
                 if (!fm.is("form")) {
                     fm = fm.filter("input[type=submit]").parents("form:first");
@@ -641,7 +646,7 @@ scrr = 'script[src*="!"]';
                 return false;
             });
         }
-
+ 
         // Handle link clicks
         function _click(e, mode) {
             var link = e.currentTarget;
@@ -757,11 +762,11 @@ scrr = 'script[src*="!"]';
             //Set current URL to canonical if no hash or parameters in current URl
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
 
-            _ajaxify_forms();
+            _ajaxify_forms(true);
             
             //If hash in URL animate scroll to it
-            if (url.iO('#') && mode !== true) {
-                $('html, body').animate({
+            if (url.iO('#') && mode !== true) { 
+                $('html, body').animate({ 
                     scrollTop: $('#' + url.split('#')[1]).offset().top
                 }, 500);
             }
