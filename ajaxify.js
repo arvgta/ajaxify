@@ -192,7 +192,6 @@ scrr = 'script[src*="!"]';
         }
 
         function _lAjax(hin, p, post, pre) { //execute Ajax load
-            $.log("Ajax request : " + hin);
             var xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
