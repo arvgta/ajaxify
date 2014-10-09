@@ -255,7 +255,7 @@ scrr = 'script[src*="!"]';
                 $(function () { //on DOMReady
                     if (_init(settings)) { //sub-plugins initialisation
                         $this.pronto(0, settings); //Pronto initialisation
-                        if(deltas) $.getPage(location.href, $.scripts); //delta-loading initialisation
+                        if(deltas) $.scripts("1"); //delta-loading initialisation
                     }
                 });
             }
@@ -303,6 +303,12 @@ scrr = 'script[src*="!"]';
             if (o === "s") {
                 return _allstyle($s.y);
             }
+            
+            if (o === "1") { 
+                $.detScripts($s);
+                return _addScripts(false, $s, settings);
+            }
+            
             if (o === "a") {
                 return _alltxts($s.t);
             }
@@ -372,9 +378,9 @@ scrr = 'script[src*="!"]';
     var DetScripts = function () {
         var head, lk, j;
         this.a = function ($s) {
-            head = $.getPage("head");
-            lk = head.find(".ajy-link");
-            j = $.getPage("script");
+            head = pass ? $.getPage("head") : $("head");
+            lk = head.find(pass ? ".ajy-link" : "link");
+            j = pass ? $.getPage("script") : $("script");
             $s.c = _rel(lk, "stylesheet");
             $s.y = head.find("style");
             $s.can = _rel(lk, "canonical");
