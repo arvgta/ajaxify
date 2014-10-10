@@ -338,7 +338,7 @@ scrr = 'script[src*="!"]';
 
         function _addtext(t) {
             try {
-                eval(t);
+                $.globalEval(t);
             } catch (e) {
                 alert(e);
             }
