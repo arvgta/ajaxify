@@ -28,6 +28,9 @@ scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
+//getRootUrl() from Baluptons history.js - satisfies JSHint
+function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
+
 /*global jQuery*/ //Tell JSHint, not to moan about "jQuery" being undefined
 
 // The stateful Log plugin - initialised in Ajaxify at the bottom of the file
@@ -340,7 +343,11 @@ scrr = 'script[src*="!"]';
             try {
                 $.globalEval(t);
             } catch (e) {
-                alert(e);
+	            try { 
+                    eval(t);
+                } catch (e) {
+                    $.log("Error in inline script : " + t + "\nError code : " + e);
+                }
             }
         }
 		
@@ -515,7 +522,8 @@ scrr = 'script[src*="!"]';
             currentURL = '',
             requestTimer = null,
             post = null,
-            $gthis, fm;
+            $gthis, fm,
+            rootUrl = getRootUrl();
 
         // Default Options
         var settings = $.extend({
@@ -621,13 +629,19 @@ scrr = 'script[src*="!"]';
             }
             return o;
         }
-
+        
+        function _internal(url) { 
+            return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
+        }
+        
         function _ajaxify_forms(mode) { 
             if (!forms) return false;
             
             var divs;
             divs = mode ? $gthis : $("body");
-            divs.find(forms).submit(function (q) {
+            divs.find(forms).filter(function() {
+                return _internal($(this).attr("action"));
+            }).submit(function (q) {
                 fm = $(q.target);
                 if (!fm.is("form")) {
                     fm = fm.filter("input[type=submit]").parents("form:first");
