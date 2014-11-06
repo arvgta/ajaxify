@@ -205,6 +205,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                     }
                     $.cache($(_parseHTML(h)));
                     $.pages([hin, $.cache()]);
+
                     if(p) p();
                 },
                 error: function(jqXHR, status, error) {
@@ -293,11 +294,13 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             canonical: true,
             inline: true,
             inlinehints: false,
+            inlineskip: "adsbygoogle",
             style: true
         }, options);
         var canonical = settings.canonical,
             inline = settings.inline,
             inlinehints = settings.inlinehints,
+            inlineskip = settings.inlineskip,
             style = settings.style;
         this.a = function (o) {
             if (o === "i") {
@@ -335,18 +338,18 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         function _alltxts($s) {
             $s.each(function () {
                 var d = $(this).text();
-                if (!d.iO(").ajaxify(") && (inline || $(this).hasClass("ajaxy") || _inline(d))) _addtext(d);
+                if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d);
             });
         }
 
         function _addtext(t) {
             try {
                 $.globalEval(t);
-            } catch (e) {
+            } catch (e1) {
 	            try { 
                     eval(t);
-                } catch (e) {
-                    $.log("Error in inline script : " + t + "\nError code : " + e);
+                } catch (e2) {
+                    $.log("Error in inline script : " + t + "\nError code : " + e2);
                 }
             }
         }
@@ -355,7 +358,16 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             $("head").append('<style type="text/css">' + t + '</style>');
         }
 
-        function _inline(txt) {
+        function _inlineskip(txt) {
+            var d = inlineskip;
+            if (d) {
+                d = d.split(", ");
+                for (var i = 0; i < d.length; i++)
+                    if (txt.iO(d[i])) return true;
+            }
+        }
+        
+        function _inlinehints(txt) {
             var d = inlinehints;
             if (d) {
                 d = d.split(", ");
