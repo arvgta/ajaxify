@@ -534,7 +534,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             currentURL = '',
             requestTimer = null,
             post = null,
-            $gthis, fm,
+            $gthis, $cd, fm, cdwidth,
             rootUrl = getRootUrl();
 
         // Default Options
@@ -567,6 +567,8 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         this.a = function ($this, h) {
             if(!h) {
                 $gthis = $this;
+                $cd = $this.first();
+                cdwidth = $cd.width();
                 _init_p();
                 return $this;
             }
@@ -643,7 +645,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         }
         
         function _internal(url) { 
-            return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
+            return url && (url.substring(0,rootUrl.length) === rootUrl || !url.iO(':'));
         }
         
         function _ajaxify_forms(mode) { 
@@ -720,17 +722,15 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         }
 		
         function _render2(e, doPush, mode) {
+            $cd.stop(true, true);
+            
             var afterEffect = function () {
                 _doRender(e, doPush, mode);
             };
 			
-            if(fade) $gthis.fadeOut(fade, afterEffect);
+            if(fade) $cd.fadeOut(fade, afterEffect);
             else if(squeeze) {
-                 $gthis.each( function() { 
-                    var $this = $("#" + $(this).attr("id"));
-                    $this.data( "oldwidth", $this.width());
-                    $this.animate({width: 0, opacity: 0, marginRight: $this.width()}, squeeze, afterEffect);
-                 });
+                $cd.animate({width: 0, opacity: 0, marginRight: cdwidth}, squeeze, afterEffect);
             }
 			
             else afterEffect();
@@ -780,14 +780,11 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             
             // Update DOM and fetch canonical URL - important for handling re-directs
             canURL = fn('-', post, $gthis);
-            if(fade) $gthis.fadeIn(fade);
-            if(pop) { 
-                var d = $gthis; d.css({'opacity': 1 }).effect("scale", {from:{width:d.width()/2,height:d.height()/2}, percent: 100}, pop);
+            if(fade) $cd.fadeIn(fade);
+            else if(pop) { 
+                $cd.css({'opacity': 1 }).effect("scale", {from:{width: cdwidth/2, height: $cd.height()/2}, percent: 100}, pop);
             } else if(squeeze) {
-                $gthis.each( function() { 
-                    var $this = $("#" + $(this).attr("id"));
-                    $this.animate({width: $this.data("oldwidth"), opacity: 1, marginRight: 0}, squeeze);
-                });
+                $cd.animate({width: cdwidth, opacity: 1, marginRight: 0}, squeeze);
             }
 			
             //Set current URL to canonical if no hash or parameters in current URl
