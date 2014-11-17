@@ -792,8 +792,8 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
             _ajaxify_forms(true);
             
-            //If hash in URL animate scroll to it
-            if (url.iO('#') && mode !== true) { 
+            //If hash in URL and hash not standalone at the end, animate scroll to it
+            if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) { 
                 $('html, body').animate({ 
                     scrollTop: $('#' + url.split('#')[1]).offset().top
                 }, 500);
