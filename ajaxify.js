@@ -806,6 +806,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
         // Google Analytics support
         function _gaCaptureView(url) { 
+            url = url.replace(rootUrl,'');
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
 
