@@ -167,7 +167,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         function _lSel(p, $t) { //load page into DOM and handle scripts
             pass++;
             _lDivs($t);
-            $.scripts(p);
+            $.scripts(p && p.same);
             $.scripts("s");
             $.scripts("a");
             return $.scripts("c");
@@ -667,12 +667,16 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 var g = "get",
                     m = fm.attr("method");
                 if (m.length > 0 && m.toLowerCase() == "post") g = "post";
-                var h, a = fm.attr("action");
+                var h, s, a = fm.attr("action");
                 if (a !== null && a.length > 0) h = a;
-                else h = currentURL; if (g == "get") h = _b(h, p);
+                else h = currentURL; 
+                s = (h == currentURL);
+                
+                if (g == "get") h = _b(h, p);
                 else {
                     post = {};
                     post.data = p;
+                    post.same = s;
                 }
                 $window.trigger("pronto.submit", h);
                 _request(h);
