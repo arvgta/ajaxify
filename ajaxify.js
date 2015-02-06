@@ -145,10 +145,11 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 // <URL> - loads HTML via Ajax
 // "+" - pre-fetches page
 // "-" - loads page into DOM and handle scripts
+// "x" - returns XHR
 // otherwise - returns selection of current page to client
 (function ($) {
-    var GetPage = function () {
-        this.a = function (o, p, p2) {
+    var GetPage = function () { var xhr;
+        this.a = function (o, p, p2) { 
             if (!o) {
                 return $.cache();
             }
@@ -161,6 +162,10 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             if (o === "-") {
                 return _lSel(p, p2);
             }
+            if (o === "x") {
+                return xhr;
+            }
+            
             if($.cache()) return $.cache().find(".ajy-" + o);
         };
 
@@ -195,7 +200,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         }
 
         function _lAjax(hin, p, post, pre) { //execute Ajax load
-            var xhr = $.ajax({
+                xhr = $.ajax({
                 url: hin,
                 type: post ? "POST" : "GET",
                 data: post ? post.data : null,
@@ -720,6 +725,9 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 clearTimeout(requestTimer);
                 requestTimer = null;
             }
+            
+            $window.trigger("pronto.beforeload", e);
+            
             requestTimer = setTimeout(function () {
                 _render2(e, doPush, mode);
             }, requestDelay);
