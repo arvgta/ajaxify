@@ -650,6 +650,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         }
         
         function _internal(url) { 
+            if (url==='') return true;
             return url && (url.substring(0,rootUrl.length) === rootUrl || !url.iO(':'));
         }
         
