@@ -201,7 +201,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
         function _lAjax(hin, p, post, pre) { //execute Ajax load
                 xhr = $.ajax({
-                url: hin,
+				url: hin,
                 type: post ? "POST" : "GET",
                 data: post ? post.data : null,
                 success: function (h) {
@@ -544,7 +544,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
         // Default Options
         var settings = $.extend({
-            selector: "a:not(.no-ajaxy)",
+            selector: "a:not(.no-ajaxy):not([target='_blank'])",
             fade: 0,
             pop: 0,
             squeeze: 0,
@@ -761,7 +761,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             var data = e.originalEvent.state;
             
             // Check if data exists
-            if (data !== null && data.url !== currentURL) {
+            if (data !== null && data.url !== currentURL) { 
                 $window.trigger("pronto.request", e); // Fire request event
                 var req3 = function () { //Callback - continue with _render()
                     _render(e, false, false);
