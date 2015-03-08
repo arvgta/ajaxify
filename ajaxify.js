@@ -178,9 +178,10 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             return $.scripts("c");
         }
 
-        function _lPage(h, p, post, pre) { //fire Ajax load, check for hash first
+        function _lPage(h, p, rq, pre) { //fire Ajax load, check for hash first
+            var _post = rq ? rq.post : false;
             if (h.iO("#")) h = h.split("#")[0];
-            if (post || !$.cache(h)) return _lAjax(h, p, post, pre);
+            if (_post || !$.cache(h)) return _lAjax(h, p, _post, pre);
             if(p) p();
         }
 
@@ -200,10 +201,12 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         }
 
         function _lAjax(hin, p, post, pre) { //execute Ajax load
+                var ispost = post ? post.is : false;
+                
                 xhr = $.ajax({
 				url: hin,
-                type: post ? "POST" : "GET",
-                data: post ? post.data : null,
+                type: ispost ? "POST" : "GET",
+                data: ispost ? post.data : null,
                 success: function (h) {
                     if (!h || !_isHtml(xhr)) {
                         if (!pre) location.href = hin;
@@ -538,7 +541,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         var $window = $(window),
             currentURL = '',
             requestTimer = null,
-            post = null,
+            rq = null,
             $gthis, $cd, fm, cdwidth,
             rootUrl = getRootUrl();
 
@@ -603,7 +606,8 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
         //Prefetch target page on hoverIntent
         function _prefetch(e) {
-            post = null; // Assume not a POST
+            _init_rq(); // Assume not a POST
+            
             var link = e.currentTarget;
             
             //Validate link internal and not the same URL
@@ -654,6 +658,22 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             return url && (url.substring(0,rootUrl.length) === rootUrl || !url.iO(':'));
         }
         
+        function _init_rq() {
+            rq = {};
+            rq.post = {};
+            rq.post.is = false;
+            rq.post.data = null;
+            rq.same = false;
+        }
+        
+        function _root(u) {
+            u = u.iO('?') ? u.split('?')[0] : u;
+        }
+        
+        function _sameRoot(u1, u2) {
+            return _root(u1) === _root(u2);
+        }
+        
         function _ajaxify_forms(mode) { 
             if (!forms) return false;
             
@@ -674,15 +694,17 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                     m = fm.attr("method");
                 if (m.length > 0 && m.toLowerCase() == "post") g = "post";
                 var h, s, a = fm.attr("action");
-                if (a !== null && a.length > 0) h = a;
+                if (a && a.length > 0) h = a;
                 else h = currentURL; 
-                s = (h == currentURL);
+                s = _sameRoot(h, currentURL);
+                
+                _init_rq();
+                rq.same = s;
                 
                 if (g == "get") h = _b(h, p);
                 else {
-                    post = {};
-                    post.data = p;
-                    post.same = s;
+                    rq.post.is = true;
+                    rq.post.data = p;
                 }
                 $window.trigger("pronto.submit", h);
                 _request(h);
@@ -693,7 +715,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         // Handle link clicks
         function _click(e, mode) {
             var link = e.currentTarget;
-            post = null;
+            _init_rq();
             if (_exoticKey(e) || _diffHost(link)) return; // Ignore everything but normal click and internal URLs
             if (_hashChange(link)) { // Only the hash part has changed
                 _saveState(); // Update state on hash change
@@ -718,7 +740,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 _render(e, true, mode);
             };
 			
-            fn(href, reqr, post); //Call "fn" - handler of parent, informing whether POST or not
+            fn(href, reqr, rq); //Call "fn" - handler of parent, informing whether POST or not
             }
 
         function _render(e, doPush, mode) {
@@ -758,10 +780,13 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
         // Handle back/forward navigation
         function _onPop(e) {
+            _init_rq();
+            
             var data = e.originalEvent.state;
             
             // Check if data exists
-            if (data !== null && data.url !== currentURL) { 
+            if (data !== null && data.url !== currentURL) {
+                rq.same = _sameRoot(data.url, currentURL);
                 $window.trigger("pronto.request", e); // Fire request event
                 var req3 = function () { //Callback - continue with _render()
                     _render(e, false, false);
@@ -789,7 +814,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             $window.trigger("pronto.load", e);  // Fire load event
 
             // Update DOM and fetch canonical URL - important for handling re-directs
-            canURL = fn('-', post, $gthis);
+            canURL = fn('-', rq, $gthis);
             _saveState(); // Update current state
             
             $('title').html(fn('title').html()); // Update title
