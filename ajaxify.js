@@ -450,8 +450,8 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 $scriptsN = $sN;
             } 
             if (_allScripts($this, PK)) return true;
-            if (pass) _classAlways($this, PK);
-            if (same) return _sameScripts($scriptsN, PK);
+            if (same) { _classAlways($this, PK); return; }
+            //if (pass>1 && same) return _sameScripts($scriptsN, PK);
             $scriptsN = [];
             _newArray($this, $scriptsN, $scriptsO, PK);
             if (pass) {
@@ -481,7 +481,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             $t.each(function () {
                 if ($(this).attr("data-class") == "always") {
                     _iScript($(this).attr(PK), PK);
-                    $(this).remove();
+                    //$(this).remove();
                 }
             });
         }
