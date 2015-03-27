@@ -12,6 +12,9 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 //Minified hoverIntent plugin that satisfies JSHint
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
+//Minified idle plugin that satisfies JSHint
+(function(n){n.fn.idle = function(e) {var i,t,o={idle:6e4,events:"mousemove keypress mousedown touchstart",onIdle:function(){},onActive:function(){},onHide:function(){},onShow:function(){},keepTracking:!1},c=!1,u=!0,d=n.extend({},o,e);return i=function(n,e){return c&&(e.onActive.call(),c=!1),(e.keepTracking?clearInterval:clearTimeout)(n),t(e);}, t = function(n) {var e,i=n.keepTracking?setInterval:setTimeout;return(e=i(function(){c=!0;n.onIdle.call();},n.idle)),e;},this.each(function(){var o=t(d);return n(this).on(d.events,function(){o=i(o,d);}),(e.onShow||e.onHide)&&n(document).on("visibilitychange webkitvisibilitychange mozvisibilitychange msvisibilitychange",function() {return document.hidden||document.webkitHidden||document.mozHidden||document.msHidden?u&&(u=!1,d.onHide.call()):u||(u=!0,d.onShow.call());});});};})(jQuery);
+
 //Module global variables
 var l=0, pass=0, api=window.history && window.history.pushState && window.history.replaceState,
 
@@ -451,7 +454,6 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             } 
             if (_allScripts($this, PK)) return true;
             if (same) { _classAlways($this, PK); return; }
-            //if (pass>1 && same) return _sameScripts($scriptsN, PK);
             $scriptsN = [];
             _newArray($this, $scriptsN, $scriptsO, PK);
             if (pass) {
@@ -481,7 +483,6 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             $t.each(function () {
                 if ($(this).attr("data-class") == "always") {
                     _iScript($(this).attr(PK), PK);
-                    //$(this).remove();
                 }
             });
         }
@@ -543,7 +544,8 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             requestTimer = null,
             rq = null,
             $gthis, $cd, fm, cdwidth,
-            rootUrl = getRootUrl();
+            sliding = false, timer, currEl,
+			rootUrl = getRootUrl();
 
         // Default Options
         var settings = $.extend({
@@ -555,6 +557,10 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             forms: "form:not(.no-ajaxy)",
             prefetch: true,
             previewoff: true,
+            idleTime: 0,
+            slideTime: 0,
+			menu: false,
+            addclass: "jqhover",
             fn: false,
             cb: 0
         }, options);
@@ -568,6 +574,10 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             forms = settings.forms,
             prefetch = settings.prefetch,
             previewoff = settings.previewoff,
+            idleTime = settings.idleTime,
+            slideTime = settings.slideTime,
+			menu = settings.menu,
+            addclass = settings.addclass,
             cb = settings.cb,
             fn = settings.fn;
         
@@ -599,8 +609,68 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
+			_idle();
         }
-
+		
+        function _idle() {
+            if(!idleTime) return;
+			
+			$(document).idle({
+                onIdle: function(){
+                    $window.trigger("pronto.idle");
+                    if(sliding) return;                    
+					sliding = true;
+					_slide();
+                },
+				onActive: function(){
+                    $window.trigger("pronto.active");
+                    currEl.removeClass(addclass);
+					clearInterval(timer);
+                    sliding = false;
+					$.log('Active');
+                },
+                idle: idleTime
+            });
+		}
+		
+        function _slide() {
+            if(!sliding) return;
+			timer = setInterval(_slide1, slideTime);
+        }
+		
+		function _slide1() {
+			if(!sliding) return;
+            var next = _nextLink();
+			$.log('Slide : ' + next);
+			_request(next, true, true);
+        }
+		
+		function _nextLink() {
+            var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
+            $(menu).each(function(i, v){ var el = $(this).parent();
+                if(nextLink) return true;
+				link = v.href;
+				if(!_internal(link)) return;
+                el.removeClass(addclass);
+                if(!firstValue) firstValue = $(this).parent();
+				if(!firstLink) firstLink = link;
+				if(wasPrev) { 
+                     nextLink = link;
+                     currEl = el;
+                     el.addClass(addclass);
+                }
+				else if(currentURL == link) wasPrev = true;
+			});
+			
+			if(!nextLink) { 
+                 firstValue.addClass(addclass);
+                 nextLink = firstLink;
+                 currEl = firstValue;
+            }
+			
+			return nextLink;
+		}
+		
         //Dummy function for hoverIntent
         function _drain() {}
 
@@ -729,7 +799,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
         }
 
         // Request new url
-        function _request(e, mode) {
+        function _request(e, mode, notPush) {
             var href = typeof(e) !== "string" ? e.currentTarget.href : e;
             $window.trigger("pronto.request", e); // Fire request event
 			var reqr = function (err) { //Callback - continue with _render()
@@ -737,7 +807,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                     $.log('Error : ' + err); 
                     $window.trigger("pronto.error", err); 
                 }
-                _render(e, true, mode);
+                _render(e, !notPush, mode);
             };
 			
             fn(href, reqr, rq); //Call "fn" - handler of parent, informing whether POST or not
