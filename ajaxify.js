@@ -559,7 +559,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             previewoff: true,
             idleTime: 0,
             slideTime: 0,
-			menu: false,
+            menu: false,
             addclass: "jqhover",
             fn: false,
             cb: 0
@@ -576,7 +576,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             previewoff = settings.previewoff,
             idleTime = settings.idleTime,
             slideTime = settings.slideTime,
-			menu = settings.menu,
+            menu = settings.menu,
             addclass = settings.addclass,
             cb = settings.cb,
             fn = settings.fn;
@@ -609,60 +609,58 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
-			_idle();
+            _idle();
         }
 		
         function _idle() {
             if(!idleTime) return;
 			
-			$(document).idle({
+            $(document).idle({
                 onIdle: function(){
                     $window.trigger("pronto.idle");
                     if(sliding) return;                    
-					sliding = true;
-					_slide();
+                    sliding = true;
+                    _slide();
                 },
-				onActive: function(){
+                onActive: function(){
                     $window.trigger("pronto.active");
                     currEl.removeClass(addclass);
-					clearInterval(timer);
+                    clearInterval(timer);
                     sliding = false;
-					$.log('Active');
                 },
                 idle: idleTime
             });
-		}
+        }
 		
         function _slide() {
             if(!sliding) return;
-			timer = setInterval(_slide1, slideTime);
+            timer = setInterval(_slide1, slideTime);
         }
 		
-		function _slide1() {
-			if(!sliding) return;
+        function _slide1() {
+            if(!sliding) return;
             var next = _nextLink();
-			$.log('Slide : ' + next);
-			_request(next, true, true);
+            _request(next, true, true);
         }
 		
-		function _nextLink() {
+        function _nextLink() {
             var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
             $(menu).each(function(i, v){ var el = $(this).parent();
                 if(nextLink) return true;
-				link = v.href;
-				if(!_internal(link)) return;
+                link = v.href;
+                if(!_internal(link)) return;
                 el.removeClass(addclass);
                 if(!firstValue) firstValue = $(this).parent();
-				if(!firstLink) firstLink = link;
-				if(wasPrev) { 
+                if(!firstLink) firstLink = link;
+                if(wasPrev) { 
                      nextLink = link;
                      currEl = el;
                      el.addClass(addclass);
                 }
-				else if(currentURL == link) wasPrev = true;
-			});
+                else if(currentURL == link) wasPrev = true;
+            });
 			
-			if(!nextLink) { 
+            if(!nextLink) { 
                  firstValue.addClass(addclass);
                  nextLink = firstLink;
                  currEl = firstValue;
