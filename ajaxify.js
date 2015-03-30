@@ -882,11 +882,10 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             $window.trigger("pronto.load", e);  // Fire load event
 
             // Update DOM and fetch canonical URL - important for handling re-directs
-            canURL = fn('-', rq, $gthis);
-            _saveState(); // Update current state
+            canURL = fn('-', rq, $gthis); 
+            //_saveState(); // Update current state
             
             $('title').html(fn('title').html()); // Update title
-            _gaCaptureView(url); // Trigger analytics page view
             
             if(fade) $cd.fadeIn(fade);
             else if(pop) { 
@@ -908,13 +907,14 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
+            _gaCaptureView(url); // Trigger analytics page view
             $window.trigger("pronto.render", e); // Fire render event
             if(cb) cb();
         }
 
         // Google Analytics support
-        function _gaCaptureView(url) { 
-            url = url.replace(rootUrl,''); 
+        function _gaCaptureView(url) {
+            url = '/' + url.replace(rootUrl,'');
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
 
