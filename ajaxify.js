@@ -543,16 +543,14 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             currentURL = '',
             requestTimer = null,
             rq = null,
-            $gthis, $cd, fm, cdwidth,
+            $gthis, $cd, fm, aniTrue, aPs_from,
+            cdwidth,
             sliding = false, timer, currEl,
 			rootUrl = getRootUrl();
 
         // Default Options
         var settings = $.extend({
             selector: "a:not(.no-ajaxy):not([target='_blank'])",
-            fade: 0,
-            pop: 0,
-            squeeze: 0,
             requestDelay: 0,
             forms: "form:not(.no-ajaxy)",
             prefetch: true,
@@ -562,14 +560,13 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             menu: false,
             addclass: "jqhover",
             fn: false,
-            cb: 0
+            cb: 0,
+            aniParams: false,
+            aniTime: 0
         }, options);
 
         //Shorthands
         var selector = settings.selector,
-            fade = settings.fade,
-            pop = settings.pop,
-            squeeze = settings.squeeze,
             requestDelay = settings.requestDelay,
             forms = settings.forms,
             prefetch = settings.prefetch,
@@ -579,14 +576,18 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             menu = settings.menu,
             addclass = settings.addclass,
             cb = settings.cb,
-            fn = settings.fn;
+            fn = settings.fn,
+            aPs_to = settings.aniParams,
+            aniTime = settings.aniTime;
         
         // Main plugin function
         this.a = function ($this, h) {
             if(!h) {
                 $gthis = $this;
                 $cd = $this.first();
-                cdwidth = $cd.width();
+             
+                _ini_aPs();
+                
                 _init_p();
                 return $this;
             }
@@ -610,6 +611,36 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
             _idle();
+        }
+        
+        function _ini_aPs() {
+            aniTrue = aniTime && aPs_to;
+            cdwidth = $cd.width(); //needed for calculating the margin
+            
+            if(!aniTrue) return;
+            
+            aPs_to = $.extend({
+                opacity: 1, // default - no fade
+                width: "100%",
+                height: "100%"
+            }, aPs_to);
+
+            
+            aPs_to = $.extend({
+                marginRight: cdwidth - aPs_to.width
+            }, aPs_to);
+            
+            _save_aPs_from();
+        }
+        
+        function _save_aPs_from() {
+             aPs_from = $.extend({}, aPs_to);
+
+             for(var key in aPs_from) {
+                 if (aPs_from.hasOwnProperty(key)) { var keyval = $cd.css(key); // $.log(key + " : " + keyval);
+                     aPs_from[key] = keyval;    
+                 }
+             }     
         }
 		
         function _idle() {
@@ -808,7 +839,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 _render(e, !notPush, mode);
             };
 			
-            fn(href, reqr, rq); //Call "fn" - handler of parent, informing whether POST or not
+            fn(href, reqr, rq); //Call "fn" - handler of parent, passing "rq" - request details
             }
 
         function _render(e, doPush, mode) {
@@ -831,11 +862,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 _doRender(e, doPush, mode);
             };
 			
-            if(fade) $cd.fadeOut(fade, afterEffect);
-            else if(squeeze) {
-                $cd.animate({width: 0, opacity: 0, marginRight: cdwidth}, squeeze, afterEffect);
-            }
-			
+            if(aniTrue) $cd.animate(aPs_to, aniTime, afterEffect);
             else afterEffect();
         }
 
@@ -883,24 +910,20 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
             // Update DOM and fetch canonical URL - important for handling re-directs
             canURL = fn('-', rq, $gthis); 
-            //_saveState(); // Update current state
             
             $('title').html(fn('title').html()); // Update title
             
-            if(fade) $cd.fadeIn(fade);
-            else if(pop) { 
-                $cd.css({'opacity': 1 }).effect("scale", {from:{width: cdwidth/2, height: $cd.height()/2}, percent: 100}, pop);
-            } else if(squeeze) {
-                $cd.animate({width: cdwidth, opacity: 1, marginRight: 0}, squeeze);
+            if(aniTrue) { 
+                $cd.animate(aPs_from, aniTime); //Animate back to original dimensions
             }
-			
+                
             //Set current URL to canonical if no hash or parameters in current URl
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
 
             _ajaxify_forms(true);
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
-            if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) { 
+            if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) {
                 $('html, body').animate({ 
                     scrollTop: $('#' + url.split('#')[1]).offset().top
                 }, 500);
