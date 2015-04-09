@@ -637,7 +637,14 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
              aPs_from = $.extend({}, aPs_to);
 
              for(var key in aPs_from) {
-                 if (aPs_from.hasOwnProperty(key)) { var keyval = $cd.css(key); // $.log(key + " : " + keyval);
+                 if (aPs_from.hasOwnProperty(key)) { 
+                     var keyval = $cd.css(key), keyOval = aPs_from[key];
+
+                     if((key === "height") && keyOval.iO("%")) { 
+                         keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%";
+                         //$.log("height : " + keyval);
+                     }
+
                      aPs_from[key] = keyval;    
                  }
              }     
@@ -655,7 +662,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
                 },
                 onActive: function(){
                     $window.trigger("pronto.active");
-                    currEl.removeClass(addclass);
+                    if(currEl) currEl.removeClass(addclass);
                     clearInterval(timer);
                     sliding = false;
                 },
