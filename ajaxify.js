@@ -642,7 +642,6 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 
                      if((key === "height") && keyOval.iO("%")) { 
                          keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%";
-                         //$.log("height : " + keyval);
                      }
 
                      aPs_from[key] = keyval;    
@@ -920,23 +919,34 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             
             $('title').html(fn('title').html()); // Update title
             
+            //Animate back to original dimensions
             if(aniTrue) { 
-                $cd.animate(aPs_from, aniTime); //Animate back to original dimensions
-            }
-                
-            //Set current URL to canonical if no hash or parameters in current URl
+                $cd.animate(aPs_from, aniTime, function(){ _doRender2(e, url, doPush, mode, canURL); }); 
+            } 
+            else _doRender2(e, url, doPush, mode, canURL);
+       }
+
+       function _doRender2(e, url, doPush, mode, canURL) {
+            
+            //Set current URL to canonical if no hash or parameters in current URL
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
 
             _ajaxify_forms(true);
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
             if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) {
-                $('html, body').animate({ 
-                    scrollTop: $('#' + url.split('#')[1]).offset().top
-                }, 500);
+			    var $el = $('#' + url.split('#')[1]), scrollTop;
+
+			    if ($el.length) {
+				    scrollTop = $el.offset().top;
+			    }
+                
+                if (scrollTop !== false) {
+			        $window.scrollTop(scrollTop);
+		        }
             }
 
-            _doPush(url, doPush); // Push new states to the stack on new url
+	        _doPush(url, doPush); // Push new states to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
             $window.trigger("pronto.render", e); // Fire render event
             if(cb) cb();
