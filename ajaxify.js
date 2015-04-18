@@ -946,7 +946,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 		        }
             }
 
-	        _doPush(url, doPush); // Push new states to the stack on new url
+            _doPush(url, doPush); // Push new states to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
             $window.trigger("pronto.render", e); // Fire render event
             if(cb) cb();
