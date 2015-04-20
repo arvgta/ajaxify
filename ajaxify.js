@@ -935,15 +935,15 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
             if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) {
-			    var $el = $('#' + url.split('#')[1]), scrollTop;
+                var $el = $('#' + url.split('#')[1]), scrollTop;
 
-			    if ($el.length) {
-				    scrollTop = $el.offset().top;
-			    }
+                if ($el.length) {
+                    scrollTop = $el.offset().top;
+                }
                 
                 if (scrollTop !== false) {
-			        $window.scrollTop(scrollTop);
-		        }
+                    $window.scrollTop(scrollTop);
+                }
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
