@@ -40,7 +40,7 @@ Options default values
     pluginon : true // Plugin set "on" or "off" (==false) manually
 }
 
-Animation parameters:  Default is false (set off)
+Animation parameters (aniParams):  Default is false (set off)
 {
     opacity: 1, //no fade, set to 0 for maximum fade
     width: "100%", //in percent -  "100%" means no change
