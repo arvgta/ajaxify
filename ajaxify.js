@@ -8,6 +8,17 @@
  
 /* INTERFACE: See also http://4nf.org/interface/
 
+Simplest plugin call:
+
+jQuery('#content').ajaxify();
+Ajaxifies the whole site, dynamically replacing the div with the ID '#content' across pages
+
+If several divs should be swapped, just specify their IDs like this:
+jQuery('#content, #nav').ajaxify();
+
+The plugin can take an arbitrary amount of IDs, however the first one should specify the main content div
+
+
 Options default values
 {
 // basic config parameters
