@@ -89,116 +89,72 @@ scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
-//getRootUrl() from Baluptons history.js - satisfies JSHint
-function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
-
 /*global jQuery*/ //Tell JSHint, not to moan about "jQuery" being undefined
 
-// The stateful Log plugin - initialised in Ajaxify at the bottom of the file
-// Usage: $.log(<string>); anywhere in Ajaxify where you would like to peek into
-(function ($) { 
-    var Log = function (options) {
-        var con = window.console;
-        var settings = $.extend({
-            verbosity: 0
-        }, options);
-        var verbosity = settings.verbosity;
-        this.a = function (m) {
-            if(l < verbosity && con) con.log(m);
-        };
-    };
-    $.log = function (m, options) {
-        if (!$.log.o) $.log.o = new Log(options);
-        return $.log.o.a(m);
-    };
-})(jQuery);
+function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var a in n)if(n.hasOwnProperty(a)){var i=n[a];t+=e?",\n":"",t+="function"==typeof i?"_"+a+" = "+i.toString():a+" = "+(r?'settings["':"")+(r?a+'"]':i),e++}return t+";"}function pO(n,r,t,e,a){var i="",o="",s="",p="",f="",c="",l=!1,u=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");funStr=e.toString(),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),f=getParamNames(e),l=f.iO("$this"),c=f.replace("$this, ",""),c="$this"==f?"":c,t&&(c+=""===c?"options":", options"),r&&(o=JSON2Str(r)),t&&(s="var settings = $.extend("+JSON.stringify(t)+", options);\n",s+=JSON2Str(t,1)),a&&(p=JSON2Str(a)),t||(u=u.replace(/\(options/g,"(")),l||(u=u.replace("var $this = $(this);","")),u=u.replace(/fnn/g,n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",o).replace("pSettings",s).replace("pFns",p).replace("args",f).replace("arg0",c),console.log("BP : "+u);try{jQuery.globalEval(u)}catch(g){alert(g)}}var funStr,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){l<verbosity&&console&&console.log(n)});
+
+//getRootUrl() from Baluptons history.js - satisfies JSHint
+function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
 
 // The stateful Cache plugin
 // Usage: 
 // 1) $.cache() - returns currently cached page
 // 2) $.cache(<URL>) - returns page with specified URL
 // 3) $.cache(<jQuery object>) - saves the page in cache
-(function ($) {
-    var Cache = function () {
-        var d = false;
-        this.a = function (o) {
-            if (!o) {
-                return d;
-            }
-            if (typeof o === "string") {
-                if(o === "f") { 
-                    $.pages("f");
-                    $.log("Cache flushed");
-                } else d = $.pages($.memory(o));
-                
-                return d;
-            }
-            if (typeof o === "object") {
-                d = o;
-                return d;
-            }
-        };
-    };
-    $.cache = function (o) {
-        if (!$.cache.o) $.cache.o = new Cache();
-        return $.cache.o.a(o);
-    };
-})(jQuery);
+pO("cache", 0, { d: false }, function (o) {
+    if (!o) {
+        return d;
+    }
+    if (typeof o === "string") {
+        if(o === "f") { 
+            $.pages("f");
+            $.log("Cache flushed");
+        } else d = $.pages($.memory(o));
+        
+		return d;
+    }
+
+    if (typeof o === "object") {
+        d = o;
+        return d;
+    }
+});
 
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
-(function ($) {
-    var Memory = function (options) {
-        var d = false;
-        var settings = $.extend({
-            memoryoff: false
-        }, options);
-        var memoryoff = settings.memoryoff;
-        this.a = function (h) {
-            d = memoryoff;
-            if (!h || d === true) return false;
-            if (d === false) return h;
-            if (d.iO(", ")) {
-                d = d.split(", ");
-                if (d.iO(h)) return false;
-                else return h;
-            }
-            return h == d ? false : h;
-        };
-    };
-    $.memory = function (h, options) {
-        if (!$.memory.o) $.memory.o = new Memory(options);
-        return $.memory.o.a(h);
-    };
-})(jQuery);
-
+pO("memory", { memoryoff: false }, { d: false }, function (h) {
+     d = memoryoff;
+     if (!h || d === true) return false;
+     if (d === false) return h;
+     if (d.iO(", ")) {
+          d = d.split(", ");
+          if (d.iO(h)) return false;
+          else return h;
+     }
+     
+	 return h == d ? false : h;
+});
+		
 // The stateful Pages plugin
 // Usage: 
 // 1) $.pages(<URL>) - returns page with specified URL from internal array
 // 2) $.pages(<jQuery object>) - saves the passed page in internal array
 // 3) $.pages(false) - returns false
-(function ($) {
-    var Pages = function () {
-        var d = [];
-        this.a = function (h) {
-            if (typeof h === "string") {
-                if(h === "f") d = [];
-                else for (var i = 0; i < d.length; i++)
-                    if (d[i][0] == h) return d[i][1];
-            }
-            if (typeof h === "object") {
-                d.push(h);
-            }
-            if (typeof h === "boolean") {
-                return false;
-            }
-        };
-    };
-    $.pages = function (h) {
-        if (!$.pages.o) $.pages.o = new Pages();
-        return $.pages.o.a(h);
-    };
-})(jQuery);
+pO("pages", 0, { d: [] }, function (h) {
+    if (typeof h === "string") {
+    if(h === "f") d = [];
+    else for (var i = 0; i < d.length; i++)
+        if (d[i][0] == h) return d[i][1];
+    }
+	
+    if (typeof h === "object") {
+        d.push(h);
+    }
+    
+	if (typeof h === "boolean") {
+        return false;
+    }
+});
 
 // The GetPage plugin
 // First parameter is a switch: 
@@ -208,105 +164,104 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 // "-" - loads page into DOM and handle scripts
 // "x" - returns XHR
 // otherwise - returns selection of current page to client
-(function ($) {
-    var GetPage = function () { var xhr;
-        this.a = function (o, p, p2) { 
-            if (!o) {
-                return $.cache();
-            }
-            if (o.iO("/")) {
-                return _lPage(o, p, p2);
-            }
-            if (o === "+") {
-                return _lPage(p, p2, false, true);
-            }
-            if (o === "-") {
-                return _lSel(p, p2);
-            }
-            if (o === "x") {
-                return xhr;
-            }
+
+pO("getPage", { xhr: 0 }, 0, function (o, p, p2) { 
+    if (!o) {
+        return $.cache();
+    }
+    
+	if (o.iO("/")) {
+        return _lPage(o, p, p2);
+    }
+    
+    if (o === "+") {
+        return _lPage(p, p2, false, true);
+    }
+    
+	if (o === "-") {
+        return _lSel(p, p2);
+    }
+    
+    if (o === "x") {
+        return xhr;
+    }
             
-            if($.cache()) return $.cache().find(".ajy-" + o);
-        };
-
-        function _lSel(p, $t) { //load page into DOM and handle scripts
-            pass++;
-            _lDivs($t);
-            $.scripts(p && p.same);
-            $.scripts("s");
-            $.scripts("a");
-            return $.scripts("c");
-        }
-
-        function _lPage(h, p, rq, pre) { //fire Ajax load, check for hash first
-            var _post = rq ? rq.post : false;
-            if (h.iO("#")) h = h.split("#")[0];
-            if (_post || !$.cache(h)) return _lAjax(h, p, _post, pre);
-            if(p) p();
-        }
-
-        function _ld($t, $h) {
-            $h.find(".ajy-script").each(function(){
-                 if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
-                 else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
-            });
+    if($.cache()) return $.cache().find(".ajy-" + o);
+}, {
+    lSel: function (p, $t) { //load page into DOM and handle scripts
+        pass++;
+        _lDivs($t);
+        $.scripts(p && p.same);
+        $.scripts("s");
+        $.scripts("a");
+        return $.scripts("c") 
+    },
+		
+    lPage: function (h, p, rq, pre) { //fire Ajax load, check for hash first
+         var _post = rq ? rq.post : false;
+         if (h.iO("#")) h = h.split("#")[0];
+         if (_post || !$.cache(h)) return _lAjax(h, p, _post, pre);
+         if(p) p();
+    },
+		
+	ld: function ($t, $h) {
+        $h.find(".ajy-script").each(function(){
+            if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
+            else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
+        });
             
-            $t.html($h.html());
-        }
-
-        function _lDivs($t) { //load target divs into DOM
-            if ($.cache()) $t.each(function () { 
-                _ld($(this), $.cache().find("#" + $(this).attr("id")));
-            });
-        }
-
-        function _lAjax(hin, p, post, pre) { //execute Ajax load
-                var ispost = post ? post.is : false;
+        $t.html($h.html());
+    },
+		
+    lDivs: function ($t) { //load target divs into DOM
+        if ($.cache()) $t.each(function () { 
+            _ld($(this), $.cache().find("#" + $(this).attr("id")));
+        });
+    },
+		
+    lAjax: function (hin, p, post, pre) { //execute Ajax load
+        var ispost = post ? post.is : false;
                 
-                xhr = $.ajax({
-				url: hin,
-                type: ispost ? "POST" : "GET",
-                data: ispost ? post.data : null,
-                success: function (h) {
-                    if (!h || !_isHtml(xhr)) {
-                        if (!pre) location.href = hin;
-                    }
-                    $.cache($(_parseHTML(h)));
-                    $.pages([hin, $.cache()]);
+        xhr = $.ajax({
+		url: hin,
+        type: ispost ? "POST" : "GET",
+        data: ispost ? post.data : null,
+        success: function (h) {
+            if (!h || !_isHtml(xhr)) {
+                if (!pre) location.href = hin;
+            }
+            
+            $.cache($(_parseHTML(h)));
+            $.pages([hin, $.cache()]);
 
-                    if(p) p();
-                },
-                error: function(jqXHR, status, error) {
-                    // Try to parse response text
-                    try { 
-                        $.log('Response text : ' + jqXHR.responseText);
-                        $.cache($(_parseHTML(jqXHR.responseText)));
-                        $.pages([hin, $.cache()]); 
-                        if(p) p(error);
-                    } catch (e) {}
-                }
-            });
+            if(p) p();
+        },
+        error: function(jqXHR, status, error) {
+        // Try to parse response text
+            try { 
+                $.log('Response text : ' + jqXHR.responseText);
+                $.cache($(_parseHTML(jqXHR.responseText)));
+                $.pages([hin, $.cache()]); 
+                if(p) p(error);
+            } catch (e) {}
         }
-        
-        function _isHtml(x) { //restrict interesting MIME types - only HTML / XML
-            var d;
-            return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
-        }
-
-        function _parseHTML(h) { //process fetched HTML
-            return $.trim(_replD(h));
-        }
-
-        function _replD(h) { //pre-process HTML so it can be loaded by jQuery
-            return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
-        }
-    };
-    $.getPage = function (o, p, p2) {
-        if (!$.getPage.o) $.getPage.o = new GetPage();
-        return $.getPage.o.a(o, p, p2);
-    };
-})(jQuery);
+        });
+    },
+		
+    isHtml: function (x) { //restrict interesting MIME types - only HTML / XML
+        var d;
+        return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
+    },
+		
+    parseHTML: function (h) { //process fetched HTML
+        return $.trim(_replD(h));
+    },
+		
+    replD: function (h) { //pre-process HTML so it can be loaded by jQuery
+        return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
+    }
+}
+);
 
 // The main plugin - Ajaxify
 // Is passed the global options 
