@@ -67,10 +67,10 @@ You can specify any parameters that are understood by .css() or .animate() respe
  //Intuitively better understandable shorthand for String.indexOf() - String.iO()
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 
-//Minified hoverIntent plugin that satisfies JSHint
+//Minified hoverIntent plugin
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
-//Minified idle plugin that satisfies JSHint
+//Minified idle plugin
 (function(n){n.fn.idle = function(e) {var i,t,o={idle:6e4,events:"mousemove keypress mousedown touchstart",onIdle:function(){},onActive:function(){},onHide:function(){},onShow:function(){},keepTracking:!1},c=!1,u=!0,d=n.extend({},o,e);return i=function(n,e){return c&&(e.onActive.call(),c=!1),(e.keepTracking?clearInterval:clearTimeout)(n),t(e);}, t = function(n) {var e,i=n.keepTracking?setInterval:setTimeout;return(e=i(function(){c=!0;n.onIdle.call();},n.idle)),e;},this.each(function(){var o=t(d);return n(this).on(d.events,function(){o=i(o,d);}),(e.onShow||e.onHide)&&n(document).on("visibilitychange webkitvisibilitychange mozvisibilitychange msvisibilitychange",function() {return document.hidden||document.webkitHidden||document.mozHidden||document.msHidden?u&&(u=!1,d.onHide.call()):u||(u=!0,d.onShow.call());});});};})(jQuery);
 
 //Module global variables
@@ -89,11 +89,10 @@ scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
-/*global jQuery*/ //Tell JSHint, not to moan about "jQuery" being undefined
+//Minified pO() function
+function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var i in n)if(n.hasOwnProperty(i)){var a=n[i];t+=e?",\n":"",t+="function"==typeof a?"_"+i+" = "+a.toString():i+" = "+(r?'settings["':"")+(r?i+'"]':JSON.stringify(a)),e++}return t+";"}function pO(n,r,t,e,i,a){var o="",s="",p="",f="",c="",l="",u=!1,g=!1,S=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),o=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),c=getParamNames(e),u=c.iO("$this"),g=c.iO("options"),l=c.replace("$this, ",""),l="$this"==c?"":l,t&&!g&&(l+=""===l?"options":", options"),r&&(s=JSON2Str(r)),t&&(p="var settings = $.extend("+JSON.stringify(t)+", options);\n",p+=JSON2Str(t,1)),i&&(f=JSON2Str(i)),t||(S=S.replace(/\(options/g,"(")),u||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,u?"fn."+n:n).replace(/Name/g,o).replace("funStr",funStr).replace("pVars",s).replace("pSettings",p).replace("pFns",f).replace("args",c).replace("arg0",l),console.log("BP : "+S),!a)try{jQuery.globalEval(S)}catch(v){alert("Error : "+v+" | "+S)}}var funStr,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){l<verbosity&&console&&console.log(n)});
 
-function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var a in n)if(n.hasOwnProperty(a)){var i=n[a];t+=e?",\n":"",t+="function"==typeof i?"_"+a+" = "+i.toString():a+" = "+(r?'settings["':"")+(r?a+'"]':i),e++}return t+";"}function pO(n,r,t,e,a){var i="",o="",s="",p="",f="",c="",l=!1,u=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");funStr=e.toString(),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),f=getParamNames(e),l=f.iO("$this"),c=f.replace("$this, ",""),c="$this"==f?"":c,t&&(c+=""===c?"options":", options"),r&&(o=JSON2Str(r)),t&&(s="var settings = $.extend("+JSON.stringify(t)+", options);\n",s+=JSON2Str(t,1)),a&&(p=JSON2Str(a)),t||(u=u.replace(/\(options/g,"(")),l||(u=u.replace("var $this = $(this);","")),u=u.replace(/fnn/g,n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",o).replace("pSettings",s).replace("pFns",p).replace("args",f).replace("arg0",c),console.log("BP : "+u);try{jQuery.globalEval(u)}catch(g){alert(g)}}var funStr,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){l<verbosity&&console&&console.log(n)});
-
-//getRootUrl() from Baluptons history.js - satisfies JSHint
+//getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
 
 // The stateful Cache plugin
@@ -101,7 +100,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 // 1) $.cache() - returns currently cached page
 // 2) $.cache(<URL>) - returns page with specified URL
 // 3) $.cache(<jQuery object>) - saves the page in cache
-pO("cache", 0, { d: false }, function (o) {
+pO("cache", { d: false }, 0, function (o) {
     if (!o) {
         return d;
     }
@@ -122,7 +121,7 @@ pO("cache", 0, { d: false }, function (o) {
 
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
-pO("memory", { memoryoff: false }, { d: false }, function (h) {
+pO("memory", { d: false }, { memoryoff: false }, function (h) {
      d = memoryoff;
      if (!h || d === true) return false;
      if (d === false) return h;
@@ -140,7 +139,7 @@ pO("memory", { memoryoff: false }, { d: false }, function (h) {
 // 1) $.pages(<URL>) - returns page with specified URL from internal array
 // 2) $.pages(<jQuery object>) - saves the passed page in internal array
 // 3) $.pages(false) - returns false
-pO("pages", 0, { d: [] }, function (h) {
+pO("pages", { d: [] }, 0, function (h) {
     if (typeof h === "string") {
     if(h === "f") d = [];
     else for (var i = 0; i < d.length; i++)
@@ -268,42 +267,29 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
 // Checks for necessary pre-conditions - otherwise gracefully degrades
 // Initialises sub-plugins
 // Calls Pronto
-(function ($) {
-    var Ajaxify = function (options) {
-        var settings = $.extend({
-            pluginon: true,
-            deltas: true,
-            fn: $.getPage
-        }, options);
-        var pluginon = settings.pluginon,
-        deltas = settings.deltas;
-        
-        this.a = function ($this, o) {
-            if(!o) {
-                $(function () { //on DOMReady
-                    if (_init(settings)) { //sub-plugins initialisation
-                        $this.pronto(0, settings); //Pronto initialisation
-                        if(deltas) $.scripts("1"); //delta-loading initialisation
-                    }
-                });
-            }
-            else return $().pronto(o);
-        };
+var fn = jQuery.getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
 
-        function _init(s) {
+pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
+    var o = options;
+    if(!o || typeof(o) !== 'string') {
+        $(function () { //on DOMReady
+            if (_init(settings)) { //sub-plugins initialisation
+                $this.pronto(0, settings); //Pronto initialisation
+                if(deltas) $.scripts("1"); //delta-loading initialisation
+            }
+        });
+    }
+        else return $().pronto(o);
+    }, {
+        init: function (s) {
             if (!api || !pluginon) return false;
             $.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
             return true;
-        }
-    };
-    $.fn.ajaxify = function (options) {
-        var $this = $(this);
-        if (!$.fn.ajaxify.o) $.fn.ajaxify.o = new Ajaxify(options);
-        return typeof(options) === 'string' ? $.fn.ajaxify.o.a($this, options) : $.fn.ajaxify.o.a($this);
-    };
-})(jQuery);
+            }
+        }/*, 1*/
+);
 
 // The stateful Scripts plugin
 // First parameter is switch:
@@ -311,244 +297,188 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
 // "a" - handle inline scripts
 // "c" - fetch canonical URL
 // otherwise - delta loading
-(function ($) {
-    var Scripts = function (options) {
-        var $s = $();
-        var settings = $.extend({
-            canonical: true,
-            inline: true,
-            inlinehints: false,
-            inlineskip: "adsbygoogle",
-            style: true
-        }, options);
-        var canonical = settings.canonical,
-            inline = settings.inline,
-            inlinehints = settings.inlinehints,
-            inlineskip = settings.inlineskip,
-            style = settings.style;
-        this.a = function (o) {
-            if (o === "i") {
-                return true;
-            }
-            if (o === "s") {
-                return _allstyle($s.y);
-            }
+pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", style: true }, function (o) {
+    if (o === "i") {
+        if(!$s) $s = $();
+        return true;
+    }
+    if (o === "s") {
+        return _allstyle($s.y);
+    }
             
-            if (o === "1") { 
-                $.detScripts($s);
-                return _addScripts(false, $s, settings);
-            }
+    if (o === "1") { 
+        $.detScripts($s);
+        return _addScripts(false, $s, settings);
+    }
             
-            if (o === "a") {
-                return _alltxts($s.t);
-            }
-            if (o === "c") {
-                if (canonical && $s.can) return $s.can.attr("href");
-                else return false;
-            }
-            $.detScripts($s); //fetch all scripts
-            _addScripts(o, $s, settings); //delta-loading
-        };
+    if (o === "a") {
+        return _alltxts($s.t);
+    }
 
-        function _allstyle($s) {
-            if (!style || !$s) return;
-            $("head").find("style").remove();
-            $s.each(function () {
-                var d = $(this).text();
-                _addstyle(d);
-            });
-        }
-		
-        function _alltxts($s) {
-            $s.each(function () {
-                var d = $(this).text();
-                if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d);
-            });
-        }
-
-        function _addtext(t) {
-            try {
-                $.globalEval(t);
-            } catch (e1) {
-	            try { 
-                    eval(t);
-                } catch (e2) {
-                    $.log("Error in inline script : " + t + "\nError code : " + e2);
-                }
+    if (o === "c") {
+        if (canonical && $s.can) return $s.can.attr("href");
+        else return false;
+    }
+    
+    $.detScripts($s); //fetch all scripts
+    _addScripts(o, $s, settings); //delta-loading
+}, {
+    allstyle: function ($s) {
+        if (!style || !$s) return;
+        $("head").find("style").remove();
+        $s.each(function () {
+            var d = $(this).text();
+            _addstyle(d);
+        });
+    },
+    alltxts: function ($s) {
+        $s.each(function () {
+             var d = $(this).text();
+             if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d);
+        });
+    },
+    addtext: function (t) {
+        try {
+            $.globalEval(t);
+        } catch (e1) {
+	        try { 
+                 eval(t);
+            } catch (e2) {
+                 $.log("Error in inline script : " + t + "\nError code : " + e2);
             }
         }
-		
-        function _addstyle(t) {
-            $("head").append('<style type="text/css">' + t + '</style>');
+    },
+    addstyle: function (t) {
+        $("head").append('<style type="text/css">' + t + '</style>');
+    },
+    inlineskip: function (txt) {
+        var d = inlineskip;
+        if (d) {
+            d = d.split(", ");
+            for (var i = 0; i < d.length; i++)
+                if (txt.iO(d[i])) return true;
         }
-
-        function _inlineskip(txt) {
-            var d = inlineskip;
-            if (d) {
-                d = d.split(", ");
-                for (var i = 0; i < d.length; i++)
-                    if (txt.iO(d[i])) return true;
-            }
-        }
-        
-        function _inlinehints(txt) {
-            var d = inlinehints;
-            if (d) {
-                d = d.split(", ");
-                for (var i = 0; i < d.length; i++)
-                    if (txt.iO(d[i])) return true;
-            }
-        }
-
-        function _addScripts(same, $s, st) {
-            $s.c.addAll(same, "href", st);
-            $s.s.addAll(same, "src", st);
-        }
-    };
-    $.scripts = function (o, options) {
-        if (!$.scripts.o) $.scripts.o = new Scripts(options);
-        return $.scripts.o.a(o);
-    };
-})(jQuery);
-
+    },
+    inlinehints: function (txt) {
+         var d = inlinehints;
+         if (d) {
+             d = d.split(", ");
+             for (var i = 0; i < d.length; i++)
+                 if (txt.iO(d[i])) return true;
+         }
+    },
+    addScripts: function (same, $s, st) {
+        $s.c.addAll(same, "href", st);
+        $s.s.addAll(same, "src", st);
+    }
+}
+);
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" jQuery object that is passed in and fills it
 // Fetches all stylesheets in the head
 // Fetches the canonical URL
 // Fetches all external scripts on the page
 // Fetches all inline scripts on the page
-(function ($) {
-    var DetScripts = function () {
-        var head, lk, j;
-        this.a = function ($s) {
-            head = pass ? $.getPage("head") : $("head");
-            lk = head.find(pass ? ".ajy-link" : "link");
-            j = pass ? $.getPage("script") : $("script");
-            $s.c = _rel(lk, "stylesheet");
-            $s.y = head.find("style");
-            $s.can = _rel(lk, "canonical");
-            $s.s = j.filter(function () {
-                return $(this).attr("src");
-            });
-            $s.t = j.filter(function () {
-                return !($(this).attr("src"));
-            });
-        };
+pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
+    head = pass ? $.getPage("head") : $("head");
+    lk = head.find(pass ? ".ajy-link" : "link");
+    j = pass ? $.getPage("script") : $("script");
+    $s.c = _rel(lk, "stylesheet");
+    $s.y = head.find("style");
+    $s.can = _rel(lk, "canonical");
+    $s.s = j.filter(function () {
+         return $(this).attr("src");
+    });
+    $s.t = j.filter(function () {
+         return !($(this).attr("src"));
+    })}, {
+    rel: function(lk, v) {
+        return $(lk).filter(function () {
+             return $(this).attr("rel").iO(v);
+        })}
+    }
+);
 
-        function _rel(lk, v) {
-            return $(lk).filter(function () {
-                return $(this).attr("rel").iO(v);
-            });
+pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [] }, { deltas: true }, function ($this, same, PK) {
+    if(!$this.length) return;
+    if (PK == "href") {
+        $scriptsO = $sCssO;
+        $scriptsN = $sCssN;
+    } else {
+        $scriptsO = $sO;
+        $scriptsN = $sN;
+    } 
+    if (_allScripts($this, PK)) return true;
+    if (same) { _classAlways($this, PK); return; }
+    $scriptsN = [];
+    _newArray($this, $scriptsN, $scriptsO, PK);
+    if (pass) {
+         _findCommon($scriptsO, $scriptsN);
+         _freeOld($scriptsO, PK);
+         _sameScripts($scriptsN, PK);
+         $scriptsO = $scriptsN.slice();
+    }
+    if (PK == "href") {
+         $sCssO = $scriptsO;
+         $sCssN = $scriptsN;
+    } else {
+         $sO = $scriptsO;
+         $sN = $scriptsN;
+    }
+    }, {
+    allScripts: function ($t, PK) {
+        if (deltas) return false;
+        $t.each(function () {
+             _iScript($(this)[0], PK);
+        });
+        
+        return true;
+    },
+    classAlways: function ($t, PK) {
+        $t.each(function () {
+        if ($(this).attr("data-class") == "always") {
+            _iScript($(this).attr(PK), PK);
         }
-    };
-    $.detScripts = function ($s) {
-        if (!$.detScripts.o) $.detScripts.o = new DetScripts();
-        return $.detScripts.o.a($s);
-    };
-})(jQuery);
-
-(function ($) {
-    var AddAll = function (options) {
-        var $scriptsO, $scriptsN, $sCssO = [],
-            $sCssN = [],
-            $sO = [],
-            $sN = [];
-        var settings = $.extend({
-        }, options);
-        var deltas = settings.deltas;
-        this.a = function ($this, same, PK) {
-            if(!$this.length) return;
-            if (PK == "href") {
-                $scriptsO = $sCssO;
-                $scriptsN = $sCssN;
-            } else {
-                $scriptsO = $sO;
-                $scriptsN = $sN;
-            } 
-            if (_allScripts($this, PK)) return true;
-            if (same) { _classAlways($this, PK); return; }
-            $scriptsN = [];
-            _newArray($this, $scriptsN, $scriptsO, PK);
-            if (pass) {
-                _findCommon($scriptsO, $scriptsN);
-                _freeOld($scriptsO, PK);
-                _sameScripts($scriptsN, PK);
-                $scriptsO = $scriptsN.slice();
-            }
-            if (PK == "href") {
-                $sCssO = $scriptsO;
-                $sCssN = $scriptsN;
-            } else {
-                $sO = $scriptsO;
-                $sN = $scriptsN;
-            }
-        };
-
-        function _allScripts($t, PK) {
-            if (deltas) return false;
-            $t.each(function () {
-                _iScript($(this)[0], PK);
-            });
-            return true;
+        });
+    },
+    sameScripts: function (s, PK) {
+        for (var i = 0; i < s.length; i++)
+             if (s[i][1] === 0) _iScript(s[i][0], PK);
+    },
+    iScript: function ($S, PK) {
+        $("head").append((PK == "href" ? linki : scri).replace("*", $S));
+    },
+    newArray: function ($t, sN, sO, PK) {
+        var d;
+        $t.each(function () {
+             d = [$(this).attr(PK), 0];
+             sN.push(d);
+             if (!pass) sO.push(d);
+        });
+    },
+    findCommon: function (s, sN) {
+        for (var i = 0; i < s.length; i++) {
+             s[i][1] = 2;
+             if (_findScript(s[i][0], sN)) s[i][1] = 1;
         }
-
-        function _classAlways($t, PK) {
-            $t.each(function () {
-                if ($(this).attr("data-class") == "always") {
-                    _iScript($(this).attr(PK), PK);
-                }
-            });
-        }
-
-        function _sameScripts(s, PK) {
-            for (var i = 0; i < s.length; i++)
-                if (s[i][1] === 0) _iScript(s[i][0], PK);
-        }
-
-        function _iScript($S, PK) {
-            $("head").append((PK == "href" ? linki : scri).replace("*", $S));
-        }
-
-        function _newArray($t, sN, sO, PK) {
-            var d;
-            $t.each(function () {
-                d = [$(this).attr(PK), 0];
-                sN.push(d);
-                if (!pass) sO.push(d);
-            });
-        }
-
-        function _findCommon(s, sN) {
-            for (var i = 0; i < s.length; i++) {
-                s[i][1] = 2;
-                if (_findScript(s[i][0], sN)) s[i][1] = 1;
-            }
-        }
-
-        function _findScript($S, s) {
-            if ($S)
-                for (var i = 0; i < s.length; i++)
-                    if (s[i][0] == $S) {
-                        s[i][1] = 1;
-                        return true;
-                    }
-        }
-
-        function _freeOld(s, PK) {
-            for (var i = 0; i < s.length; i++)
-                if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
-        }
-
-        function _removeScript($S, PK) {
-            $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
-        }
-    };
-    $.fn.addAll = function (same, PK, options) {
-        var $this = $(this);
-        if (!$.fn.addAll.o) $.fn.addAll.o = new AddAll(options);
-        return $.fn.addAll.o.a($this, same, PK);
-    };
-})(jQuery);
+    },
+    findScript: function ($S, s) {
+        if ($S)
+        for (var i = 0; i < s.length; i++)
+             if (s[i][0] == $S) {
+                 s[i][1] = 1;
+                 return true;
+             }
+    },
+    freeOld: function (s, PK) {
+        for (var i = 0; i < s.length; i++)
+            if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
+    },
+    removeScript: function ($S, PK) {
+        $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
+    }
+    }
+);
 
 (function ($) {
     var Pronto = function (options) {
@@ -572,7 +502,6 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
             slideTime: 0,
             menu: false,
             addclass: "jqhover",
-            fn: false,
             cb: 0,
             aniParams: false,
             aniTime: 0
@@ -589,7 +518,6 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
             menu = settings.menu,
             addclass = settings.addclass,
             cb = settings.cb,
-            fn = settings.fn,
             aPs_to = settings.aniParams,
             aniTime = settings.aniTime;
         
