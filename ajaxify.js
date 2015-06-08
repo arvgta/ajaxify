@@ -90,7 +90,7 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]';
 
 //Minified pO() function
-function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var i in n)if(n.hasOwnProperty(i)){var a=n[i];t+=e?",\n":"",t+="function"==typeof a?"_"+i+" = "+a.toString():i+" = "+(r?'settings["':"")+(r?i+'"]':JSON.stringify(a)),e++}return t+";"}function pO(n,r,t,e,i,a){var o="",s="",p="",f="",c="",l="",u=!1,g=!1,S=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),o=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),c=getParamNames(e),u=c.iO("$this"),g=c.iO("options"),l=c.replace("$this, ",""),l="$this"==c?"":l,t&&!g&&(l+=""===l?"options":", options"),r&&(s=JSON2Str(r)),t&&(p="var settings = $.extend("+JSON.stringify(t)+", options);\n",p+=JSON2Str(t,1)),i&&(f=JSON2Str(i)),t||(S=S.replace(/\(options/g,"(")),u||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,u?"fn."+n:n).replace(/Name/g,o).replace("funStr",funStr).replace("pVars",s).replace("pSettings",p).replace("pFns",f).replace("args",c).replace("arg0",l),console.log("BP : "+S),!a)try{jQuery.globalEval(S)}catch(v){alert("Error : "+v+" | "+S)}}var funStr,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){l<verbosity&&console&&console.log(n)});
+function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var i in n)if(n.hasOwnProperty(i)){var a=n[i];t+=e?",\n":"",t+="function"==typeof a?"_"+i+" = "+a.toString():i+" = "+(r?'settings["':"")+(r?i+'"]':JSON.stringify(a)),e++}return t+";"}function pO(n,r,t,e,i,a){var s="",o="",p="",f="",c="",u="",l=!1,g=!1,S=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),c=getParamNames(e),l=c.iO("$this"),g=c.iO("options"),u=c.replace("$this, ",""),u="$this"==c?"":u,t&&!g&&(u+=""===u?"options":", options"),r&&(o=JSON2Str(r)),t&&(p="var settings = $.extend("+JSON.stringify(t)+", options);\n",p+=JSON2Str(t,1)),i&&(f=JSON2Str(i)),t||(S=S.replace(/\(options/g,"(")),l||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,l?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",o).replace("pSettings",p).replace("pFns",f).replace("args",c).replace("arg0",u),!a)try{jQuery.globalEval(S)}catch(v){alert("Error : "+v+" | "+S)}}var funStr,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){l<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
@@ -288,7 +288,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
             $.memory(0, s);
             return true;
             }
-        }/*, 1*/
+        }
 );
 
 // The stateful Scripts plugin
@@ -480,14 +480,57 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     }
 );
 
+pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime: 0 }, function (o, p) {
+    if(!o) return;
+
+	if (o === "i") {
+        cd = p.first();
+        aniTrue = aniTime && aniParams;
+        cdwidth = cd.width();
+        if(!aniTrue) return;
+		
+        aniParams = $.extend({
+            opacity: 1, // default - no fade
+            width: "100%",
+            height: "100%"
+        }, aniParams);
+		
+		aniParams = $.extend({
+            marginRight: cdwidth - aniParams.width
+        }, aniParams);
+		
+        from = $.extend({}, aniParams);
+		
+        for(var key in from) {
+            if (from.hasOwnProperty(key)) { 
+                var keyval = cd.css(key), keyOval = from[key];
+
+                if((key === "height") && keyOval.iO("%")) { 
+                    keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%";
+                }
+
+                from[key] = keyval;    
+            }
+        }     
+    }
+	
+    if(!p) return;
+	
+	if(!aniTrue) p();
+	
+    if (o === "1" || o === "2") {
+		if(o === "1") cd.stop(true, true);
+        cd.animate(o === "1" ? aniParams : from, aniTime, p);
+    }
+});
+
 (function ($) {
     var Pronto = function (options) {
         var $window = $(window),
             currentURL = '',
             requestTimer = null,
             rq = null,
-            $gthis, $cd, fm, aniTrue, aPs_from,
-            cdwidth,
+            $gthis, fm,
             sliding = false, timer, currEl,
 			rootUrl = getRootUrl();
 
@@ -502,9 +545,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
             slideTime: 0,
             menu: false,
             addclass: "jqhover",
-            cb: 0,
-            aniParams: false,
-            aniTime: 0
+            cb: 0
         }, options);
 
         //Shorthands
@@ -517,19 +558,15 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
             slideTime = settings.slideTime,
             menu = settings.menu,
             addclass = settings.addclass,
-            cb = settings.cb,
-            aPs_to = settings.aniParams,
-            aniTime = settings.aniTime;
+            cb = settings.cb;
         
         // Main plugin function
         this.a = function ($this, h) {
             if(!h) {
                 $gthis = $this;
-                $cd = $this.first();
-             
-                _ini_aPs();
-                
-                _init_p();
+                $.cd(0, 0, settings);
+                $.cd("i", $gthis);
+				_init_p();
                 return $this;
             }
             else if(h.iO("/")) { 
@@ -553,43 +590,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
             _ajaxify_forms();
             _idle();
         }
-        
-        function _ini_aPs() {
-            aniTrue = aniTime && aPs_to;
-            cdwidth = $cd.width(); //needed for calculating the margin
-            
-            if(!aniTrue) return;
-            
-            aPs_to = $.extend({
-                opacity: 1, // default - no fade
-                width: "100%",
-                height: "100%"
-            }, aPs_to);
-
-            
-            aPs_to = $.extend({
-                marginRight: cdwidth - aPs_to.width
-            }, aPs_to);
-            
-            _save_aPs_from();
-        }
-        
-        function _save_aPs_from() {
-             aPs_from = $.extend({}, aPs_to);
-
-             for(var key in aPs_from) {
-                 if (aPs_from.hasOwnProperty(key)) { 
-                     var keyval = $cd.css(key), keyOval = aPs_from[key];
-
-                     if((key === "height") && keyOval.iO("%")) { 
-                         keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%";
-                     }
-
-                     aPs_from[key] = keyval;    
-                 }
-             }     
-        }
-		
+     
         function _idle() {
             if(!idleTime) return;
 			
@@ -803,14 +804,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         }
 		
         function _render2(e, doPush, mode) {
-            $cd.stop(true, true);
-            
-            var afterEffect = function () {
-                _doRender(e, doPush, mode);
-            };
-			
-            if(aniTrue) $cd.animate(aPs_to, aniTime, afterEffect);
-            else afterEffect();
+			$.cd("1", function () { _doRender(e, doPush, mode); });
         }
 
         // Save current state
@@ -860,15 +854,10 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
             
             $('title').html(fn('title').html()); // Update title
             
-            //Animate back to original dimensions
-            if(aniTrue) { 
-                $cd.animate(aPs_from, aniTime, function(){ _doRender2(e, url, doPush, mode, canURL); }); 
-            } 
-            else _doRender2(e, url, doPush, mode, canURL);
+            $.cd("2", function () { _doRender2(e, url, doPush, mode, canURL); });
        }
 
        function _doRender2(e, url, doPush, mode, canURL) {
-            
             //Set current URL to canonical if no hash or parameters in current URL
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
 
