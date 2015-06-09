@@ -74,7 +74,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 (function(n){n.fn.idle = function(e) {var i,t,o={idle:6e4,events:"mousemove keypress mousedown touchstart",onIdle:function(){},onActive:function(){},onHide:function(){},onShow:function(){},keepTracking:!1},c=!1,u=!0,d=n.extend({},o,e);return i=function(n,e){return c&&(e.onActive.call(),c=!1),(e.keepTracking?clearInterval:clearTimeout)(n),t(e);}, t = function(n) {var e,i=n.keepTracking?setInterval:setTimeout;return(e=i(function(){c=!0;n.onIdle.call();},n.idle)),e;},this.each(function(){var o=t(d);return n(this).on(d.events,function(){o=i(o,d);}),(e.onShow||e.onHide)&&n(document).on("visibilitychange webkitvisibilitychange mozvisibilitychange msvisibilitychange",function() {return document.hidden||document.webkitHidden||document.mozHidden||document.msHidden?u&&(u=!1,d.onHide.call()):u||(u=!0,d.onShow.call());});});};})(jQuery);
 
 //Module global variables
-var l=0, pass=0, api=window.history && window.history.pushState && window.history.replaceState,
+var l = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -516,7 +516,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 	
     if(!p) return;
 	
-	if(!aniTrue) p();
+	if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2") {
 		if(o === "1") cd.stop(true, true);
@@ -524,15 +524,77 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     }
 });
 
+pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover" }, function (o) {
+	if(!o) return;
+	
+	if (o === "i") { 
+	    if(!idleTime) return;
+			
+        $(document).idle({
+            onIdle: function(){
+                _trigger("idle");
+                if(sliding) return;                    
+                sliding = true;
+                _slide();
+            },
+            onActive: function(){
+                _trigger("active");
+                if(currEl) currEl.removeClass(addclass);
+                clearInterval(timer);
+                sliding = false;
+            },
+            idle: idleTime
+        });     
+    }
+	
+    //sp = o;
+}, {
+    slide: function() { 
+        if(!sliding) return;
+        timer = setInterval(_slide1, slideTime); 
+    },
+    slide1: function() { 
+        if(!sliding) return;
+        $().pronto(_nextLink());
+    }, 
+	nextLink: function() { 
+        var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
+        $(menu).each(function(i, v){ var el = $(this).parent();
+            if(nextLink) return true;
+            link = v.href;
+            if(!_internal(link)) return;
+            el.removeClass(addclass);
+            if(!firstValue) firstValue = $(this).parent();
+            if(!firstLink) firstLink = link;
+            if(wasPrev) { 
+                nextLink = link;
+                currEl = el;
+                el.addClass(addclass);
+            }
+            else if(currentURL == link) wasPrev = true;
+        });
+			
+        if(!nextLink) { 
+             firstValue.addClass(addclass);
+             nextLink = firstLink;
+             currEl = firstValue;
+        }
+		
+        return nextLink;
+    }
+});
+
+function _trigger(t, e){ jQuery(window).trigger('pronto.' + t, e); }
+function _internal(url) { 
+    if (url==='') return true;
+    return url && (url.substring(0,rootUrl.length) === rootUrl || !url.iO(':'));
+}
+
 (function ($) {
     var Pronto = function (options) {
-        var $window = $(window),
-            currentURL = '',
-            requestTimer = null,
+        var requestTimer = null,
             rq = null,
-            $gthis, fm,
-            sliding = false, timer, currEl,
-			rootUrl = getRootUrl();
+            $gthis, fm;
 
         // Default Options
         var settings = $.extend({
@@ -541,10 +603,6 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             forms: "form:not(.no-ajaxy)",
             prefetch: true,
             previewoff: true,
-            idleTime: 0,
-            slideTime: 0,
-            menu: false,
-            addclass: "jqhover",
             cb: 0
         }, options);
 
@@ -554,10 +612,6 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             forms = settings.forms,
             prefetch = settings.prefetch,
             previewoff = settings.previewoff,
-            idleTime = settings.idleTime,
-            slideTime = settings.slideTime,
-            menu = settings.menu,
-            addclass = settings.addclass,
             cb = settings.cb;
         
         // Main plugin function
@@ -565,12 +619,14 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             if(!h) {
                 $gthis = $this;
                 $.cd(0, 0, settings);
+                $.slides(0, settings);
+                //$.slides($.pronto);
                 $.cd("i", $gthis);
 				_init_p();
                 return $this;
             }
             else if(h.iO("/")) { 
-                _request(h, true);
+                _request(h, true, true);
                  return 'OK';
             }
         };
@@ -580,7 +636,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             settings.$body = $("body");
             currentURL = window.location.href; // Capture current url & state
             _saveState(); // Set initial state
-            $window.on("popstate", _onPop); //Set handler for popState
+            $(window).on("popstate", _onPop); //Set handler for popState
             if (prefetch) {
                 $(selector).hoverIntent(_prefetch, _drain); //If "prefetch" option defined then set handler to "_prefetch" on hoverIntent
                 $(selector).on("touchstart", _prefetch); //for touchscreens
@@ -588,64 +644,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             _ajaxify_forms();
-            _idle();
-        }
-     
-        function _idle() {
-            if(!idleTime) return;
-			
-            $(document).idle({
-                onIdle: function(){
-                    $window.trigger("pronto.idle");
-                    if(sliding) return;                    
-                    sliding = true;
-                    _slide();
-                },
-                onActive: function(){
-                    $window.trigger("pronto.active");
-                    if(currEl) currEl.removeClass(addclass);
-                    clearInterval(timer);
-                    sliding = false;
-                },
-                idle: idleTime
-            });
-        }
-		
-        function _slide() {
-            if(!sliding) return;
-            timer = setInterval(_slide1, slideTime);
-        }
-		
-        function _slide1() {
-            if(!sliding) return;
-            var next = _nextLink();
-            _request(next, true, true);
-        }
-		
-        function _nextLink() {
-            var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
-            $(menu).each(function(i, v){ var el = $(this).parent();
-                if(nextLink) return true;
-                link = v.href;
-                if(!_internal(link)) return;
-                el.removeClass(addclass);
-                if(!firstValue) firstValue = $(this).parent();
-                if(!firstLink) firstLink = link;
-                if(wasPrev) { 
-                     nextLink = link;
-                     currEl = el;
-                     el.addClass(addclass);
-                }
-                else if(currentURL == link) wasPrev = true;
-            });
-			
-            if(!nextLink) { 
-                 firstValue.addClass(addclass);
-                 nextLink = firstLink;
-                 currEl = firstValue;
-            }
-			
-            return nextLink;
+            $.slides("i");
         }
 		
         //Dummy function for hoverIntent
@@ -700,11 +699,6 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             return o;
         }
         
-        function _internal(url) { 
-            if (url==='') return true;
-            return url && (url.substring(0,rootUrl.length) === rootUrl || !url.iO(':'));
-        }
-        
         function _init_rq() {
             rq = {};
             rq.post = {};
@@ -753,7 +747,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
                     rq.post.is = true;
                     rq.post.data = p;
                 }
-                $window.trigger("pronto.submit", h);
+                _trigger("submit", h);
                 _request(h);
                 return false;
             });
@@ -778,11 +772,11 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
         // Request new url
         function _request(e, mode, notPush) {
             var href = typeof(e) !== "string" ? e.currentTarget.href : e;
-            $window.trigger("pronto.request", e); // Fire request event
+            _trigger("request", e); // Fire request event
 			var reqr = function (err) { //Callback - continue with _render()
                 if (err) { 
                     $.log('Error : ' + err); 
-                    $window.trigger("pronto.error", err); 
+                    _trigger("error", err); 
                 }
                 _render(e, !notPush, mode);
             };
@@ -796,7 +790,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
                 requestTimer = null;
             }
             
-            $window.trigger("pronto.beforeload", e);
+            _trigger("beforeload", e);
             
             requestTimer = setTimeout(function () {
                 _render2(e, doPush, mode);
@@ -823,7 +817,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             // Check if data exists
             if (data !== null && data.url !== currentURL) {
                 rq.same = _sameRoot(data.url, currentURL);
-                $window.trigger("pronto.request", e); // Fire request event
+                _trigger("request", e); // Fire request event
                 var req3 = function () { //Callback - continue with _render()
                     _render(e, false, false);
                 };
@@ -847,7 +841,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
        function _doRender(e, doPush, mode) {
             var url, canURL; //Canonical URL
             url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;
-            $window.trigger("pronto.load", e);  // Fire load event
+            _trigger("load", e);  // Fire load event
 
             // Update DOM and fetch canonical URL - important for handling re-directs
             canURL = fn('-', rq, $gthis); 
@@ -872,13 +866,13 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
                 }
                 
                 if (scrollTop !== false) {
-                    $window.scrollTop(scrollTop);
+                    $(window).scrollTop(scrollTop);
                 }
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
-            $window.trigger("pronto.render", e); // Fire render event
+            _trigger("render", e); // Fire render event
             if(cb) cb();
         }
 
