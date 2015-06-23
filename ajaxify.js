@@ -22,7 +22,7 @@ The plugin can take an arbitrary amount of IDs, however the first one should spe
 Options default values
 {
 // basic config parameters
-    selector : "a:not(.no-ajaxy)", //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
+    selector : "a:not(.no-ajaxy):not([target='_blank'])",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : true, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
  
@@ -60,7 +60,7 @@ Animation parameters (aniParams):  Default is false (set off)
 
 More animation parameters
 
-You can specify any parameters that are understood by .css() or .animate() respectively…
+You can specify any parameters that are understood by .animate() respectively…
 
 */
 
@@ -165,41 +165,25 @@ pO("pages", { d: [] }, 0, function (h) {
 // otherwise - returns selection of current page to client
 
 pO("getPage", { xhr: 0 }, 0, function (o, p, p2) { 
-    if (!o) {
-        return $.cache();
-    }
-    
-	if (o.iO("/")) {
-        return _lPage(o, p, p2);
-    }
-    
-    if (o === "+") {
-        return _lPage(p, p2, false, true);
-    }
-    
-	if (o === "-") {
-        return _lSel(p, p2);
-    }
-    
-    if (o === "x") {
-        return xhr;
-    }
-            
+    if (!o) return $.cache();
+	if (o.iO("/")) return _lPage(o, p);
+    if (o === "+") return _lPage(p, p2, true);
+    if (o === "-") return _lSel(p);
+    if (o === "x") return xhr;            
     if($.cache()) return $.cache().find(".ajy-" + o);
 }, {
-    lSel: function (p, $t) { //load page into DOM and handle scripts
+    lSel: function ($t) { //load page into DOM and handle scripts
         pass++;
         _lDivs($t);
-        $.scripts(p && p.same);
+        $.scripts($.rq("s"));
         $.scripts("s");
         $.scripts("a");
-        return $.scripts("c") 
+        return $.scripts("c");
     },
 		
-    lPage: function (h, p, rq, pre) { //fire Ajax load, check for hash first
-         var _post = rq ? rq.post : false;
+    lPage: function (h, p, pre) { //fire Ajax load, check for hash first
          if (h.iO("#")) h = h.split("#")[0];
-         if (_post || !$.cache(h)) return _lAjax(h, p, _post, pre);
+         if ($.rq("is") || !$.cache(h)) return _lAjax(h, p, pre);
          if(p) p();
     },
 		
@@ -218,13 +202,13 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
         });
     },
 		
-    lAjax: function (hin, p, post, pre) { //execute Ajax load
-        var ispost = post ? post.is : false;
+    lAjax: function (hin, p, pre) { //execute Ajax load
+        var ispost = $.rq("is");
                 
         xhr = $.ajax({
 		url: hin,
         type: ispost ? "POST" : "GET",
-        data: ispost ? post.data : null,
+        data: ispost ? $.rq("d") : null,
         success: function (h) {
             if (!h || !_isHtml(xhr)) {
                 if (!pre) location.href = hin;
@@ -586,21 +570,111 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
 
 function _trigger(t, e){ jQuery(window).trigger('pronto.' + t, e); }
 function _internal(url) { 
+    if (!url) return false;
+    if(typeof(url) === 'object') url = url.href;
     if (url==='') return true;
-    return url && (url.substring(0,rootUrl.length) === rootUrl || !url.iO(':'));
+    return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
 }
+
+function _root(u) {
+    u = u.iO('?') ? u.split('?')[0] : u;
+}
+        
+function _sameRoot(u1, u2) {
+    return _root(u1) === _root(u2);
+}
+
+pO("rq", { ispost: 0, data: 0, same: 0 }, 0, function (o, p) {
+    if(o === "i") {
+        ispost = false;
+        data = null;
+        same = false;
+        return;
+	}
+	
+	if(o === "s") {
+        if(p) same = p;
+		return same;
+	}
+	
+	if(o === "is") {
+        if(p) ispost = p;
+		return ispost;
+	}
+	
+	if(o === "d") {
+        if(p) data = p;
+        return data;
+	}
+});
+
+pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
+    if (!forms || !o) return;
+    
+    if(o === "d") divs = p;
+    if(o === "a") divs.find(forms).filter(function() {
+        return _internal($(this).attr("action"));
+    }).submit(function (q) {
+        fm = $(q.target);
+        if (!fm.is("form")) {
+            fm = fm.filter("input[type=submit]").parents("form:first");
+            if (fm.length === 0) {
+                return true;
+            }
+        }
+        
+        p = _k();
+        var g = "get",
+        m = fm.attr("method");
+        if (m.length > 0 && m.toLowerCase() == "post") g = "post";
+        
+        var h, a = fm.attr("action");
+        if (a && a.length > 0) h = a;
+        else h = currentURL; 
+                
+        $.rq("i");
+        $.rq("s", _sameRoot(h, currentURL));
+               
+        if (g == "get") h = _b(h, p);
+        else {
+            $.rq("is", true);
+            $.rq("d", p);
+        }
+        
+        _trigger("submit", h);
+        $().pronto({ href: h });
+        return false;
+    });
+}, {
+    k: function () {
+        var o = fm.serialize();
+        var n = $("input[name][type=submit]", fm);
+        if (n.length === 0) return o;
+        var p = n.attr("name") + "=" + n.val();
+        if (o.length > 0) {
+            o += "&" + p;
+        } else {
+            o = p;
+        }
+        
+        return o;
+    },
+    b: function (m, n) {
+        if (m.indexOf("?") > 0) {
+            m = m.substring(0, m.indexOf("?"));
+        }
+        return m + "?" + n;
+    }
+});
 
 (function ($) {
     var Pronto = function (options) {
-        var requestTimer = null,
-            rq = null,
-            $gthis, fm;
+        var requestTimer = null, $gthis;
 
         // Default Options
         var settings = $.extend({
             selector: "a:not(.no-ajaxy):not([target='_blank'])",
             requestDelay: 0,
-            forms: "form:not(.no-ajaxy)",
             prefetch: true,
             previewoff: true,
             cb: 0
@@ -609,7 +683,6 @@ function _internal(url) {
         //Shorthands
         var selector = settings.selector,
             requestDelay = settings.requestDelay,
-            forms = settings.forms,
             prefetch = settings.prefetch,
             previewoff = settings.previewoff,
             cb = settings.cb;
@@ -619,13 +692,18 @@ function _internal(url) {
             if(!h) {
                 $gthis = $this;
                 $.cd(0, 0, settings);
+                $.frms(0, 0, settings);
                 $.slides(0, settings);
                 //$.slides($.pronto);
                 $.cd("i", $gthis);
 				_init_p();
                 return $this;
             }
-            else if(h.iO("/")) { 
+            if(typeof(h) === "object") { 
+                _request(h.href);
+                 return;
+            }
+            if(h.iO("/")) { 
                 _request(h, true, true);
                  return 'OK';
             }
@@ -643,8 +721,10 @@ function _internal(url) {
             }
             
             settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
-            _ajaxify_forms();
-            $.slides("i");
+            $.frms("d", $("body")); //Select forms in whole body
+            $.frms("a"); //Ajaxify forms
+            $.frms("d", $gthis); //Every further pass - select forms in content div(s) only
+            $.slides("i"); //Init slideshow
         }
 		
         //Dummy function for hoverIntent
@@ -652,12 +732,12 @@ function _internal(url) {
 
         //Prefetch target page on hoverIntent
         function _prefetch(e) {
-            _init_rq(); // Assume not a POST
+            $.rq("i"); // Initialise request
             
             var link = e.currentTarget;
             
             //Validate link internal and not the same URL
-            if (_diffHost(link)) return false;
+            if (!_internal(link)) return false;
             if (currentURL == link.href) return false;
 			
             var req2 = function () {
@@ -668,96 +748,19 @@ function _internal(url) {
         }
 
         function _isInDivs(link) {
-            var isInDivs = false;
+            var is = false;
             $gthis.each(function () {
-                try {
-                    if ($(link).parents("#" + $(this).attr("id")).length > 0) isInDivs = true;
-                } catch (e) {
-                    alert(e);
-                }
+                if ($(link).parents("#" + $(this).attr("id")).length > 0) is = true;
             });
-            return isInDivs;
+            
+            return is;
         }
 
-        function _b(m, n) {
-            if (m.indexOf("?") > 0) {
-                m = m.substring(0, m.indexOf("?"));
-            }
-            return m + "?" + n;
-        }
-		
-        function _k() {
-            var o = fm.serialize();
-            var n = $("input[name][type=submit]", fm);
-            if (n.length === 0) return o;
-            var p = n.attr("name") + "=" + n.val();
-            if (o.length > 0) {
-                o += "&" + p;
-            } else {
-                o = p;
-            }
-            return o;
-        }
-        
-        function _init_rq() {
-            rq = {};
-            rq.post = {};
-            rq.post.is = false;
-            rq.post.data = null;
-            rq.same = false;
-        }
-        
-        function _root(u) {
-            u = u.iO('?') ? u.split('?')[0] : u;
-        }
-        
-        function _sameRoot(u1, u2) {
-            return _root(u1) === _root(u2);
-        }
-        
-        function _ajaxify_forms(mode) { 
-            if (!forms) return false;
-            
-            var divs;
-            divs = mode ? $gthis : $("body");
-            divs.find(forms).filter(function() {
-                return _internal($(this).attr("action"));
-            }).submit(function (q) {
-                fm = $(q.target);
-                if (!fm.is("form")) {
-                    fm = fm.filter("input[type=submit]").parents("form:first");
-                    if (fm.length === 0) {
-                        return true;
-                    }
-                }
-                var p = _k();
-                var g = "get",
-                    m = fm.attr("method");
-                if (m.length > 0 && m.toLowerCase() == "post") g = "post";
-                var h, s, a = fm.attr("action");
-                if (a && a.length > 0) h = a;
-                else h = currentURL; 
-                s = _sameRoot(h, currentURL);
-                
-                _init_rq();
-                rq.same = s;
-                
-                if (g == "get") h = _b(h, p);
-                else {
-                    rq.post.is = true;
-                    rq.post.data = p;
-                }
-                _trigger("submit", h);
-                _request(h);
-                return false;
-            });
-        }
- 
         // Handle link clicks
         function _click(e, mode) {
             var link = e.currentTarget;
-            _init_rq();
-            if (_exoticKey(e) || _diffHost(link)) return; // Ignore everything but normal click and internal URLs
+            $.rq("i");
+            if (_exoticKey(e) || !_internal(link)) return; // Ignore everything but normal click and internal URLs
             if (_hashChange(link)) { // Only the hash part has changed
                 _saveState(); // Update state on hash change
                 return true;
@@ -781,7 +784,7 @@ function _internal(url) {
                 _render(e, !notPush, mode);
             };
 			
-            fn(href, reqr, rq); //Call "fn" - handler of parent, passing "rq" - request details
+            fn(href, reqr); //Call "fn" - handler of parent
             }
 
         function _render(e, doPush, mode) {
@@ -810,13 +813,13 @@ function _internal(url) {
 
         // Handle back/forward navigation
         function _onPop(e) {
-            _init_rq();
+            $.rq("i");
             
             var data = e.originalEvent.state;
             
             // Check if data exists
             if (data !== null && data.url !== currentURL) {
-                rq.same = _sameRoot(data.url, currentURL);
+                $.rq("s", _sameRoot(data.url, currentURL));
                 _trigger("request", e); // Fire request event
                 var req3 = function () { //Callback - continue with _render()
                     _render(e, false, false);
@@ -844,10 +847,8 @@ function _internal(url) {
             _trigger("load", e);  // Fire load event
 
             // Update DOM and fetch canonical URL - important for handling re-directs
-            canURL = fn('-', rq, $gthis); 
-            
+            canURL = fn('-', $gthis);
             $('title').html(fn('title').html()); // Update title
-            
             $.cd("2", function () { _doRender2(e, url, doPush, mode, canURL); });
        }
 
@@ -855,19 +856,13 @@ function _internal(url) {
             //Set current URL to canonical if no hash or parameters in current URL
             if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
 
-            _ajaxify_forms(true);
+            $.frms("a"); //Ajaxify forms
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
             if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) {
                 var $el = $('#' + url.split('#')[1]), scrollTop;
-
-                if ($el.length) {
-                    scrollTop = $el.offset().top;
-                }
-                
-                if (scrollTop !== false) {
-                    $(window).scrollTop(scrollTop);
-                }
+                if ($el.length) scrollTop = $el.offset().top;
+                if (scrollTop !== false) $(window).scrollTop(scrollTop);
             }
 
             _doPush(url, doPush); // Push new states to the stack on new url
@@ -882,9 +877,9 @@ function _internal(url) {
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
 
-        function _diffHost(link) {
+        /*function _diffHost(link) {
             return (window.location.protocol !== link.protocol || window.location.host !== link.host);
-        }
+        }*/
 
         function _exoticKey(e) {
             return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
