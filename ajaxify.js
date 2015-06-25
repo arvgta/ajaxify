@@ -189,7 +189,8 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
 		
 	ld: function ($t, $h) {
         $h.find(".ajy-script").each(function(){
-            if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
+            //if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
+            if(!($(this).attr("src"))) $(this).replaceWith('');
             else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
         });
             
@@ -334,7 +335,7 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
             }
         }
     },
-    apptext: function (t) { //$.log('Apptext: ' + t);
+    apptext: function (t) { 
         var scriptNode = document.createElement('script');
         scriptNode.appendChild(document.createTextNode(t));
         $.cd("g").get(0).appendChild(scriptNode);
