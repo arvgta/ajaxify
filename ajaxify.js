@@ -281,7 +281,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
 // "a" - handle inline scripts
 // "c" - fetch canonical URL
 // otherwise - delta loading
-pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", style: true }, function (o) {
+pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: false, style: true }, function (o) {
     if (o === "i") {
         if(!$s) $s = $();
         return true;
@@ -322,6 +322,8 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         });
     },
     addtext: function (t) {
+        if(inlineappend) return _apptext(t);
+        
         try {
             $.globalEval(t);
         } catch (e1) {
@@ -331,6 +333,11 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
                  $.log("Error in inline script : " + t + "\nError code : " + e2);
             }
         }
+    },
+    apptext: function (t) { //$.log('Apptext: ' + t);
+        var scriptNode = document.createElement('script');
+        scriptNode.appendChild(document.createTextNode(t));
+        $.cd("g").get(0).appendChild(scriptNode);
     },
     addstyle: function (t) {
         $("head").append('<style type="text/css">' + t + '</style>');
@@ -466,8 +473,10 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
 
 pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return;
+    
+    if(o === "g") return cd;
 
-	if (o === "i") {
+	if(o === "i") {
         cd = p.first();
         aniTrue = aniTime && aniParams;
         cdwidth = cd.width();
