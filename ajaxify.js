@@ -677,14 +677,20 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     }
 });
 
+pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
+    if(!o) return;
+
+    if(o === "-" && requestTimer) return clearTimeout(requestTimer);
+    if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay);
+});
+
 (function ($) {
     var Pronto = function (options) {
-        var requestTimer = null, $gthis;
+        var $gthis;
 
         // Default Options
         var settings = $.extend({
             selector: "a:not(.no-ajaxy):not([target='_blank'])",
-            requestDelay: 0,
             prefetch: true,
             previewoff: true,
             cb: 0
@@ -692,7 +698,6 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
 
         //Shorthands
         var selector = settings.selector,
-            requestDelay = settings.requestDelay,
             prefetch = settings.prefetch,
             previewoff = settings.previewoff,
             cb = settings.cb;
@@ -704,6 +709,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
                 $.cd(0, 0, settings);
                 $.frms(0, 0, settings);
                 $.slides(0, settings);
+                $.rqTimer(0, settings);
                 //$.slides($.pronto);
                 $.cd("i", $gthis);
 				_init_p();
@@ -798,16 +804,12 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
             }
 
         function _render(e, doPush, mode) {
-            if (requestTimer !== null) {
-                clearTimeout(requestTimer);
-                requestTimer = null;
-            }
-            
+            $.rqTimer('-');
             _trigger("beforeload", e);
             
-            requestTimer = setTimeout(function () {
+            $.rqTimer(function () {
                 _render2(e, doPush, mode);
-            }, requestDelay);
+            });
         }
 		
         function _render2(e, doPush, mode) {
@@ -886,10 +888,6 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
             url = '/' + url.replace(rootUrl,'');
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
-
-        /*function _diffHost(link) {
-            return (window.location.protocol !== link.protocol || window.location.host !== link.host);
-        }*/
 
         function _exoticKey(e) {
             return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
