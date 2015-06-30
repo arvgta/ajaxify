@@ -426,7 +426,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         
         return true;
     },
-    classAlways: function ($t, PK) {
+    classAlways: function ($t, PK) { 
         $t.each(function () {
         if ($(this).attr("data-class") == "always") {
             _iScript($(this).attr(PK), PK);
@@ -586,14 +586,8 @@ function _internal(url) {
     return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
 }
 
-function _root(u) {
-    u = u.iO('?') ? u.split('?')[0] : u;
-}
+function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
         
-function _sameRoot(u1, u2) {
-    return _root(u1) === _root(u2);
-}
-
 pO("rq", { ispost: 0, data: 0, same: 0 }, 0, function (o, p) {
     if(o === "i") {
         ispost = false;
@@ -603,13 +597,13 @@ pO("rq", { ispost: 0, data: 0, same: 0 }, 0, function (o, p) {
 	}
 	
 	if(o === "s") {
-        if(p) same = p;
-		return same;
+        if(p) same = (_root(p) === _root(currentURL));
+        return same;
 	}
 	
 	if(o === "is") {
         if(p) ispost = p;
-		return ispost;
+        return ispost;
 	}
 	
 	if(o === "d") {
@@ -643,7 +637,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         else h = currentURL; 
                 
         $.rq("i");
-        $.rq("s", _sameRoot(h, currentURL));
+        $.rq("s", h);
                
         if (g == "get") h = _b(h, p);
         else {
@@ -800,6 +794,7 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
                 _render(e, !notPush, mode);
             };
 			
+            $.rq("s", href);
             fn(href, reqr); //Call "fn" - handler of parent
             }
 
@@ -827,17 +822,16 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
         function _onPop(e) {
             $.rq("i");
             
-            var data = e.originalEvent.state;
+            var data = e.originalEvent.state, url = data ? data.url : 0;
             
             // Check if data exists
-            if (data !== null && data.url !== currentURL) {
-                $.rq("s", _sameRoot(data.url, currentURL));
-                _trigger("request", e); // Fire request event
-                var req3 = function () { //Callback - continue with _render()
-                    _render(e, false, false);
-                };
-                fn(data.url, req3); //Call "fn" - handler of parent, passing URL
-            }
+            if (!url || url === currentURL) return;
+            $.rq("s", url);
+            _trigger("request", e); // Fire request event
+            var req3 = function () { //Callback - continue with _render()
+                _render(e, false, false);
+            };
+            fn(url, req3); //Call "fn" - handler of parent, passing URL
         }
 
         // Push new states to the stack on new url
