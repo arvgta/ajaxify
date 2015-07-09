@@ -95,6 +95,17 @@ function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexO
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
 
+//Global helpers
+function _trigger(t, e){ jQuery(window).trigger('pronto.' + t, e); }
+function _internal(url) { 
+    if (!url) return false;
+    if(typeof(url) === 'object') url = url.href;
+    if (url==='') return true;
+    return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
+}
+
+function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
+
 // The stateful Cache plugin
 // Usage: 
 // 1) $.cache() - returns currently cached page
@@ -578,18 +589,15 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
     }
 });
 
-function _trigger(t, e){ jQuery(window).trigger('pronto.' + t, e); }
-function _internal(url) { 
-    if (!url) return false;
-    if(typeof(url) === 'object') url = url.href;
-    if (url==='') return true;
-    return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
-}
+pO("rq", { ispost: 0, data: 0, same: 0, u: 0 }, 0, function (o, p) {
+    if(o === "c") {
+        if(!p) return u;
+		if(u === p) return true;
+        u = p;
+        return false;  
+	}
 
-function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
-        
-pO("rq", { ispost: 0, data: 0, same: 0 }, 0, function (o, p) {
-    if(o === "i") {
+	if(o === "i") {
         ispost = false;
         data = null;
         same = false;
@@ -769,6 +777,7 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
         // Handle link clicks
         function _click(e, mode) {
             var link = e.currentTarget;
+            if($.rq("c", link.href)) return;
             $.rq("i");
             if (_exoticKey(e) || !_internal(link)) return; // Ignore everything but normal click and internal URLs
             if (_hashChange(link)) { // Only the hash part has changed
@@ -777,7 +786,7 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
             }
             e.preventDefault();
             e.stopPropagation();
-            if (currentURL == link.href) {
+            if (currentURL === link.href) {
                 _saveState();
             } else _request(e, mode);
         }
