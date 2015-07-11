@@ -589,19 +589,31 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
     }
 });
 
-pO("rq", { ispost: 0, data: 0, same: 0, u: 0 }, 0, function (o, p) {
-    if(o === "c") {
-        if(!p) return u;
-		if(u === p) return true;
-        u = p;
-        return false;  
+pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+     if(o === "c") {
+        if(!p) return sema;
+        e = p;
+        l = e.currentTarget;
+        h = l.href;
+		if(sema === h) return false;
+        sema = h;
+        return true;
 	}
-
+    
+    if(o === "v") {
+        if(!p) return false;
+        e = p;
+        l = e.currentTarget;
+        h = l.href;
+        if(!_internal(h)) return false;
+        o = "i";
+    }
+    
 	if(o === "i") {
         ispost = false;
         data = null;
         same = false;
-        return;
+        return l;
 	}
 	
 	if(o === "s") {
@@ -750,13 +762,8 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 
         //Prefetch target page on hoverIntent
         function _prefetch(e) {
-            $.rq("i"); // Initialise request
-            
-            var link = e.currentTarget;
-            
-            //Validate link internal and not the same URL
-            if (!_internal(link)) return false;
-            if (currentURL == link.href) return false;
+            var link = $.rq("v", e); //validate internal URL
+            if (!link || currentURL == link.href) return false;
 			
             var req2 = function () {
                 if (previewoff === true) return false;
@@ -775,20 +782,17 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
         }
 
         // Handle link clicks
-        function _click(e, mode) {
-            var link = e.currentTarget;
-            if($.rq("c", link.href)) return;
-            $.rq("i");
-            if (_exoticKey(e) || !_internal(link)) return; // Ignore everything but normal click and internal URLs
+        function _click(e, mode) { 
+            if(!$.rq("c", e)) return;
+            var link = $.rq("v", e);  //validate internal URL
+            if (_exoticKey(e) || !link) return; // Ignore everything but normal click
             if (_hashChange(link)) { // Only the hash part has changed
                 _saveState(); // Update state on hash change
                 return true;
             }
             e.preventDefault();
             e.stopPropagation();
-            if (currentURL === link.href) {
-                _saveState();
-            } else _request(e, mode);
+           _request(e, mode);
         }
 
         // Request new url
