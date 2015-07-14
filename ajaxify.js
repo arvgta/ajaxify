@@ -293,7 +293,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
 // "a" - handle inline scripts
 // "c" - fetch canonical URL
 // otherwise - delta loading
-pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: false, style: true }, function (o) {
+pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") {
         if(!$s) $s = $();
         return true;
