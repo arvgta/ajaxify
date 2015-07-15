@@ -772,7 +772,7 @@ pO("hApi", 0, 0, function (o) {
             if(h.iO("/")) {
                  $.rq("h", h);
                  $.rq("m", true);				 
-				_request();
+				_request(true);
             }
         };
 
