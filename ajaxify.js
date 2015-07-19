@@ -240,7 +240,8 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
                 $.pages([hin, $.cache()]); 
                 if(p) p(error);
             } catch (e) {}
-        }
+        },
+		async: true
         });
     },
 		
@@ -695,6 +696,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         
         _trigger("submit", h);
         $().pronto({ href: h });
+		
         return false;
     });
 }, {
@@ -730,7 +732,7 @@ pO("hApi", 0, 0, function (o) {
     if(!o) return;
 
     if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL);
-	else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
+    else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
 (function ($) {
@@ -817,10 +819,10 @@ pO("hApi", 0, 0, function (o) {
 
         // Handle link clicks
         function _click(e, mode) { 
-            if(!$.rq("c", e)) return;
-            $.rq("m", mode);
+            if(!$.rq("c", e)) return; //Central semaphore - prevent multiple _click()s
             var link = $.rq("v", e);  //validate internal URL
-            if ( !link || _exoticKey(e)) return; // Ignore everything but normal click
+            $.rq("m", mode);
+            if (!link || _exoticKey(e)) return; // Ignore everything but normal click
             if (_hashChange(link)) { // Only the hash part has changed
                 $.hApi("="); // Update state on hash change
                 return true;
@@ -846,7 +848,7 @@ pO("hApi", 0, 0, function (o) {
 			
             $.rq("s", href);
             fn(href, reqr); //Call "fn" - handler of parent
-            }
+        }
 
         function _render() {
             $.rqTimer('-');
@@ -867,7 +869,7 @@ pO("hApi", 0, 0, function (o) {
             if (!url || url === currentURL) return;
             $.rq("s", url);
             _trigger("request"); // Fire request event
-            fn(url, _render); //Call "fn" - handler of parent, passing URL, continue with _render(false, false)
+            fn(url, _render); //Call "fn" - handler of parent, passing URL, continue with _render()
         }
 
         // Push new states to the stack on new url
@@ -895,7 +897,7 @@ pO("hApi", 0, 0, function (o) {
             $.frms("a"); //Ajaxify forms - in content divs only
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
-            if (url.iO('#') && (url.iO('#') < url.length - 1) && $.rq("m") !== true) {
+            if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) {
                 var $el = $('#' + url.split('#')[1]), scrollTop;
                 if ($el.length) scrollTop = $el.offset().top;
                 if (scrollTop !== false) $(window).scrollTop(scrollTop);
