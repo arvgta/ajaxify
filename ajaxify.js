@@ -241,7 +241,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
                 if(p) p(error);
             } catch (e) {}
         },
-		async: true
+        async: true
         });
     },
 		
@@ -591,7 +591,7 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
     }
 });
 
-pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
      if(o === "c") {
         if(!p) return sema;
         e = p;
@@ -632,7 +632,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, e: 0, l: 0, h
 	if(o === "l") return l;
     if(o === "e") {
         if(p) e = p;
-        return e ? e : h; // Return "e" of if not given "h"
+        return e ? e : h; // Return "e" or if not given "h"
     }
     
     if(o === "m") {
@@ -659,6 +659,13 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, e: 0, l: 0, h
         if(p) data = p;
         return data;
 	}
+	
+    if(o === "can") {
+        if(p) can = p;
+        return can;
+	}
+	
+	if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
 
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
@@ -763,7 +770,7 @@ pO("hApi", 0, 0, function (o) {
                 $.rqTimer(0, settings);
                 //$.slides($.pronto);
                 $.cd("i", $gthis);
-				_init_p();
+                _init_p();
                 return $this;
             }
             if(typeof(h) === "object") { 
@@ -774,7 +781,7 @@ pO("hApi", 0, 0, function (o) {
             if(h.iO("/")) {
                  $.rq("h", h);
                  $.rq("m", true);				 
-				_request(true);
+                _request(true);
             }
         };
 
@@ -789,7 +796,7 @@ pO("hApi", 0, 0, function (o) {
             }
             
             var $body = $("body");
-			$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
+            $body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
             $.frms("d", $body); //Select forms in whole body
             $.frms("a"); //Ajaxify forms
             $.frms("d", $gthis); //Every further pass - select forms in content div(s) only
@@ -830,20 +837,20 @@ pO("hApi", 0, 0, function (o) {
             e.preventDefault();
             e.stopPropagation();
            
-		   _request();
+            _request();
         }
 
         // Request new url
         function _request(notPush) {
             var href = $.rq("h");
-			$.rq("p", !notPush);
+            $.rq("p", !notPush);
             _trigger("request"); // Fire request event
 			var reqr = function (err) { //Callback - continue with _render()
                 if (err) { 
                     $.log('Error : ' + err); 
                     _trigger("error", err); 
                 }
-				_render();
+                _render();
             };
 			
             $.rq("s", href);
@@ -856,7 +863,7 @@ pO("hApi", 0, 0, function (o) {
             $.rqTimer(_render2);
         }
 		
-        function _render2() { $.cd("1", _doRender); }
+        function _render2() { $.cd("1", _doRender); } //Animate to
 
         // Handle back/forward navigation
         function _onPop(e) {
@@ -869,7 +876,7 @@ pO("hApi", 0, 0, function (o) {
             if (!url || url === currentURL) return;
             $.rq("s", url);
             _trigger("request"); // Fire request event
-            fn(url, _render); //Call "fn" - handler of parent, passing URL, continue with _render()
+            fn(url, _render); //Call "fn" - handler of parent, continue with _render()
         }
 
         // Push new states to the stack on new url
@@ -880,20 +887,16 @@ pO("hApi", 0, 0, function (o) {
 
         // Render HTML
        function _doRender() {
-            var url, canURL, e = $.rq("e"); //Canonical URL
-            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;
+            var url, e = $.rq("e"); 
+            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //Get URL from event
             _trigger("load");  // Fire load event
-
-            // Update DOM and fetch canonical URL - important for handling re-directs
-            canURL = fn('-', $gthis);
+            $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL - important for handling re-directs
             $('title').html(fn('title').html()); // Update title
-            $.cd("2", function () { _doRender2(url, canURL); });
+            $.cd("2", function () { _doRender2(url); }); //Animate back
        }
 
-       function _doRender2(url, canURL) {
-            //Set current URL to canonical if no hash or parameters in current URL
-            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
-
+       function _doRender2(url) {
+            url = $.rq("can?", url); //Set current URL to canonical if no hash or parameters in current URL
             $.frms("a"); //Ajaxify forms - in content divs only
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
