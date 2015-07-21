@@ -787,23 +787,22 @@ pO("hApi", 0, 0, function (o) {
         function _init_p() {
             currentURL = window.location.href; // Capture current url & state
             $.hApi("="); // Set initial state
-            $(window).on("popstate", _onPop); //Set handler for popState
+            $(window).on("popstate", _onPop); // Set handler for popState
             if (prefetch) {
-                $(selector).hoverIntent(_prefetch, function(){}); //If "prefetch" option defined then set handler to "_prefetch" on hoverIntent
-                $(selector).on("touchstart", _prefetch); //for touchscreens
+                $(selector).hoverIntent(_prefetch, function(){});
+                $(selector).on("touchstart", _prefetch); // for touchscreens
             }
             
             var $body = $("body");
-            $body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
-            $.frms("d", $body); //Select forms in whole body
-            $.frms("a"); //Ajaxify forms
-            $.frms("d", $gthis); //Every further pass - select forms in content div(s) only
-            $.slides("i"); //Init slideshow
+            $body.on("click.pronto", selector, _click); // Real click handler -> _click()
+            $.frms("d", $body); // Select forms in whole body
+            $.frms("a"); // Ajaxify forms
+            $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
+            $.slides("i"); // Init slideshow
         }
 		
-        //Prefetch target page on hoverIntent or touchstart
-        function _prefetch(e) {
-            var link = $.rq("v", e); //validate internal URL
+        function _prefetch(e) { //...target page on hoverIntent or touchstart
+            var link = $.rq("v", e); // validate internal URL
             if (!link || currentURL == link.href) return false;
             fn('+', link.href, function () {
                 if (previewoff === true) return false;
@@ -820,77 +819,71 @@ pO("hApi", 0, 0, function (o) {
             return is;
         }
 
-        // Handle link clicks
-        function _click(e, mode) { 
-            if(!$.rq("c", e)) return; //Central semaphore - prevent multiple _click()s
-            var link = $.rq("v", e);  //validate internal URL
-            $.rq("m", mode); //Store mode variable -> "true" means don't jump on hash change
+        function _click(e, mode) { // Handle link clicks 
+            if(!$.rq("c", e)) return; // Central semaphore - prevents multiple _click()s
+            var link = $.rq("v", e);  // validate internal URL
+            $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
             if (!link || _exoticKey(e)) return; // Ignore everything but normal click
             if (_hashChange(link)) { // Only the hash part has changed
                 $.hApi("="); // Update state on hash change
                 return true;
             }
-            e.preventDefault();
-            e.stopPropagation();
+            e.preventDefault(); // Stop normal click behaviour
+            e.stopPropagation(); // Stop "bubbling-up"
            
-            _request();
+            _request(); // Continue with _request()
         }
 
-        // Request new url
-        function _request(notPush) {
-            $.rq("p", !notPush);
+        function _request(notPush) { // ... new url
+            $.rq("p", !notPush); // mode for _doPush()
             _trigger("request"); // Fire request event
-            $.rq("s"); //Set "same" variable
-            fn($.rq("h"), function (err) { //Call "fn" - handler of parent
+            $.rq("s"); // Set "same" variable
+            fn($.rq("h"), function (err) { // Call "fn" - handler of parent
                 if (err) { 
                     $.log('Error in _request : ' + err); 
                     _trigger("error", err); 
                 }
-                _render(); //continue with _render()
+                _render(); // continue with _render()
             });
         }
 
-        function _render() {
-            $.rqTimer('-');
+        function _render() { // Clear and set timer
+            $.rqTimer('-'); // Clear
             _trigger("beforeload");
-            $.rqTimer(_render2);
+            $.rqTimer(_render2); // Set.  Continue with _render2() 
         }
 		
-        function _render2() { $.cd("1", _doRender); } //Animate to
+        function _render2() { $.cd("1", _doRender); } // Animate to
 
-        // Handle back/forward navigation
-        function _onPop(e) {
+        function _onPop(e) { // Handle back/forward navigation
             $.rq("i");
             $.rq("e", e);
             
             var data = e.originalEvent.state, url = data ? data.url : 0;
             
-            // Check if data exists
-            if (!url || url === currentURL) return;
+            if (!url || url === currentURL) return;  // Check if data exists
             $.rq("s", url);
             _trigger("request"); // Fire request event
-            fn(url, _render); //Call "fn" - handler of parent, continue with _render()
+            fn(url, _render); // Call "fn" - handler of parent, continue with _render()
         }
 
-        // Push new states to the stack on new url
-        function _doPush(url) {
+        function _doPush(url) { // Push new states to the stack on new url
             currentURL = url;
             $.hApi($.rq("p") ? "+" : "=");
         }
 
-        // Render HTML
-       function _doRender() {
-            var url, e = $.rq("e"); 
-            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //Get URL from event
+       function _doRender() { // Render HTML
             _trigger("load");  // Fire load event
-            $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL - important for handling re-directs
+            $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
             $('title').html(fn('title').html()); // Update title
-            $.cd("2", function () { _doRender2(url); }); //Animate back
+            $.cd("2", _doRender2); // Animate back - continue with _doRender2()
        }
 
-       function _doRender2(url) {
-            url = $.rq("can?", url); //Set current URL to canonical if no hash or parameters in current URL
-            $.frms("a"); //Ajaxify forms - in content divs only
+       function _doRender2() { // Continue render
+            var e = $.rq("e"), // Fetch event 
+            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; // Get URL from event
+            url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
+            $.frms("a"); // Ajaxify forms - in content divs only
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
             if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) {
@@ -902,11 +895,10 @@ pO("hApi", 0, 0, function (o) {
             _doPush(url); // Push new state to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
             _trigger("render"); // Fire render event
-            if(cb) cb();
+            if(cb) cb(); // Callback user's handler, if specified
         }
 
-        // Google Analytics support
-        function _gaCaptureView(url) {
+        function _gaCaptureView(url) { // Google Analytics support
             url = '/' + url.replace(rootUrl,'');
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
