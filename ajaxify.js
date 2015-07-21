@@ -645,9 +645,8 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
 		return push;
     }
     
-	if(o === "s") {
-        if(p) same = (_root(p) === _root(currentURL));
-        return same;
+	if(o === "s") { var t = p ? p : h;
+        return same = (_root(t) === _root(currentURL));
 	}
 	
 	if(o === "is") {
@@ -768,7 +767,6 @@ pO("hApi", 0, 0, function (o) {
                 $.frms(0, 0, settings);
                 $.slides(0, settings);
                 $.rqTimer(0, settings);
-                //$.slides($.pronto);
                 $.cd("i", $gthis);
                 _init_p();
                 return $this;
@@ -807,12 +805,10 @@ pO("hApi", 0, 0, function (o) {
         function _prefetch(e) {
             var link = $.rq("v", e); //validate internal URL
             if (!link || currentURL == link.href) return false;
-			
-            var req2 = function () {
+            fn('+', link.href, function () {
                 if (previewoff === true) return false;
                 if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
-            };
-            fn('+', link.href, req2);
+            });
         }
 
         function _isInDivs(link) {
@@ -828,7 +824,7 @@ pO("hApi", 0, 0, function (o) {
         function _click(e, mode) { 
             if(!$.rq("c", e)) return; //Central semaphore - prevent multiple _click()s
             var link = $.rq("v", e);  //validate internal URL
-            $.rq("m", mode);
+            $.rq("m", mode); //Store mode variable -> "true" means don't jump on hash change
             if (!link || _exoticKey(e)) return; // Ignore everything but normal click
             if (_hashChange(link)) { // Only the hash part has changed
                 $.hApi("="); // Update state on hash change
@@ -842,19 +838,16 @@ pO("hApi", 0, 0, function (o) {
 
         // Request new url
         function _request(notPush) {
-            var href = $.rq("h");
             $.rq("p", !notPush);
             _trigger("request"); // Fire request event
-			var reqr = function (err) { //Callback - continue with _render()
+            $.rq("s"); //Set "same" variable
+            fn($.rq("h"), function (err) { //Call "fn" - handler of parent
                 if (err) { 
-                    $.log('Error : ' + err); 
+                    $.log('Error in _request : ' + err); 
                     _trigger("error", err); 
                 }
-                _render();
-            };
-			
-            $.rq("s", href);
-            fn(href, reqr); //Call "fn" - handler of parent
+                _render(); //continue with _render()
+            });
         }
 
         function _render() {
