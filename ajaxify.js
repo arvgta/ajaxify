@@ -41,6 +41,7 @@ Options default values
     inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
     inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
     inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
+    inlineappend : true, // append scripts to the main content div, instead of "eval"-ing them
     style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
     prefetch : true, // Plugin pre-fetches pages on hoverIntent or touchstart
  
@@ -96,7 +97,7 @@ function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexO
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
 
 //Global helpers
-function _trigger(t, e){ jQuery(window).trigger('pronto.' + t, e); }
+function _trigger(t, e){ e = e ? e : jQuery.rq("e"); jQuery(window).trigger('pronto.' + t, e); }
 function _internal(url) { 
     if (!url) return false;
     if(typeof(url) === 'object') url = url.href;
@@ -186,7 +187,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     lSel: function ($t) { //load page into DOM and handle scripts
         pass++;
         _lDivs($t);
-        $.scripts($.rq("s"));
+        $.scripts($.rq("s?"));
         $.scripts("s");
         $.scripts("a");
         return $.scripts("c");
@@ -239,7 +240,8 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
                 $.pages([hin, $.cache()]); 
                 if(p) p(error);
             } catch (e) {}
-        }
+        },
+        async: true
         });
     },
 		
@@ -589,7 +591,7 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
     }
 });
 
-pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
      if(o === "c") {
         if(!p) return sema;
         e = p;
@@ -613,13 +615,41 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, e: 0, l: 0, h: 0}, 0, function 
         ispost = false;
         data = null;
         same = false;
+        mode = false;
+        push = false;
         return l;
 	}
-	
-	if(o === "s") {
-        if(p) same = (_root(p) === _root(currentURL));
-        return same;
+    
+    if(o === "h") { // Access href hard
+        if(p) {
+            e = 0;  // Reset e
+            h = p;  // Poke in href hard
+        }
+        
+        return h;
+    }
+    
+	if(o === "l") return l;
+    if(o === "e") {
+        if(p) e = p;
+        return e ? e : h; // Return "e" or if not given "h"
+    }
+    
+    if(o === "m") {
+        if(p) mode = p;
+		return mode;
+    }
+
+    if(o === "p") {
+        if(p) push = p;
+		return push;
+    }
+    
+	if(o === "s") { var t = p ? p : h;
+        same = (_root(t) === _root(currentURL));
 	}
+    
+    if(o === "s?") return same;
 	
 	if(o === "is") {
         if(p) ispost = p;
@@ -630,6 +660,13 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, e: 0, l: 0, h: 0}, 0, function 
         if(p) data = p;
         return data;
 	}
+	
+    if(o === "can") {
+        if(p) can = p;
+        return can;
+	}
+	
+	if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
 
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
@@ -667,6 +704,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         
         _trigger("submit", h);
         $().pronto({ href: h });
+		
         return false;
     });
 }, {
@@ -698,6 +736,13 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay);
 });
 
+pO("hApi", 0, 0, function (o) {
+    if(!o) return;
+
+    if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL);
+    else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
+});
+
 (function ($) {
     var Pronto = function (options) {
         var $gthis;
@@ -724,52 +769,47 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
                 $.frms(0, 0, settings);
                 $.slides(0, settings);
                 $.rqTimer(0, settings);
-                //$.slides($.pronto);
                 $.cd("i", $gthis);
-				_init_p();
+                _init_p();
                 return $this;
             }
             if(typeof(h) === "object") { 
-                _request(h.href);
+                $.rq("h", h.href);
+                _request();
                  return;
             }
-            if(h.iO("/")) { 
-                _request(h, true, true);
-                 return 'OK';
+            if(h.iO("/")) {
+                 $.rq("h", h);
+                 $.rq("m", true);				 
+                _request(true);
             }
         };
 
         // Private Methods
         function _init_p() {
-            settings.$body = $("body");
             currentURL = window.location.href; // Capture current url & state
-            _saveState(); // Set initial state
-            $(window).on("popstate", _onPop); //Set handler for popState
+            $.hApi("="); // Set initial state
+            $(window).on("popstate", _onPop); // Set handler for popState
             if (prefetch) {
-                $(selector).hoverIntent(_prefetch, _drain); //If "prefetch" option defined then set handler to "_prefetch" on hoverIntent
-                $(selector).on("touchstart", _prefetch); //for touchscreens
+                $(selector).hoverIntent(_prefetch, function(){});
+                $(selector).on("touchstart", _prefetch); // for touchscreens
             }
             
-            settings.$body.on("click.pronto", selector, _click); //For real clicks set handler to _click()
-            $.frms("d", $("body")); //Select forms in whole body
-            $.frms("a"); //Ajaxify forms
-            $.frms("d", $gthis); //Every further pass - select forms in content div(s) only
-            $.slides("i"); //Init slideshow
+            var $body = $("body");
+            $body.on("click.pronto", selector, _click); // Real click handler -> _click()
+            $.frms("d", $body); // Select forms in whole body
+            $.frms("a"); // Ajaxify forms
+            $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
+            $.slides("i"); // Init slideshow
         }
 		
-        //Dummy function for hoverIntent
-        function _drain() {}
-
-        //Prefetch target page on hoverIntent
-        function _prefetch(e) {
-            var link = $.rq("v", e); //validate internal URL
+        function _prefetch(e) { //...target page on hoverIntent or touchstart
+            var link = $.rq("v", e); // validate internal URL
             if (!link || currentURL == link.href) return false;
-			
-            var req2 = function () {
+            fn('+', link.href, function () {
                 if (previewoff === true) return false;
                 if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
-            };
-            fn('+', link.href, req2);
+            });
         }
 
         function _isInDivs(link) {
@@ -781,117 +821,80 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
             return is;
         }
 
-        // Handle link clicks
-        function _click(e, mode) { 
-            if(!$.rq("c", e)) return;
-            var link = $.rq("v", e);  //validate internal URL
-            if (_exoticKey(e) || !link) return; // Ignore everything but normal click
+        function _click(e, mode) { //...handler for normal clicks
+            if(!$.rq("c", e)) return; // Central semaphore - prevents multiple _click()s
+            var link = $.rq("v", e);  // validate internal URL
+            $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
+            if (!link || _exoticKey(e)) return; // Ignore everything but normal click
             if (_hashChange(link)) { // Only the hash part has changed
-                _saveState(); // Update state on hash change
+                $.hApi("="); // Update state on hash change
                 return true;
             }
-            e.preventDefault();
-            e.stopPropagation();
-           _request(e, mode);
+            e.preventDefault(); // Stop normal click behaviour
+            e.stopPropagation(); // Stop "bubbling-up"
+           
+            _request(); // Continue with _request()
         }
 
-        // Request new url
-        function _request(e, mode, notPush) {
-            var href = typeof(e) !== "string" ? e.currentTarget.href : e;
-            _trigger("request", e); // Fire request event
-			var reqr = function (err) { //Callback - continue with _render()
+        function _request(notPush) { // ... new url
+            $.rq("p", !notPush); // mode for hApi - replaceState / pushState
+            _trigger("request"); // Fire request event
+            $.rq("s"); // Set "same" variable
+            fn($.rq("h"), function (err) { // Call "fn" - handler of parent
                 if (err) { 
-                    $.log('Error : ' + err); 
+                    $.log('Error in _request : ' + err); 
                     _trigger("error", err); 
                 }
-                _render(e, !notPush, mode);
-            };
-			
-            $.rq("s", href);
-            fn(href, reqr); //Call "fn" - handler of parent
-            }
-
-        function _render(e, doPush, mode) {
-            $.rqTimer('-');
-            _trigger("beforeload", e);
-            
-            $.rqTimer(function () {
-                _render2(e, doPush, mode);
+                _render(); // continue with _render()
             });
         }
-		
-        function _render2(e, doPush, mode) {
-			$.cd("1", function () { _doRender(e, doPush, mode); });
+
+        function _render() { // Clear and set timer
+            $.rqTimer('-'); // Clear
+            _trigger("beforeload");
+            $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
         }
 
-        // Save current state
-        function _saveState() {
-            history.replaceState({ // Update state
-                url: currentURL
-            }, "state-" + currentURL, currentURL);
-        }
-
-        // Handle back/forward navigation
-        function _onPop(e) {
+        function _onPop(e) { // Handle back/forward navigation
             $.rq("i");
+            $.rq("e", e);
             
             var data = e.originalEvent.state, url = data ? data.url : 0;
             
-            // Check if data exists
-            if (!url || url === currentURL) return;
+            if (!url || url === currentURL) return;  // Check if data exists
             $.rq("s", url);
-            _trigger("request", e); // Fire request event
-            var req3 = function () { //Callback - continue with _render()
-                _render(e, false, false);
-            };
-            fn(url, req3); //Call "fn" - handler of parent, passing URL
+            _trigger("request"); // Fire request event
+            fn(url, _render); // Call "fn" - handler of parent, continue with _render()
         }
-
-        // Push new states to the stack on new url
-        function _doPush(url, doPush) {
-            currentURL = url;
-            if (doPush) {
-                history.pushState({
-                    url: currentURL
-                }, "state-" + currentURL, currentURL);
-            } else {
-                _saveState();
-            }
-        }
-
-        // Render HTML
-       function _doRender(e, doPush, mode) {
-            var url, canURL; //Canonical URL
-            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;
-            _trigger("load", e);  // Fire load event
-
-            // Update DOM and fetch canonical URL - important for handling re-directs
-            canURL = fn('-', $gthis);
+        
+        function _doRender() { // Render HTML
+            _trigger("load");  // Fire load event
+            $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
             $('title').html(fn('title').html()); // Update title
-            $.cd("2", function () { _doRender2(e, url, doPush, mode, canURL); });
-       }
+            $.cd("2", _doRender2); // Animate back - continue with _doRender2()
+        }
 
-       function _doRender2(e, url, doPush, mode, canURL) {
-            //Set current URL to canonical if no hash or parameters in current URL
-            if (canURL && canURL != url && !url.iO('#') && !url.iO('?')) url = canURL;
-
-            $.frms("a"); //Ajaxify forms
+        function _doRender2() { // Continue render
+            var e = $.rq("e"), // Fetch event 
+            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; // Get URL from event
+            url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
+            $.frms("a"); // Ajaxify forms - in content divs only
             
             //If hash in URL and hash not standalone at the end, animate scroll to it
-            if (url.iO('#') && (url.iO('#') < url.length - 1) && mode !== true) {
+            if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) {
                 var $el = $('#' + url.split('#')[1]), scrollTop;
                 if ($el.length) scrollTop = $el.offset().top;
                 if (scrollTop !== false) $(window).scrollTop(scrollTop);
             }
 
-            _doPush(url, doPush); // Push new states to the stack on new url
+            currentURL = url;
+            $.hApi($.rq("p") ? "+" : "="); // Push new state to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
-            _trigger("render", e); // Fire render event
-            if(cb) cb();
+            _trigger("render"); // Fire render event
+            if(cb) cb(); // Callback user's handler, if specified
         }
 
-        // Google Analytics support
-        function _gaCaptureView(url) {
+        function _gaCaptureView(url) { // Google Analytics support
             url = '/' + url.replace(rootUrl,'');
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
         }
