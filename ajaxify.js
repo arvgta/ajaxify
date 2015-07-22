@@ -187,7 +187,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     lSel: function ($t) { //load page into DOM and handle scripts
         pass++;
         _lDivs($t);
-        $.scripts($.rq("s"));
+        $.scripts($.rq("s?"));
         $.scripts("s");
         $.scripts("a");
         return $.scripts("c");
@@ -646,8 +646,10 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
     }
     
 	if(o === "s") { var t = p ? p : h;
-        return same = (_root(t) === _root(currentURL));
+        same = (_root(t) === _root(currentURL));
 	}
+    
+    if(o === "s?") return same;
 	
 	if(o === "is") {
         if(p) ispost = p;
@@ -819,7 +821,7 @@ pO("hApi", 0, 0, function (o) {
             return is;
         }
 
-        function _click(e, mode) { // Handle link clicks 
+        function _click(e, mode) { //...handler for normal clicks
             if(!$.rq("c", e)) return; // Central semaphore - prevents multiple _click()s
             var link = $.rq("v", e);  // validate internal URL
             $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
@@ -835,7 +837,7 @@ pO("hApi", 0, 0, function (o) {
         }
 
         function _request(notPush) { // ... new url
-            $.rq("p", !notPush); // mode for _doPush()
+            $.rq("p", !notPush); // mode for hApi - replaceState / pushState
             _trigger("request"); // Fire request event
             $.rq("s"); // Set "same" variable
             fn($.rq("h"), function (err) { // Call "fn" - handler of parent
@@ -850,10 +852,8 @@ pO("hApi", 0, 0, function (o) {
         function _render() { // Clear and set timer
             $.rqTimer('-'); // Clear
             _trigger("beforeload");
-            $.rqTimer(_render2); // Set.  Continue with _render2() 
+            $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
         }
-		
-        function _render2() { $.cd("1", _doRender); } // Animate to
 
         function _onPop(e) { // Handle back/forward navigation
             $.rq("i");
@@ -866,20 +866,15 @@ pO("hApi", 0, 0, function (o) {
             _trigger("request"); // Fire request event
             fn(url, _render); // Call "fn" - handler of parent, continue with _render()
         }
-
-        function _doPush(url) { // Push new states to the stack on new url
-            currentURL = url;
-            $.hApi($.rq("p") ? "+" : "=");
-        }
-
-       function _doRender() { // Render HTML
+        
+        function _doRender() { // Render HTML
             _trigger("load");  // Fire load event
             $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
             $('title').html(fn('title').html()); // Update title
             $.cd("2", _doRender2); // Animate back - continue with _doRender2()
-       }
+        }
 
-       function _doRender2() { // Continue render
+        function _doRender2() { // Continue render
             var e = $.rq("e"), // Fetch event 
             url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; // Get URL from event
             url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
@@ -892,7 +887,8 @@ pO("hApi", 0, 0, function (o) {
                 if (scrollTop !== false) $(window).scrollTop(scrollTop);
             }
 
-            _doPush(url); // Push new state to the stack on new url
+            currentURL = url;
+            $.hApi($.rq("p") ? "+" : "="); // Push new state to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
             _trigger("render"); // Fire render event
             if(cb) cb(); // Callback user's handler, if specified
