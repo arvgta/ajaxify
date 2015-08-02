@@ -280,7 +280,10 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
         else return $().pronto(o);
     }, {
         init: function (s) {
-            if (!api || !pluginon) return false;
+            if (!api || !pluginon) {
+                $.log("Gracefully exiting...");
+                return false;
+            }
             $.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
@@ -880,13 +883,7 @@ pO("hApi", 0, 0, function (o) {
             url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
             $.frms("a"); // Ajaxify forms - in content divs only
             
-            //If hash in URL and hash not standalone at the end, animate scroll to it
-            if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) {
-                var $el = $('#' + url.split('#')[1]), scrollTop;
-                if ($el.length) scrollTop = $el.offset().top;
-                if (scrollTop !== false) $(window).scrollTop(scrollTop);
-            }
-
+            _scroll2id(url);
             currentURL = url;
             $.hApi($.rq("p") ? "+" : "="); // Push new state to the stack on new url
             _gaCaptureView(url); // Trigger analytics page view
@@ -894,6 +891,14 @@ pO("hApi", 0, 0, function (o) {
             if(cb) cb(); // Callback user's handler, if specified
         }
 
+        function _scroll2id(url) { //If hash in URL and hash not standalone at the end, 
+            if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { 
+                var $el = $('#' + url.split('#')[1]), scrollTop;
+                if ($el.length) scrollTop = $el.offset().top;
+                if (scrollTop !== false) $(window).scrollTop(scrollTop); // ...animate
+            }
+        }
+        
         function _gaCaptureView(url) { // Google Analytics support
             url = '/' + url.replace(rootUrl,'');
             if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
