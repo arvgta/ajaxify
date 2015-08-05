@@ -272,7 +272,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
     if(!o || typeof(o) !== 'string') {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
-                $this.pronto(0, settings); //Pronto initialisation
+                $().pronto(0, settings); //Pronto initialisation
+                $this.pronto("i"); 
                 if(deltas) $.scripts("1"); //delta-loading initialisation
             }
         });
@@ -556,8 +557,6 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
             idle: idleTime
         });     
     }
-	
-    //sp = o;
 }, {
     slide: function() { 
         if(!sliding) return;
@@ -746,179 +745,142 @@ pO("hApi", 0, 0, function (o) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
-(function ($) {
-    var Pronto = function (options) {
-        var $gthis;
-
-        // Default Options
-        var settings = $.extend({
-            selector: "a:not(.no-ajaxy):not([target='_blank'])",
-            prefetch: true,
-            previewoff: true,
-            cb: 0
-        }, options);
-
-        //Shorthands
-        var selector = settings.selector,
-            prefetch = settings.prefetch,
-            previewoff = settings.previewoff,
-            cb = settings.cb;
-        
-        // Main plugin function
-        this.a = function ($this, h) {
-            if(!h) {
-                $gthis = $this;
-                $.cd(0, 0, settings);
-                $.frms(0, 0, settings);
-                $.slides(0, settings);
-                $.rqTimer(0, settings);
-                $.cd("i", $gthis);
-                _init_p();
-                return $this;
-            }
-            if(typeof(h) === "object") { 
-                $.rq("h", h.href);
-                _request();
-                 return;
-            }
-            if(h.iO("/")) {
-                 $.rq("h", h);
-                 $.rq("m", true);				 
-                _request(true);
-            }
-        };
-
-        // Private Methods
-        function _init_p() {
-            currentURL = window.location.href; // Capture current url & state
-            $.hApi("="); // Set initial state
-            $(window).on("popstate", _onPop); // Set handler for popState
-            if (prefetch) {
-                $(selector).hoverIntent(_prefetch, function(){});
-                $(selector).on("touchstart", _prefetch); // for touchscreens
-            }
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy):not([target='_blank'])", prefetch: true, previewoff: true, cb: 0 }, function ($this, h) {
+     if(!h) return;
+     
+     if(h === "i") {
+         $gthis = $this;
+         $.cd(0, 0, settings);
+         $.frms(0, 0, settings);
+         $.slides(0, settings);
+         $.rqTimer(0, settings);
+         $.cd("i", $gthis);
+         _init_p();
+     }
+     
+     if(typeof(h) === "object") { 
+          $.rq("h", h.href);
+          _request();
+          return;
+     }
+     
+     if(h.iO("/")) {
+         $.rq("h", h);
+         $.rq("m", true);				 
+         _request(true);
+     }
+}, { 
+ init_p: function() {
+    currentURL = window.location.href; // Capture current url & state
+    $.hApi("="); // Set initial state
+    $(window).on("popstate", _onPop); // Set handler for popState
+    if (prefetch) {
+        $(selector).hoverIntent(_prefetch, function(){});
+        $(selector).on("touchstart", _prefetch); // for touchscreens
+    }
             
-            var $body = $("body");
-            $body.on("click.pronto", selector, _click); // Real click handler -> _click()
-            $.frms("d", $body); // Select forms in whole body
-            $.frms("a"); // Ajaxify forms
-            $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
-            $.slides("i"); // Init slideshow
-        }
-		
-        function _prefetch(e) { //...target page on hoverIntent or touchstart
-            var link = $.rq("v", e); // validate internal URL
-            if (!link || currentURL == link.href) return false;
-            fn('+', link.href, function () {
-                if (previewoff === true) return false;
-                if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
-            });
-        }
-
-        function _isInDivs(link) {
-            var is = false;
-            $gthis.each(function () {
-                if ($(link).parents("#" + $(this).attr("id")).length > 0) is = true;
-            });
-            
-            return is;
-        }
-
-        function _click(e, mode) { //...handler for normal clicks
-            if(!$.rq("c", e)) return; // Central semaphore - prevents multiple _click()s
-            var link = $.rq("v", e);  // validate internal URL
-            $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
-            if (!link || _exoticKey(e)) return; // Ignore everything but normal click
-            if (_hashChange(link)) { // Only the hash part has changed
-                $.hApi("="); // Update state on hash change
-                return true;
-            }
-            e.preventDefault(); // Stop normal click behaviour
-            e.stopPropagation(); // Stop "bubbling-up"
+    var $body = $("body");
+    $body.on("click.pronto", selector, _click); // Real click handler -> _click()
+    $.frms("d", $body); // Select forms in whole body
+    $.frms("a"); // Ajaxify forms
+    $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
+    $.slides("i"); // Init slideshow
+  }, 
+ prefetch: function(e) { //...target page on hoverIntent or touchstart
+       var link = $.rq("v", e); // validate internal URL
+       if (!link || currentURL == link.href) return false;
+       fn('+', link.href, function () {
+            if (previewoff === true) return false;
+            if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
+       });
+  },
+ isInDivs: function(link) {
+      var is = false;
+      $gthis.each(function () {
+          if ($(link).parents("#" + $(this).attr("id")).length > 0) is = true;
+      });      
+         
+      return is;
+  },
+ click: function(e, mode) { //...handler for normal clicks
+      if(!$.rq("c", e)) return; // Central semaphore - prevents multiple _click()s
+      var link = $.rq("v", e);  // validate internal URL
+      $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
+      if (!link || _exoticKey(e)) return; // Ignore everything but normal click
+      if (_hashChange(link)) { // Only the hash part has changed
+          $.hApi("="); // Update state on hash change
+          return true;
+      }
+      e.preventDefault(); // Stop normal click behaviour
+      e.stopPropagation(); // Stop "bubbling-up"
            
-            _request(); // Continue with _request()
-        }
-
-        function _request(notPush) { // ... new url
-            $.rq("p", !notPush); // mode for hApi - replaceState / pushState
-            _trigger("request"); // Fire request event
-            $.rq("s"); // Set "same" variable
-            fn($.rq("h"), function (err) { // Call "fn" - handler of parent
-                if (err) { 
-                    $.log('Error in _request : ' + err); 
-                    _trigger("error", err); 
-                }
-                _render(); // continue with _render()
-            });
-        }
-
-        function _render() { // Clear and set timer
-            $.rqTimer('-'); // Clear
-            _trigger("beforeload");
-            $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
-        }
-
-        function _onPop(e) { // Handle back/forward navigation
-            $.rq("i");
-            $.rq("e", e);
+      _request(); // Continue with _request()
+  }, 
+ request: function(notPush) { // ... new url
+      $.rq("p", !notPush); // mode for hApi - replaceState / pushState
+      _trigger("request"); // Fire request event
+      $.rq("s"); // Set "same" variable
+      fn($.rq("h"), function (err) { // Call "fn" - handler of parent
+          if (err) { 
+              $.log('Error in _request : ' + err); 
+              _trigger("error", err); 
+          }
+          
+          _render(); // continue with _render()
+      });
+  },
+ render: function() { // Clear and set timer
+      $.rqTimer('-'); // Clear
+      _trigger("beforeload");
+      $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
+  },
+ onPop: function(e) { // Handle back/forward navigation
+      $.rq("i");
+      $.rq("e", e);
             
-            var data = e.originalEvent.state, url = data ? data.url : 0;
-            
-            if (!url || url === currentURL) return;  // Check if data exists
-            $.rq("s", url);
-            _trigger("request"); // Fire request event
-            fn(url, _render); // Call "fn" - handler of parent, continue with _render()
-        }
-        
-        function _doRender() { // Render HTML
-            _trigger("load");  // Fire load event
-            $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
-            $('title').html(fn('title').html()); // Update title
-            $.cd("2", _doRender2); // Animate back - continue with _doRender2()
-        }
-
-        function _doRender2() { // Continue render
-            var e = $.rq("e"), // Fetch event 
-            url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; // Get URL from event
-            url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
-            $.frms("a"); // Ajaxify forms - in content divs only
-            
-            _scroll2id(url);
-            currentURL = url;
-            $.hApi($.rq("p") ? "+" : "="); // Push new state to the stack on new url
-            _gaCaptureView(url); // Trigger analytics page view
-            _trigger("render"); // Fire render event
-            if(cb) cb(); // Callback user's handler, if specified
-        }
-
-        function _scroll2id(url) { //If hash in URL and hash not standalone at the end, 
-            if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { 
-                var $el = $('#' + url.split('#')[1]), scrollTop;
-                if ($el.length) scrollTop = $el.offset().top;
-                if (scrollTop !== false) $(window).scrollTop(scrollTop); // ...animate
-            }
-        }
-        
-        function _gaCaptureView(url) { // Google Analytics support
-            url = '/' + url.replace(rootUrl,'');
-            if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
-        }
-
-        function _exoticKey(e) {
-            return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
-        }
-
-        function _hashChange(link) {
-            return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
-        }
-    };
-
-    // Define Plugin
-    $.fn.pronto = function (h, options) {
-        var $this = $(this);
-        if (!$.fn.pronto.o) $.fn.pronto.o = new Pronto(options);
-        return $.fn.pronto.o.a($this, h);
-    };
-})(jQuery);
+      var data = e.originalEvent.state, url = data ? data.url : 0;
+           
+      if (!url || url === currentURL) return;  // Check if data exists
+      $.rq("s", url);
+      _trigger("request"); // Fire request event
+      fn(url, _render); // Call "fn" - handler of parent, continue with _render()
+  },
+ doRender: function() { // Render HTML
+      _trigger("load");  // Fire load event
+      $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
+      $('title').html(fn('title').html()); // Update title
+      $.cd("2", _doRender2); // Animate back - continue with _doRender2()
+  },
+ doRender2: function() { // Continue render
+      var e = $.rq("e"), // Fetch event 
+      url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; // Get URL from event
+      url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
+      $.frms("a"); // Ajaxify forms - in content divs only
+           
+      _scroll2id(url);
+      currentURL = url;
+      $.hApi($.rq("p") ? "+" : "="); // Push new state to the stack on new url
+      _gaCaptureView(url); // Trigger analytics page view
+      _trigger("render"); // Fire render event
+      if(cb) cb(); // Callback user's handler, if specified
+  },
+ scroll2id: function(url) { //If hash in URL and hash not standalone at the end, 
+      if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { 
+          var $el = $('#' + url.split('#')[1]), scrollTop;
+          if ($el.length) scrollTop = $el.offset().top;
+          if (scrollTop !== false) $(window).scrollTop(scrollTop); // ...animate
+      }
+  },
+ gaCaptureView: function(url) { // Google Analytics support
+      url = '/' + url.replace(rootUrl,'');
+      if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
+  },
+ exoticKey: function(e) {
+      return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
+  },
+ hashChange: function(link) {
+      return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
+  }
+});
 
 jQuery.log("Ajaxify loaded...", {verbosity: 2});
