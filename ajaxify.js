@@ -340,7 +340,8 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         });
     },
     addtext: function (t) {
-        if(inlineappend) return _apptext(t);
+        if(!t || !t.length) return;
+        if(inlineappend) try { return _apptext(t); } catch (e) { $.log("Error in apptext: " + t); }
         
         try {
             $.globalEval(t);
@@ -355,7 +356,7 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
     apptext: function (t) { 
         var scriptNode = document.createElement('script');
         scriptNode.appendChild(document.createTextNode(t));
-        $.cd("g").get(0).appendChild(scriptNode);
+        $.cd("g").append(scriptNode);
     },
     addstyle: function (t) {
         $("head").append('<style type="text/css">' + t + '</style>');
@@ -756,6 +757,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy):not([target='_blank'])
          $.rqTimer(0, settings);
          $.cd("i", $gthis);
          _init_p();
+         return $this;
      }
      
      if(typeof(h) === "object") { 
