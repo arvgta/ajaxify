@@ -22,7 +22,7 @@ The plugin can take an arbitrary amount of IDs, however the first one should spe
 Options default values
 {
 // basic config parameters
-    selector : "a:not(.no-ajaxy):not([target='_blank'])",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
+    selector : "a:not(.no-ajaxy)",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : true, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
  
@@ -184,7 +184,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     if (o === "x") return xhr;            
     if($.cache()) return $.cache().find(".ajy-" + o);
 }, {
-    lSel: function ($t) { //load page into DOM and handle scripts
+    lSel: function ($t) { var r; //load page into DOM and handle scripts
         pass++;
         _lDivs($t);
         $.scripts($.rq("s?"));
@@ -272,7 +272,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
     if(!o || typeof(o) !== 'string') {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
-                $().pronto(0, settings); //Pronto initialisation
+                $this.pronto(0, settings); //Pronto initialisation
                 $this.pronto("i"); 
                 if(deltas) $.scripts("1"); //delta-loading initialisation
             }
@@ -343,12 +343,8 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         if(!t || !t.length) return;
         if(inlineappend) try { return _apptext(t); } catch (e) { $.log("Error in apptext: " + t); }
         
-        try {
-            $.globalEval(t);
-        } catch (e1) {
-	        try { 
-                 eval(t);
-            } catch (e2) {
+        try { $.globalEval(t); } catch (e1) {
+	        try { eval(t); } catch (e2) {
                  $.log("Error in inline script : " + t + "\nError code : " + e2);
             }
         }
@@ -746,10 +742,11 @@ pO("hApi", 0, 0, function (o) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy):not([target='_blank'])", prefetch: true, previewoff: true, cb: 0 }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, previewoff: true, cb: 0 }, function ($this, h) {
      if(!h) return;
      
-     if(h === "i") {
+     if(h === "i") { 
+         if(!$this.length) $.log("Warning - empty content selector passed!");
          $gthis = $this;
          $.cd(0, 0, settings);
          $.frms(0, 0, settings);
@@ -878,7 +875,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy):not([target='_blank'])
       if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
   },
  exoticKey: function(e) {
-      return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey);
+      return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank");
   },
  hashChange: function(link) {
       return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
