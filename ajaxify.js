@@ -113,16 +113,15 @@ function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
 // 2) $.cache(<URL>) - returns page with specified URL
 // 3) $.cache(<jQuery object>) - saves the page in cache
 pO("cache", { d: false }, 0, function (o) {
-    if (!o) {
-        return d;
-    }
+    if (!o) return d;
+	
     if (typeof o === "string") {
         if(o === "f") { 
             $.pages("f");
             $.log("Cache flushed");
         } else d = $.pages($.memory(o));
         
-		return d;
+        return d;
     }
 
     if (typeof o === "object") {
@@ -134,16 +133,16 @@ pO("cache", { d: false }, 0, function (o) {
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 pO("memory", { d: false }, { memoryoff: false }, function (h) {
-     d = memoryoff;
-     if (!h || d === true) return false;
-     if (d === false) return h;
-     if (d.iO(", ")) {
-          d = d.split(", ");
-          if (d.iO(h)) return false;
-          else return h;
-     }
+    d = memoryoff;
+    if (!h || d === true) return false;
+    if (d === false) return h;
+    if (d.iO(", ")) {
+         d = d.split(", ");
+         if (d.iO(h)) return false;
+         else return h;
+    }
      
-	 return h == d ? false : h;
+    return h == d ? false : h;
 });
 		
 // The stateful Pages plugin
@@ -158,13 +157,8 @@ pO("pages", { d: [] }, 0, function (h) {
         if (d[i][0] == h) return d[i][1];
     }
 	
-    if (typeof h === "object") {
-        d.push(h);
-    }
-    
-	if (typeof h === "boolean") {
-        return false;
-    }
+    if (typeof h === "object") d.push(h);
+    if (typeof h === "boolean") return false;
 });
 
 // The GetPage plugin
@@ -184,7 +178,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     if (o === "x") return xhr;            
     if($.cache()) return $.cache().find(".ajy-" + o);
 }, {
-    lSel: function ($t) { var r; //load page into DOM and handle scripts
+    lSel: function ($t) { //load page into DOM and handle scripts
         pass++;
         _lDivs($t);
         $.scripts($.rq("s?"));
@@ -199,7 +193,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
          if(p) p();
     },
 		
-	ld: function ($t, $h) {
+    ld: function ($t, $h) {
         $h.find(".ajy-script").each(function(){
             //if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
             if(!($(this).attr("src"))) $(this).replaceWith('');
@@ -290,8 +284,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
             $.cache(0, s);
             $.memory(0, s);
             return true;
-            }
-        }
+       }
+    }
 );
 
 // The stateful Scripts plugin
@@ -305,18 +299,14 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         if(!$s) $s = $();
         return true;
     }
-    if (o === "s") {
-        return _allstyle($s.y);
-    }
+    if (o === "s") return _allstyle($s.y);
             
     if (o === "1") { 
         $.detScripts($s);
         return _addScripts(false, $s, settings);
     }
             
-    if (o === "a") {
-        return _alltxts($s.t);
-    }
+    if (o === "a") return _alltxts($s.t);
 
     if (o === "c") {
         if (canonical && $s.can) return $s.can.attr("href");
@@ -528,7 +518,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2") {
-		if(o === "1") cd.stop(true, true);
+        if(o === "1") cd.stop(true, true);
         cd.animate(o === "1" ? aniParams : from, aniTime, p);
     }
 });
@@ -618,7 +608,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         mode = false;
         push = false;
         return l;
-	}
+    }
     
     if(o === "h") { // Access href hard
         if(p) {
@@ -637,7 +627,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
     
     if(o === "m") {
         if(p) mode = p;
-		return mode;
+        return mode;
     }
 
     if(o === "p") {
@@ -654,7 +644,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
     if(o === "is") {
         if(p) ispost = p;
         return ispost;
-	}
+    }
 	
     if(o === "d") {
         if(p) data = p;
