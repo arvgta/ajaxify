@@ -178,7 +178,7 @@ pO("pages", { d: [] }, 0, function (h) {
 
 pO("getPage", { xhr: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache();
-	if (o.iO("/")) return _lPage(o, p);
+    if (o.iO("/")) return _lPage(o, p);
     if (o === "+") return _lPage(p, p2, true);
     if (o === "-") return _lSel(p);
     if (o === "x") return xhr;            
@@ -219,7 +219,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
         var ispost = $.rq("is");
                 
         xhr = $.ajax({
-		url: hin,
+        url: hin,
         type: ispost ? "POST" : "GET",
         data: ispost ? $.rq("d") : null,
         success: function (h) {
@@ -492,7 +492,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     
     if(o === "g") return cd;
 
-	if(o === "i") {
+    if(o === "i") {
         cd = p.first();
         aniTrue = aniTime && aniParams;
         cdwidth = cd.width();
@@ -504,7 +504,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             height: "100%"
         }, aniParams);
 		
-		aniParams = $.extend({
+        aniParams = $.extend({
             marginRight: cdwidth - aniParams.width
         }, aniParams);
 		
@@ -525,7 +525,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 	
     if(!p) return;
 	
-	if(!aniTrue) { p(); return; }
+    if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2") {
 		if(o === "1") cd.stop(true, true);
@@ -597,10 +597,10 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         e = p;
         l = e.currentTarget;
         h = l.href;
-		if(sema === h) return false;
+        if(sema === h) return false;
         sema = h;
         return true;
-	}
+    }
     
     if(o === "v") {
         if(!p) return false;
@@ -611,7 +611,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         o = "i";
     }
     
-	if(o === "i") {
+    if(o === "i") {
         ispost = false;
         data = null;
         same = false;
@@ -629,7 +629,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         return h;
     }
     
-	if(o === "l") return l;
+    if(o === "l") return l;
     if(o === "e") {
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
@@ -642,21 +642,21 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
 
     if(o === "p") {
         if(p) push = p;
-		return push;
+        return push;
     }
     
-	if(o === "s") { var t = p ? p : h;
+    if(o === "s") { var t = p ? p : h;
         same = (_root(t) === _root(currentURL));
-	}
+    }
     
     if(o === "s?") return same;
 	
-	if(o === "is") {
+    if(o === "is") {
         if(p) ispost = p;
         return ispost;
 	}
 	
-	if(o === "d") {
+    if(o === "d") {
         if(p) data = p;
         return data;
 	}
@@ -666,7 +666,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         return can;
 	}
 	
-	if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
+    if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
 
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
