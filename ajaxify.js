@@ -272,8 +272,9 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
     if(!o || typeof(o) !== 'string') {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
-                $this.pronto(0, settings); //Pronto initialisation
-                $this.pronto("i"); 
+                //$this.pronto(0, settings); //Pronto initialisation
+                //$this.pronto("i");
+                $this.pronto("i", settings);
                 if(deltas) $.scripts("1"); //delta-loading initialisation
             }
         });
