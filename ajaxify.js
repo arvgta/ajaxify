@@ -649,12 +649,12 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
     if(o === "d") {
         if(p) data = p;
         return data;
-	}
+    }
 	
     if(o === "can") {
         if(p) can = p;
         return can;
-	}
+    }
 	
     if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
