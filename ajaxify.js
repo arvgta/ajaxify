@@ -52,7 +52,7 @@ Options default values
     pluginon : true // Plugin set "on" or "off" (==false) manually
 }
 
-Animation parameters (aniParams):  Default is false (set off)
+Animation parameters (aniParams):  Default is false (set off) - specify aniTime and override the following aniParams:
 {
     opacity: 1, //no fade, set to 0 for maximum fade
     width: "100%", //in percent -  "100%" means no change
@@ -61,7 +61,7 @@ Animation parameters (aniParams):  Default is false (set off)
 
 More animation parameters
 
-You can specify any parameters that are understood by .animate() respectively…
+You can specify any parameters that are understood by .animate()
 
 */
 
@@ -266,9 +266,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
     if(!o || typeof(o) !== 'string') {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
-                //$this.pronto(0, settings); //Pronto initialisation
-                //$this.pronto("i");
-                $this.pronto("i", settings);
+                $this.pronto("i", settings); //Pronto initialisation
                 if(deltas) $.scripts("1"); //delta-loading initialisation
             }
         });
@@ -825,13 +823,13 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
   },
  onPop: function(e) { // Handle back/forward navigation
-      $.rq("i");
-      $.rq("e", e);
+      $.rq("i"); //Initialise request in general
+      $.rq("e", e); //Initialise request event
             
       var data = e.originalEvent.state, url = data ? data.url : 0;
            
       if (!url || url === currentURL) return;  // Check if data exists
-      $.rq("s", url);
+      $.rq("s", url); // Set "same" variable
       _trigger("request"); // Fire request event
       fn(url, _render); // Call "fn" - handler of parent, continue with _render()
   },
