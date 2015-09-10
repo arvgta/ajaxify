@@ -52,7 +52,7 @@ Options default values
     pluginon : true // Plugin set "on" or "off" (==false) manually
 }
 
-Animation parameters (aniParams):  Default is false (set off)
+Animation parameters (aniParams):  Default is false (set off) - specify aniTime and override the following aniParams:
 {
     opacity: 1, //no fade, set to 0 for maximum fade
     width: "100%", //in percent -  "100%" means no change
@@ -61,7 +61,7 @@ Animation parameters (aniParams):  Default is false (set off)
 
 More animation parameters
 
-You can specify any parameters that are understood by .animate() respectively…
+You can specify any parameters that are understood by .animate()
 
 */
 
@@ -113,16 +113,15 @@ function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
 // 2) $.cache(<URL>) - returns page with specified URL
 // 3) $.cache(<jQuery object>) - saves the page in cache
 pO("cache", { d: false }, 0, function (o) {
-    if (!o) {
-        return d;
-    }
+    if (!o) return d;
+	
     if (typeof o === "string") {
         if(o === "f") { 
             $.pages("f");
             $.log("Cache flushed");
         } else d = $.pages($.memory(o));
         
-		return d;
+        return d;
     }
 
     if (typeof o === "object") {
@@ -134,16 +133,16 @@ pO("cache", { d: false }, 0, function (o) {
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 pO("memory", { d: false }, { memoryoff: false }, function (h) {
-     d = memoryoff;
-     if (!h || d === true) return false;
-     if (d === false) return h;
-     if (d.iO(", ")) {
-          d = d.split(", ");
-          if (d.iO(h)) return false;
-          else return h;
-     }
+    d = memoryoff;
+    if (!h || d === true) return false;
+    if (d === false) return h;
+    if (d.iO(", ")) {
+         d = d.split(", ");
+         if (d.iO(h)) return false;
+         else return h;
+    }
      
-	 return h == d ? false : h;
+    return h == d ? false : h;
 });
 		
 // The stateful Pages plugin
@@ -158,13 +157,8 @@ pO("pages", { d: [] }, 0, function (h) {
         if (d[i][0] == h) return d[i][1];
     }
 	
-    if (typeof h === "object") {
-        d.push(h);
-    }
-    
-	if (typeof h === "boolean") {
-        return false;
-    }
+    if (typeof h === "object") d.push(h);
+    if (typeof h === "boolean") return false;
 });
 
 // The GetPage plugin
@@ -178,13 +172,13 @@ pO("pages", { d: [] }, 0, function (h) {
 
 pO("getPage", { xhr: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache();
-	if (o.iO("/")) return _lPage(o, p);
+    if (o.iO("/")) return _lPage(o, p);
     if (o === "+") return _lPage(p, p2, true);
     if (o === "-") return _lSel(p);
     if (o === "x") return xhr;            
     if($.cache()) return $.cache().find(".ajy-" + o);
 }, {
-    lSel: function ($t) { var r; //load page into DOM and handle scripts
+    lSel: function ($t) { //load page into DOM and handle scripts
         pass++;
         _lDivs($t);
         $.scripts($.rq("s?"));
@@ -199,7 +193,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
          if(p) p();
     },
 		
-	ld: function ($t, $h) {
+    ld: function ($t, $h) {
         $h.find(".ajy-script").each(function(){
             //if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
             if(!($(this).attr("src"))) $(this).replaceWith('');
@@ -219,7 +213,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
         var ispost = $.rq("is");
                 
         xhr = $.ajax({
-		url: hin,
+        url: hin,
         type: ispost ? "POST" : "GET",
         data: ispost ? $.rq("d") : null,
         success: function (h) {
@@ -272,8 +266,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
     if(!o || typeof(o) !== 'string') {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
-                $this.pronto(0, settings); //Pronto initialisation
-                $this.pronto("i"); 
+                $this.pronto("i", settings); //Pronto initialisation
                 if(deltas) $.scripts("1"); //delta-loading initialisation
             }
         });
@@ -289,8 +282,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
             $.cache(0, s);
             $.memory(0, s);
             return true;
-            }
-        }
+       }
+    }
 );
 
 // The stateful Scripts plugin
@@ -304,18 +297,14 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         if(!$s) $s = $();
         return true;
     }
-    if (o === "s") {
-        return _allstyle($s.y);
-    }
+    if (o === "s") return _allstyle($s.y);
             
     if (o === "1") { 
         $.detScripts($s);
         return _addScripts(false, $s, settings);
     }
             
-    if (o === "a") {
-        return _alltxts($s.t);
-    }
+    if (o === "a") return _alltxts($s.t);
 
     if (o === "c") {
         if (canonical && $s.can) return $s.can.attr("href");
@@ -491,7 +480,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     
     if(o === "g") return cd;
 
-	if(o === "i") {
+    if(o === "i") {
         cd = p.first();
         aniTrue = aniTime && aniParams;
         cdwidth = cd.width();
@@ -503,7 +492,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             height: "100%"
         }, aniParams);
 		
-		aniParams = $.extend({
+        aniParams = $.extend({
             marginRight: cdwidth - aniParams.width
         }, aniParams);
 		
@@ -524,10 +513,10 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 	
     if(!p) return;
 	
-	if(!aniTrue) { p(); return; }
+    if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2") {
-		if(o === "1") cd.stop(true, true);
+        if(o === "1") cd.stop(true, true);
         cd.animate(o === "1" ? aniParams : from, aniTime, p);
     }
 });
@@ -596,10 +585,10 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         e = p;
         l = e.currentTarget;
         h = l.href;
-		if(sema === h) return false;
+        if(sema === h) return false;
         sema = h;
         return true;
-	}
+    }
     
     if(o === "v") {
         if(!p) return false;
@@ -610,14 +599,14 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         o = "i";
     }
     
-	if(o === "i") {
+    if(o === "i") {
         ispost = false;
         data = null;
         same = false;
         mode = false;
         push = false;
         return l;
-	}
+    }
     
     if(o === "h") { // Access href hard
         if(p) {
@@ -628,7 +617,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         return h;
     }
     
-	if(o === "l") return l;
+    if(o === "l") return l;
     if(o === "e") {
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
@@ -636,36 +625,36 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
     
     if(o === "m") {
         if(p) mode = p;
-		return mode;
+        return mode;
     }
 
     if(o === "p") {
         if(p) push = p;
-		return push;
+        return push;
     }
     
-	if(o === "s") { var t = p ? p : h;
+    if(o === "s") { var t = p ? p : h;
         same = (_root(t) === _root(currentURL));
-	}
+    }
     
     if(o === "s?") return same;
 	
-	if(o === "is") {
+    if(o === "is") {
         if(p) ispost = p;
         return ispost;
-	}
+    }
 	
-	if(o === "d") {
+    if(o === "d") {
         if(p) data = p;
         return data;
-	}
+    }
 	
     if(o === "can") {
         if(p) can = p;
         return can;
-	}
+    }
 	
-	if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
+    if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
 
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
@@ -834,13 +823,13 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
   },
  onPop: function(e) { // Handle back/forward navigation
-      $.rq("i");
-      $.rq("e", e);
+      $.rq("i"); //Initialise request in general
+      $.rq("e", e); //Initialise request event
             
       var data = e.originalEvent.state, url = data ? data.url : 0;
            
       if (!url || url === currentURL) return;  // Check if data exists
-      $.rq("s", url);
+      $.rq("s", url); // Set "same" variable
       _trigger("request"); // Fire request event
       fn(url, _render); // Call "fn" - handler of parent, continue with _render()
   },
