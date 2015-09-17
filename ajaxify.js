@@ -552,7 +552,7 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
         if(!sliding) return;
         $().pronto(_nextLink());
     }, 
-	nextLink: function() { 
+    nextLink: function() { 
         var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
         $(menu).each(function(i, v){ var el = $(this).parent();
             if(nextLink) return true;
