@@ -521,7 +521,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     }
 });
 
-pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover" }, function (o) {
+pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
 	if(!o) return;
 	
 	if (o === "i") { 
@@ -541,15 +541,28 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
                 sliding = false;
             },
             idle: idleTime
-        });     
+        });
+        
+        if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
+            parentID: 'content', //parent, where the above image(s) will be prepended 
+            imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
+            imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
+            titleOn: 'Turn slideshow off', //title tag when on
+            titleOff: 'Turn slideshow on', //title tag when off
+            imgProps: { marginLeft: '85%', marginTop: '20px' }
+        }, toggleSlide);  
+
+        parentID = toggleSlide.parentID;
     }
+    
+    if (o === "f") _insImg();
 }, {
     slide: function() { 
         if(!sliding) return;
         timer = setInterval(_slide1, slideTime); 
     },
     slide1: function() { 
-        if(!sliding) return;
+        if(!sliding || pinned) return;
         $().pronto(_nextLink());
     }, 
     nextLink: function() { 
@@ -576,6 +589,27 @@ pO("slides", { sliding: false, timer: 0, currEl: 0, sp: 0 }, { idleTime: 0, slid
         }
 		
         return nextLink;
+    },
+    insImg: function() {
+        if(!parentID) return;
+        img = $('<img src ="' + toggleSlide.imgOn + '" title="' + toggleSlide.titleOn + '" />').prependTo('#' + parentID).css(toggleSlide.imgProps);
+        
+        img.click(_toggleImg);
+        pinned = 0;
+    },
+    toggleImg: function() {
+        if(!parentID || !img || !img.length) return;
+        var src = toggleSlide.imgOn, titl = toggleSlide.titleOn;
+        
+        if(!pinned) { 
+            pinned = 1;
+            src = toggleSlide.imgOff;
+            titl = toggleSlide.titleOff;
+            //pinned = 0;
+        } else pinned = 0;
+        
+        img.attr("src", src);
+        img.attr("title", titl);
     }
 });
 
@@ -838,6 +872,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
       $('title').html(fn('title').html()); // Update title
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
+      $.slides("f"); // Finalise slideshow
   },
  doRender2: function() { // Continue render
       var e = $.rq("e"), // Fetch event 
