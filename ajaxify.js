@@ -524,8 +524,8 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
 	if(!o) return;
 	
-	if (o === "i") { 
-	    if(!idleTime) return;
+    if (o === "i") { 
+        if(!idleTime) return;
 			
         $(document).idle({
             onIdle: function(){
@@ -555,7 +555,7 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID:
         parentID = toggleSlide.parentID;
     }
     
-    if (o === "f") _insImg();
+    if (o === "f" && sliding) _insImg();
 }, {
     slide: function() { 
         if(!sliding) return;
