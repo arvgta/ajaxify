@@ -555,7 +555,7 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID:
         parentID = toggleSlide.parentID;
     }
     
-    if (o === "f" && sliding) _insImg();
+    if (o === "f") _insImg();
 }, {
     slide: function() { 
         if(!sliding) return;
