@@ -611,11 +611,11 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID:
         img.attr("src", src);
         img.attr("title", titl);
         
-        if(!pinned) {
-            if(sliding) return;                    
+        if(!pinned) {/*
+            if(currEl) currEl.removeClass(addclass);
+            if(timer) clearInterval(timer);
             sliding = true;
-            _slide1();
-            _slide();
+            _slide();*/
         }
     }
 });
