@@ -33,6 +33,7 @@ Options default values
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
+    toggleSlide: false //For toggling sliding - see below.  Default = off
     menu: false, //Selector for links in the menu
     addclass: "jqhover", //Class that gets added dynamically to the highlighted element in the slideshow
  
@@ -59,9 +60,19 @@ Animation parameters (aniParams):  Default is false (set off) - specify aniTime 
     height: "100%" //in percent -  "100%" means no change
 }
 
-More animation parameters
+More animation parameters:
+You can specify any parameters that are understood by .animate() !
 
-You can specify any parameters that are understood by .animate()
+Toggling sliding parameters (toggleSlide): Default is false (set off) 
+You can override the following toggleSlide parameters:
+{ //defaults - if not turned off completely
+    parentID: 'content', //parent, where the above image(s) will be prepended 
+    imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
+    imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
+    titleOn: 'Turn slideshow off', //title tag when on
+    titleOff: 'Turn slideshow on', //title tag when off
+    imgProps: { marginLeft: '85%', marginTop: '20px' }
+}
 
 */
 
