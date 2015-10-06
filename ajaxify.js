@@ -66,7 +66,7 @@ You can specify any parameters that are understood by .animate() !
 Toggling sliding parameters (toggleSlide): Default is false (set off) 
 You can override the following toggleSlide parameters:
 { //defaults - if not turned off completely
-    parentID: 'content', //parent, where the above image(s) will be prepended 
+    parentEl: '#content', //parent element, where the above image(s) will be prepended 
     imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
     imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
     titleOn: 'Turn slideshow off', //title tag when on
@@ -532,7 +532,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     }
 });
 
-pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
+pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
 	if(!o) return;
 	
     if (o === "i") { 
@@ -555,7 +555,7 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID:
         });
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
-            parentID: 'content', //parent, where the above image(s) will be prepended 
+            parentEl: '#content', //parent, where the above image(s) will be prepended 
             imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
             imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
             titleOn: 'Turn slideshow off', //title tag when on
@@ -563,7 +563,7 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID:
             imgProps: { marginLeft: '85%', marginTop: '20px' }
         }, toggleSlide);  
 
-        parentID = toggleSlide.parentID;
+        parentEl = toggleSlide.parentEl;
     }
     
     if (o === "f") _insImg();
@@ -602,14 +602,14 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentID:
         return nextLink;
     },
     insImg: function() {
-        if(!parentID) return;
-        img = $('<img src ="' + toggleSlide.imgOn + '" title="' + toggleSlide.titleOn + '" />').prependTo('#' + parentID).css(toggleSlide.imgProps);
+        if(!parentEl) return;
+        img = $('<img src ="' + toggleSlide.imgOn + '" title="' + toggleSlide.titleOn + '" />').prependTo(parentEl).css(toggleSlide.imgProps);
         
         img.click(_toggleImg);
         pinned = 0;
     },
     toggleImg: function() {
-        if(!parentID || !img || !img.length) return;
+        if(!parentEl || !img || !img.length) return;
         var src = toggleSlide.imgOn, titl = toggleSlide.titleOn;
         
         if(!pinned) { 
