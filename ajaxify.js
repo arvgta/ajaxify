@@ -549,6 +549,7 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl:
                 _trigger("active");
                 if(currEl) currEl.removeClass(addclass);
                 clearInterval(timer);
+				timer = 0;
                 sliding = false;
             },
             idle: idleTime
@@ -622,12 +623,13 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl:
         img.attr("src", src);
         img.attr("title", titl);
         
-        if(!pinned) {/*
+        /*if(!pinned) { //Kickstart after user resumption
             if(currEl) currEl.removeClass(addclass);
             if(timer) clearInterval(timer);
             sliding = true;
-            _slide();*/
-        }
+			_slide();
+            _slide1();
+        }*/
     }
 });
 
