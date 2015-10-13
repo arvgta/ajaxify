@@ -532,7 +532,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
     }
 });
 
-pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
+pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
 	if(!o) return;
 	
     if (o === "i") { 
@@ -541,16 +541,14 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl:
         $(document).idle({
             onIdle: function(){
                 _trigger("idle");
-                if(sliding) return;                    
-                sliding = true;
+                if(timer + 1) return;                    
                 _slide();
             },
             onActive: function(){
                 _trigger("active");
                 if(currEl) currEl.removeClass(addclass);
-                clearInterval(timer);
-				timer = 0;
-                sliding = false;
+                if(timer + 1) clearInterval(timer);
+				timer = -1;
             },
             idle: idleTime
         });
@@ -570,11 +568,10 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl:
     if (o === "f") _insImg();
 }, {
     slide: function() { 
-        if(!sliding) return;
         timer = setInterval(_slide1, slideTime); 
     },
     slide1: function() { 
-        if(!sliding || pinned) return;
+        if(pinned) return;
         $().pronto(_nextLink());
     }, 
     nextLink: function() { 
@@ -617,17 +614,16 @@ pO("slides", { sliding: false, pinned: 0, img: 0, timer: 0, currEl: 0, parentEl:
             pinned = 1;
             src = toggleSlide.imgOff;
             titl = toggleSlide.titleOff;
-            //pinned = 0;
         } else pinned = 0;
                 
         img.attr("src", src);
         img.attr("title", titl);
         
-        /*if(!pinned) { //Kickstart after user resumption
+        /*if(!pinned) { //Kickstart after user resumes
             if(currEl) currEl.removeClass(addclass);
-            if(timer) clearInterval(timer);
-            sliding = true;
-			_slide();
+            if(timer + 1) clearInterval(timer);
+            timer = -1;
+            _slide();
             _slide1();
         }*/
     }
