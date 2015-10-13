@@ -620,9 +620,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         img.attr("title", titl);
         
         /*if(!pinned) { //Kickstart after user resumes
-            if(currEl) currEl.removeClass(addclass);
             if(timer + 1) clearInterval(timer);
-            timer = -1;
             _slide();
             _slide1();
         }*/
