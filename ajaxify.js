@@ -83,7 +83,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
 //Minified idle plugin
-(function(n){n.fn.idle = function(e) {var i,t,o={idle:6e4,events:"mousemove keypress mousedown touchstart",onIdle:function(){},onActive:function(){},onHide:function(){},onShow:function(){},keepTracking:!1},c=!1,u=!0,d=n.extend({},o,e);return i=function(n,e){return c&&(e.onActive.call(),c=!1),(e.keepTracking?clearInterval:clearTimeout)(n),t(e);}, t = function(n) {var e,i=n.keepTracking?setInterval:setTimeout;return(e=i(function(){c=!0;n.onIdle.call();},n.idle)),e;},this.each(function(){var o=t(d);return n(this).on(d.events,function(){o=i(o,d);}),(e.onShow||e.onHide)&&n(document).on("visibilitychange webkitvisibilitychange mozvisibilitychange msvisibilitychange",function() {return document.hidden||document.webkitHidden||document.mozHidden||document.msHidden?u&&(u=!1,d.onHide.call()):u||(u=!0,d.onShow.call());});});};})(jQuery);
+!function(n){"use strict";n.fn.idle=function(e){var t,o,u={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},i=!1,c=n.extend({},u,e),l=null;return t=function(n,e){return i&&(e.onActive.call(),i=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){i=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
 
 //Module global variables
 var l = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
@@ -539,22 +539,13 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         if(!idleTime) return;
 			
         $(document).idle({
-            onIdle: function(){
-                _trigger("idle");
-                if(timer + 1) return;                    
-                _slide();
-            },
-            onActive: function(){
-                _trigger("active");
-                if(currEl) currEl.removeClass(addclass);
-                if(timer + 1) clearInterval(timer);
-				timer = -1;
-            },
+            onIdle: _onIdle,
+            onActive: _onActive,
             idle: idleTime
         });
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
-            parentEl: '#content', //parent, where the above image(s) will be prepended 
+            parentEl: '#content', //parent element, where the above image(s) will be prepended 
             imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
             imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
             titleOn: 'Turn slideshow off', //title tag when on
@@ -567,6 +558,17 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     
     if (o === "f") _insImg();
 }, {
+    onIdle: function(){ $.log('onIdle');
+        _trigger("idle");
+        if(timer + 1) return;                    
+        _slide();
+    },
+	onActive: function(){
+        _trigger("active");
+        if(currEl) currEl.removeClass(addclass);
+        if(timer + 1) clearInterval(timer);
+		timer = -1;
+    },
     slide: function() { 
         timer = setInterval(_slide1, slideTime); 
     },
@@ -619,11 +621,13 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         img.attr("src", src);
         img.attr("title", titl);
         
-        /*if(!pinned) { //Kickstart after user resumes
+        if(!pinned) { //Kickstart after user resumes
             if(timer + 1) clearInterval(timer);
-            _slide();
+            timer = -1;
+            if(currEl) currEl.removeClass(addclass);
             _slide1();
-        }*/
+            _onIdle();
+        }
     }
 });
 
