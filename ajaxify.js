@@ -206,7 +206,6 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
 		
     ld: function ($t, $h) {
         $h.find(".ajy-script").each(function(){
-            //if(!($(this).attr("src"))) $(this).replaceWith('<script type="text/javascript">' + $(this).text() + '</script>');
             if(!($(this).attr("src"))) $(this).replaceWith('');
             else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
         });
@@ -538,11 +537,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     if (o === "i") { 
         if(!idleTime) return;
 			
-        $(document).idle({
-            onIdle: _onIdle,
-            onActive: _onActive,
-            idle: idleTime
-        });
+        $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime });
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
             parentEl: '#content', //parent element, where the above image(s) will be prepended 
@@ -563,7 +558,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         if(timer + 1) return;                    
         _slide();
     },
-	onActive: function(){
+	onActive: function(){ $.log('onActive');
         _trigger("active");
         if(currEl) currEl.removeClass(addclass);
         if(timer + 1) clearInterval(timer);
@@ -621,12 +616,13 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         img.attr("src", src);
         img.attr("title", titl);
         
-        if(!pinned) { //Kickstart after user resumes
-            if(timer + 1) clearInterval(timer);
+        if(!pinned) { _slide1();
+        //Kickstart after user resumes
+        /*    if(timer + 1) clearInterval(timer);
             timer = -1;
             if(currEl) currEl.removeClass(addclass);
             _slide1();
-            _onIdle();
+            _onIdle(); */
         }
     }
 });
