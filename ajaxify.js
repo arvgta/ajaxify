@@ -910,7 +910,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
   },
  gaCaptureView: function(url) { // Google Analytics support
       url = '/' + url.replace(rootUrl,'');
-      if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url);
+      if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url); // the new analytics API
+	  else if ( typeof window._gaq !== 'undefined' ) window._gaq.push(['_trackPageview', url]);  // the old API					
   },
  exoticKey: function(e) {
       return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank");
