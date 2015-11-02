@@ -83,7 +83,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
 //Minified idle plugin
-!function(n){"use strict";n.fn.idle=function(e){var t,o,u={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},i=!1,c=n.extend({},u,e),l=null;return t=function(n,e){return i&&(e.onActive.call(),i=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){i=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
+!function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(){u=!0,c.onIdle.call()}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
 
 //Module global variables
 var l = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
@@ -616,13 +616,11 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         img.attr("src", src);
         img.attr("title", titl);
         
-        if(!pinned) { _slide1();
-        //Kickstart after user resumes
-        /*    if(timer + 1) clearInterval(timer);
-            timer = -1;
-            if(currEl) currEl.removeClass(addclass);
-            _slide1();
-            _onIdle(); */
+        if(!pinned) { //Kickstart in idle sub-plugin after user resumes
+        _slide1();
+        //if(timer + 1) clearInterval(timer);
+        //timer = -1;
+        $(document).trigger("idle:kick");
         }
     }
 });
@@ -911,7 +909,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
  gaCaptureView: function(url) { // Google Analytics support
       url = '/' + url.replace(rootUrl,'');
       if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url); // the new analytics API
-	  else if ( typeof window._gaq !== 'undefined' ) window._gaq.push(['_trackPageview', url]);  // the old API					
+      else if (typeof window._gaq !== 'undefined') window._gaq.push(['_trackPageview', url]);  // the old API					
   },
  exoticKey: function(e) {
       return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank");
