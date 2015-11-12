@@ -204,17 +204,12 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
          if(p) p();
     },
 		
-    ld: function ($t, $h) { //$.log('Fetching ' + $t.attr("id"));
+    ld: function ($t, $h) { 
         $h.find(".ajy-script").each(function(){
             if(!($(this).attr("src"))) $(this).replaceWith('');
             else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
         });      
         $t.html($h.html());
-        
-        /*if($t.attr("id") == 'SGVload') { $.log('Rerendering ' + $t.attr("id"));  
-            $.log('Contents ' + $t.html());  
-            $t.html($t.html());
-        }*/
     },
 		
     lDivs: function ($t) { //load target divs into DOM
