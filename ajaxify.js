@@ -552,12 +552,12 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     
     if (o === "f") _insImg();
 }, {
-    onIdle: function(){ $.log('onIdle');
+    onIdle: function(){ 
         _trigger("idle");
         if(timer + 1) return;                    
         _slide();
     },
-	onActive: function(){ $.log('onActive');
+	onActive: function(){ 
         _trigger("active");
         if(currEl) currEl.removeClass(addclass);
         if(timer + 1) clearInterval(timer);
