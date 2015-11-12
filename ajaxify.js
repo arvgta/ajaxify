@@ -83,7 +83,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
 //Minified idle plugin
-!function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(){u=!0,c.onIdle.call()}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
+!function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(){l=o(c)}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
 
 //Module global variables
 var l = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
@@ -91,8 +91,8 @@ var l = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.histo
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
 docType = /<\!DOCTYPE[^>]*>/i,
-tagso = /<(html|head|body|title|meta|script|link)([\s\>])/gi,
-tagsc = /<\/(html|head|body|title|meta|script|link)\>/gi,
+tagso = /<(html|head|body|meta|script|link)([\s\>])/gi,
+tagsc = /<\/(html|head|body|meta|script|link)\>/gi,
 
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
@@ -187,7 +187,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     if (o === "+") return _lPage(p, p2, true);
     if (o === "-") return _lSel(p);
     if (o === "x") return xhr;            
-    if($.cache()) return $.cache().find(".ajy-" + o);
+    if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o);
 }, {
     lSel: function ($t) { //load page into DOM and handle scripts
         pass++;
@@ -204,13 +204,17 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
          if(p) p();
     },
 		
-    ld: function ($t, $h) {
+    ld: function ($t, $h) { //$.log('Fetching ' + $t.attr("id"));
         $h.find(".ajy-script").each(function(){
             if(!($(this).attr("src"))) $(this).replaceWith('');
             else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
-        });
-            
+        });      
         $t.html($h.html());
+        
+        /*if($t.attr("id") == 'SGVload') { $.log('Rerendering ' + $t.attr("id"));  
+            $.log('Contents ' + $t.html());  
+            $t.html($t.html());
+        }*/
     },
 		
     lDivs: function ($t) { //load target divs into DOM
