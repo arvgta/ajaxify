@@ -163,9 +163,9 @@ pO("memory", { d: false }, { memoryoff: false }, function (h) {
 // 3) $.pages(false) - returns false
 pO("pages", { d: [] }, 0, function (h) {
     if (typeof h === "string") {
-    if(h === "f") d = [];
-    else for (var i = 0; i < d.length; i++)
-        if (d[i][0] == h) return d[i][1];
+        if(h === "f") d = [];
+        else for (var i = 0; i < d.length; i++)
+            if (d[i][0] == h) return d[i][1];
     }
 	
     if (typeof h === "object") d.push(h);
@@ -280,7 +280,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
             }
         });
     }
-        else return $().pronto(o);
+    else return $().pronto(o);
     }, {
         init: function (s) {
             if (!api || !pluginon) {
@@ -306,6 +306,7 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         if(!$s) $s = $();
         return true;
     }
+    
     if (o === "s") return _allstyle($s.y);
             
     if (o === "1") { 
@@ -440,9 +441,9 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     },
     classAlways: function ($t, PK) { 
         $t.each(function () {
-        if ($(this).attr("data-class") == "always") {
-            _iScript($(this).attr(PK), PK);
-        }
+            if ($(this).attr("data-class") == "always") {
+                 _iScript($(this).attr(PK), PK);
+            }
         });
     },
     sameScripts: function (s, PK) {
@@ -468,11 +469,11 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     },
     findScript: function ($S, s) {
         if ($S)
-        for (var i = 0; i < s.length; i++)
-             if (s[i][0] == $S) {
-                 s[i][1] = 1;
-                 return true;
-             }
+            for (var i = 0; i < s.length; i++)
+                if (s[i][0] == $S) {
+                    s[i][1] = 1;
+                    return true;
+                }
     },
     freeOld: function (s, PK) {
         for (var i = 0; i < s.length; i++)
@@ -531,7 +532,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 });
 
 pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
-	if(!o) return;
+    if(!o) return;
 	
     if (o === "i") { 
         if(!idleTime) return;
@@ -678,7 +679,8 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         return push;
     }
     
-    if(o === "s") { var t = p ? p : h;
+    if(o === "s") { 
+        var t = p ? p : h;
         same = (_root(t) === _root(currentURL));
     }
     
