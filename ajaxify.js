@@ -557,11 +557,11 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         if(timer + 1) return;                    
         _slide();
     },
-	onActive: function(){ 
+    onActive: function(){ 
         _trigger("active");
         if(currEl) currEl.removeClass(addclass);
         if(timer + 1) clearInterval(timer);
-		timer = -1;
+        timer = -1;
     },
     slide: function() { 
         timer = setInterval(_slide1, slideTime); 
