@@ -31,6 +31,7 @@ Options default values
     aniTime : 0, //in msec - must be set for animations to work
     aniParams : false, //Animation parameters - see below.  Default = off
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
+    scrolltop : false, // Always scroll to top of page
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
     toggleSlide: false //For toggling sliding - see below.  Default = off
@@ -778,7 +779,7 @@ pO("hApi", 0, 0, function (o) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, previewoff: true, cb: 0 }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, previewoff: true, scrolltop: false, cb: 0 }, function ($this, h) {
      if(!h) return;
      
      if(h === "i") { 
@@ -900,11 +901,12 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
   },
- scroll2id: function(url) { //If hash in URL and hash not standalone at the end, 
-      if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { 
-          var $el = $('#' + url.split('#')[1]), scrollTop;
-          if ($el.length) scrollTop = $el.offset().top;
-          if (scrollTop !== false) $(window).scrollTop(scrollTop); // ...animate
+ scroll2id: function(url) { //If hash in URL and hash not standalone at the end or scrolltop set, 
+      if(scrolltop) $(window).scrollTop(0); //always scroll to top
+      else if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { //if hash in URL
+          var $el = $('#' + url.split('#')[1]), offSet;
+          if ($el.length) offSet = $el.offset().top;
+          if (offSet !== false) $(window).scrollTop(offSet); // ...animate
       }
   },
  gaCaptureView: function(url) { // Google Analytics support
