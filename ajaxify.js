@@ -87,7 +87,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 !function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(){l=o(c)}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
 
 //Module global variables
-var l = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
+var lvl = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -103,7 +103,7 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]';
 
 //Minified pO() function
-function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var i in n)if(n.hasOwnProperty(i)){var a=n[i];t+=e?",\n":"",t+="function"==typeof a?"_"+i+" = "+a.toString():i+" = "+(r?'settings["':"")+(r?i+'"]':JSON.stringify(a)),e++}return t+";"}function pO(n,r,t,e,i,a){var s="",o="",p="",f="",c="",u="",l=!1,g=!1,S=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),c=getParamNames(e),l=c.iO("$this"),g=c.iO("options"),u=c.replace("$this, ",""),u="$this"==c?"":u,t&&!g&&(u+=""===u?"options":", options"),r&&(o=JSON2Str(r)),t&&(p="var settings = $.extend("+JSON.stringify(t)+", options);\n",p+=JSON2Str(t,1)),i&&(f=JSON2Str(i)),t||(S=S.replace(/\(options/g,"(")),l||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,l?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",o).replace("pSettings",p).replace("pFns",f).replace("args",c).replace("arg0",u),!a)try{jQuery.globalEval(S)}catch(v){alert("Error : "+v+" | "+S)}}var funStr,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){l<verbosity&&console&&console.log(n)});
+function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,S=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),p||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(S),!i)try{jQuery.globalEval(S)}catch(v){alert("Error : "+v+" | "+S)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;")):n}var funStr,logging=!0,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
@@ -202,7 +202,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     lPage: function (h, p, pre) { //fire Ajax load, check for hash first
          if (h.iO("#")) h = h.split("#")[0];
          if ($.rq("is") || !$.cache(h)) return _lAjax(h, p, pre);
-         if(p) p();
+         if(p) return p();
     },
 		
     ld: function ($t, $h) { 
@@ -234,7 +234,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
             $.cache($(_parseHTML(h)));
             $.pages([hin, $.cache()]);
 
-            if(p) p();
+            if(p) return p();
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
@@ -393,15 +393,13 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.y = head.find("style");
     $s.can = _rel(lk, "canonical");
     $s.s = j.filter(function () {
-         return $(this).attr("src");
+         return($(this).attr("src"));
     });
-    $s.t = j.filter(function () {
-         return !($(this).attr("src"));
-    })}, {
+    $s.t = j.filter(function () {return(!($(this).attr("src")));});
+    }, {
     rel: function(lk, v) {
-        return $(lk).filter(function () {
-             return $(this).attr("rel").iO(v);
-        })}
+        return $(lk).filter(function (){return($(this).attr("rel").iO(v));});
+    }
     }
 );
 
@@ -710,13 +708,13 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     
     if(o === "d") divs = p;
     if(o === "a") divs.find(forms).filter(function() {
-        return _internal($(this).attr("action"));
+        return(_internal($(this).attr("action")));
     }).submit(function (q) {
         fm = $(q.target);
         if (!fm.is("form")) {
             fm = fm.filter("input[type=submit]").parents("form:first");
             if (fm.length === 0) {
-                return true;
+                return(true);
             }
         }
         
@@ -741,7 +739,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         _trigger("submit", h);
         $().pronto({ href: h });
 		
-        return false;
+        return(false);
     });
 }, {
     k: function () {
@@ -838,8 +836,16 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
          
       return is;
   },
+ stopBubbling: function(e) {
+      e.preventDefault();
+	  e.stopPropagation();
+	  e.stopImmediatePropagation();
+ },
  click: function(e, mode) { //...handler for normal clicks
-      if(!$.rq("c", e)) return; // Central semaphore - prevents multiple _click()s
+      if(!$.rq("c", e)) {
+          _stopBubbling(e);
+          return; // Central semaphore - prevents multiple _click()s
+      }
       var link = $.rq("v", e);  // validate internal URL
       $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
       if (!link || _exoticKey(e)) return; // Ignore everything but normal click
@@ -847,9 +853,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
           $.hApi("="); // Update state on hash change
           return true;
       }
-      e.preventDefault(); // Stop normal click behaviour
-      e.stopPropagation(); // Stop "bubbling-up"
-           
+      
+      _stopBubbling(e); // Stop "bubbling-up"     
       _request(); // Continue with _request()
   }, 
  request: function(notPush) { // ... new url
@@ -922,4 +927,4 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
   }
 });
 
-jQuery.log("Ajaxify loaded...", {verbosity: 2});
+jQuery.log("Ajaxify loaded...", {verbosity: 10});
