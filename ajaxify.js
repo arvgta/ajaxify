@@ -336,13 +336,13 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
     alltxts: function ($s) {
         $s.each(function () {
              var d = $(this).text(), t = $(this).attr('type');
-             if(t && !t.toLowerCase().iO('text/javascript')) return;
-             if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d);
+             if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t);
         });
     },
-    addtext: function (t) {
+    addtext: function (t, type) {
         if(!t || !t.length) return;
-        if(inlineappend) try { return _apptext(t); } catch (e) { $.log("Error in apptext: " + t); }
+        if(!type) type = 'text/javascript';
+        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { $.log("Error in apptext: " + t); }
         
         try { $.globalEval(t); } catch (e1) {
 	        try { eval(t); } catch (e2) {
@@ -350,8 +350,9 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
             }
         }
     },
-    apptext: function (t) { 
+    apptext: function (t, type) { 
         var scriptNode = document.createElement('script');
+        scriptNode.type = type;
         scriptNode.appendChild(document.createTextNode(t));
         $.cd("g").append(scriptNode);
     },
