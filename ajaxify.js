@@ -335,7 +335,8 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
     },
     alltxts: function ($s) {
         $s.each(function () {
-             var d = $(this).text();
+             var d = $(this).text(), t = $(this).attr('type');
+             if(t && !t.toLowerCase().iO('text/javascript')) return;
              if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d);
         });
     },
