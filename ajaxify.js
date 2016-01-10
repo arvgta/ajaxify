@@ -627,16 +627,6 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
 });
 
 pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
-    if(o === "c") {
-        if(!p) return sema;
-        e = p;
-        l = e.currentTarget;
-        h = l.href;
-        if(sema === h) return false;
-        sema = h;
-        return true;
-    }
-    
     if(o === "v") {
         if(!p) return false;
         e = p;
@@ -844,20 +834,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
 	  e.stopImmediatePropagation();
  },
  click: function(e, mode) { //...handler for normal clicks
-/*    if(!$.rq("c", e)) { // Central semaphore - prevents multiple clicks
-          $.log("Blocked");
-          _stopBubbling(e);
-          return; 
-      }
-*/
       var link = $.rq("v", e);  // validate internal URL and not the same link
       $.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
       if (!link || _exoticKey(e)) return; // Ignore everything but normal click
-/*    if (_hashChange(link)) { // Only the hash part has changed
-          $.hApi("="); // Update state on hash change
-          return true;
-      }
-*/      
       _stopBubbling(e);      
       _request(); // Continue with _request()
   }, 
