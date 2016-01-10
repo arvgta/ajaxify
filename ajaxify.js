@@ -910,4 +910,4 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
   }
 });
 
-jQuery.log("Ajaxify loaded...", {verbosity: 10});
+jQuery.log("Ajaxify loaded...", {verbosity: 0});
