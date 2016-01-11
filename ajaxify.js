@@ -837,10 +837,11 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       var link = $.rq("v", e);  // validate internal URL and not the same link
       if(_exoticKey(e)) return;
       //$.rq("m", mode); // Mode variable -> "true" means don't jump on hash change
-      if (_hashChange(link)) { // Only the hash part has changed
+/*      if (_hashChange(link)) { // Only the hash part has changed
           $.hApi("="); // Update state on hash change
           return true;
       }
+*/
       _stopBubbling(e);
       if (!link) return; // Ignore everything but normal click      
       _request(); // Continue with _request()
