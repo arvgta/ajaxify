@@ -836,9 +836,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
  },
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL and not the same link
-      if(_exoticKey(e)) return;
+      if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       _stopBubbling(e);
-      if (!link) return; // Ignore everything but normal click
       if(_hashChange(link)) {
           _scroll2id(link.href);
           $.hAPi('=', link.href);
