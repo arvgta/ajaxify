@@ -627,12 +627,16 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
 });
 
 pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+    if(o === "=") {
+        return h === currentURL; 
+    }
+    
     if(o === "v") {
         if(!p) return false;
         e = p;
         l = e.currentTarget;
         h = l.href;
-        if(h === currentURL || !_internal(h)) return false;
+        if(!_internal(h)) return false;
         o = "i";
     }
     
@@ -814,8 +818,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
     $.slides("i"); // Init slideshow
   }, 
  prefetch: function(e) { //...target page on hoverIntent or touchstart
-       var link = $.rq("v", e); // validate internal URL and not the same link
-       if (!link) return false;
+       var link = $.rq("v", e); // validate internal URL
+       if ($.rq("=") || !link) return false;
        fn('+', link.href, function () {
             if (previewoff === true) return false;
             if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
@@ -835,7 +839,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
 	  e.stopImmediatePropagation();
  },
  click: function(e, mode) { //...handler for normal clicks
-      var link = $.rq("v", e);  // validate internal URL and not the same link
+      var link = $.rq("v", e);  // validate internal URL
+      if($.rq("=")) { _stopBubbling(e); return; }
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       _stopBubbling(e);
       if(_hashChange(link)) {
