@@ -762,8 +762,9 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay);
 });
 
-pO("hApi", 0, 0, function (o) {
+pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
+    //if(p) currentURL = p;
 
     if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL);
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
@@ -837,7 +838,13 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       var link = $.rq("v", e);  // validate internal URL and not the same link
       if(_exoticKey(e)) return;
       _stopBubbling(e);
-      if (!link) return; // Ignore everything but normal click      
+      if (!link) return; // Ignore everything but normal click
+      if(_hashChange(link)) {
+          _scroll2id(link.href);
+          $.hAPi('=', link.href);
+          return;
+      }
+      
       _request(); // Continue with _request()
   }, 
  request: function(notPush) { // ... new url
