@@ -840,7 +840,11 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
  },
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
-      if($.rq("=")) { _stopBubbling(e); return; }
+      if($.rq("=")) { 
+          _stopBubbling(e); 
+          return;
+      }
+      
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       _stopBubbling(e);
       if(_hashChange(link)) {
