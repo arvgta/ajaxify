@@ -835,8 +835,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
   },
  stopBubbling: function(e) { // Stop "bubbling-up"
       e.preventDefault();
-	  e.stopPropagation();
-	  e.stopImmediatePropagation();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
  },
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
@@ -846,7 +846,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       if(_hashChange(link)) {
           _scroll2id(link.href);
           currentURL = link.href;
-          $.hApi('=');
+          $.hApi("=");
           return;
       }
       
