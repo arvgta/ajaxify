@@ -846,7 +846,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       }
       
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      _stopBubbling(e);
       if(_hashChange(link)) {
           _scroll2id(link.href);
           currentURL = link.href;
@@ -854,6 +853,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
           return;
       }
       
+      _stopBubbling(e);
       _request(); // Continue with _request()
   }, 
  request: function(notPush) { // ... new url
