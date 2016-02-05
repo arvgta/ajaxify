@@ -848,9 +848,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(_hashChange(link)) {
           _scroll2id(link.href);
-          currentURL = link.href;
+          if(link.href.substr(-1) !=='#') currentURL = link.href;
           $.hApi("=");
-          return;
+          return true;
       }
       
       _stopBubbling(e);
