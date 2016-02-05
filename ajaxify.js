@@ -840,10 +840,10 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
  },
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
-      if($.rq("=")) { 
+      /*if($.rq("=")) { 
           _stopBubbling(e); 
           return;
-      }
+      }*/
       
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(_hashChange(link)) {
@@ -854,7 +854,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       }
       
       _stopBubbling(e);
-      _request(); // Continue with _request()
+      if($.rq("=")) $.hApi("=");
+      else _request(); // Continue with _request()
   }, 
  request: function(notPush) { // ... new url
       $.rq("p", !notPush); // mode for hApi - replaceState / pushState
