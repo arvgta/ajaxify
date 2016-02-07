@@ -574,7 +574,8 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     }, 
     nextLink: function() { 
         var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
-        $(menu).each(function(i, v){ var el = $(this).parent();
+        $(menu).each(function(i, v){ 
+            var el = $(this).parent();
             if(nextLink) return true;
             link = v.href;
             if(!_internal(link)) return;
@@ -617,11 +618,11 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         img.attr("src", src);
         img.attr("title", titl);
         
-        if(!pinned) { //Kickstart in idle sub-plugin after user resumes
-        _slide1();
-        //if(timer + 1) clearInterval(timer);
-        //timer = -1;
-        $(document).trigger("idle:kick");
+        if(!pinned) { //Kickstart in idle sub-plugin after user resumes 
+            _slide1();
+            //if(timer + 1) clearInterval(timer);
+            //timer = -1;
+            $(document).trigger("idle:kick");
         }
     }
 });
