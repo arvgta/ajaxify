@@ -768,6 +768,7 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
+    if(p) currentURL = p;
 
     if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL);
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
@@ -801,8 +802,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
      }
 }, { 
  init_p: function() {
-    currentURL = window.location.href; // Capture current url & state
-    $.hApi("="); // Set initial state
+    $.hApi("=", window.location.href); // Set initial state
     $(window).on("popstate", _onPop); // Set handler for popState
     if (prefetch) {
         $(selector).hoverIntent(_prefetch, function(){});
@@ -894,8 +894,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       $.frms("a"); // Ajaxify forms - in content divs only
            
       _scroll2id(url);
-      currentURL = url;
-      $.hApi($.rq("p") ? "+" : "="); // Push new state to the stack on new url
+      $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
       _gaCaptureView(url); // Trigger analytics page view
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
