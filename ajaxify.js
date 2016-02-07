@@ -768,7 +768,6 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
-    //if(p) currentURL = p;
 
     if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL);
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
