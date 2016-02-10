@@ -289,7 +289,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
                 return false;
             }
             $.log("Ajaxify loaded...", s);
-			$.scripts("i", s);
+            $.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
             return true;
