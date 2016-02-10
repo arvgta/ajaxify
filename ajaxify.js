@@ -288,7 +288,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
                 $.log("Gracefully exiting...");
                 return false;
             }
-            $.scripts("i", s);
+            $.log("Ajaxify loaded...", s);
+			$.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
             return true;
@@ -920,5 +921,3 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
   }
 });
-
-jQuery.log("Ajaxify loaded...", {verbosity: 0});
