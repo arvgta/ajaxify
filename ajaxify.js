@@ -103,7 +103,7 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]';
 
 //Minified pO() function
-function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,S=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),p||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(S),!i)try{jQuery.globalEval(S)}catch(v){alert("Error : "+v+" | "+S)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n){verbosity&&lvl<verbosity&&console&&console.log(n)});
+function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
@@ -214,7 +214,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
     },
 		
     lDivs: function ($t) { //load target divs into DOM
-        if ($.cache()) $t.each(function () { 
+        if ($.cache()) $t.each(function() { 
             _ld($(this), $.cache().find("#" + $(this).attr("id")));
         });
     },
@@ -226,7 +226,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
         url: hin,
         type: ispost ? "POST" : "GET",
         data: ispost ? $.rq("d") : null,
-        success: function (h) {
+        success: function(h) {
             if (!h || !_isHtml(xhr)) {
                 if (!pre) location.href = hin;
             }
@@ -234,7 +234,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
             $.cache($(_parseHTML(h)));
             $.pages([hin, $.cache()]);
 
-            if(p) return p();
+            if(p) return(p());
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
@@ -271,7 +271,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
 // Calls Pronto
 var fn = jQuery.getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
 
-pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
+pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this, options) {
     var o = options;
     if(!o || typeof(o) !== 'string') {
         $(function () { //on DOMReady
@@ -288,7 +288,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true }, function ($this, options) {
                 $.log("Gracefully exiting...");
                 return false;
             }
-            $.log("Ajaxify loaded...", s);
+            $.log("Ajaxify loaded...", verbosity);
             $.scripts("i", s);
             $.cache(0, s);
             $.memory(0, s);
@@ -329,13 +329,13 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
     allstyle: function ($s) {
         if (!style || !$s) return;
         $("head").find("style").remove();
-        $s.each(function () {
+        $s.each(function() {
             var d = $(this).text();
             _addstyle(d);
         });
     },
     alltxts: function ($s) {
-        $s.each(function () {
+        $s.each(function() {
              var d = $(this).text(), t = $(this).prop('type');
              if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t);
         });
@@ -395,13 +395,13 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.c = _rel(lk, "stylesheet");
     $s.y = head.find("style");
     $s.can = _rel(lk, "canonical");
-    $s.s = j.filter(function () {
+    $s.s = j.filter(function() {
          return($(this).attr("src"));
     });
-    $s.t = j.filter(function () {return(!($(this).attr("src")));});
+    $s.t = j.filter(function() {return(!($(this).attr("src")));});
     }, {
     rel: function(lk, v) {
-        return $(lk).filter(function (){return($(this).attr("rel").iO(v));});
+        return($(lk).filter(function(){return($(this).attr("rel").iO(v));}));
     }
     }
 );
@@ -435,14 +435,14 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     }, {
     allScripts: function ($t, PK) {
         if (deltas) return false;
-        $t.each(function () {
+        $t.each(function() {
              _iScript($(this)[0], PK);
         });
         
         return true;
     },
     classAlways: function ($t, PK) { 
-        $t.each(function () {
+        $t.each(function() {
             if ($(this).attr("data-class") == "always") {
                  _iScript($(this).attr(PK), PK);
             }
@@ -457,7 +457,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     },
     newArray: function ($t, sN, sO, PK) {
         var d;
-        $t.each(function () {
+        $t.each(function() {
              d = [$(this).attr(PK), 0];
              sN.push(d);
              if (!pass) sO.push(d);
@@ -577,9 +577,9 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
         $(menu).each(function(i, v){ 
             var el = $(this).parent();
-            if(nextLink) return true;
+            if(nextLink) return(true);
             link = v.href;
-            if(!_internal(link)) return;
+            if(!_internal(link)) return(undefined);
             el.removeClass(addclass);
             if(!firstValue) firstValue = $(this).parent();
             if(!firstLink) firstLink = link;
@@ -707,7 +707,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     if(o === "d") divs = p;
     if(o === "a") divs.find(forms).filter(function() {
         return(_internal($(this).attr("action")));
-    }).submit(function (q) {
+    }).submit(function(q) {
         fm = $(q.target);
         if (!fm.is("form")) {
             fm = fm.filter("input[type=submit]").parents("form:first");
@@ -821,14 +821,14 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
  prefetch: function(e) { //...target page on hoverIntent or touchstart
        var link = $.rq("v", e); // validate internal URL
        if ($.rq("=") || !link) return false;
-       fn('+', link.href, function () {
-            if (previewoff === true) return false;
+       fn('+', link.href, function() {
+            if (previewoff === true) return(false);
             if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
        });
   },
  isInDivs: function(link) {
       var is = false;
-      $gthis.each(function () {
+      $gthis.each(function() {
           if ($(link).parents("#" + $(this).attr("id")).length > 0) is = true;
       });      
          
@@ -857,7 +857,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       $.rq("p", !notPush); // mode for hApi - replaceState / pushState
       _trigger("request"); // Fire request event
       $.rq("s"); // Set "same" variable
-      fn($.rq("h"), function (err) { // Call "fn" - handler of parent
+      fn($.rq("h"), function(err) { // Call "fn" - handler of parent
           if (err) { 
               $.log('Error in _request : ' + err); 
               _trigger("error", err); 
@@ -921,3 +921,5 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
   }
 });
+
+jQuery.log(0, 1);
