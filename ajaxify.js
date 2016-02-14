@@ -182,10 +182,19 @@ pO("pages", { d: [] }, 0, function (h) {
 // "x" - returns XHR
 // otherwise - returns selection of current page to client
 
-pO("getPage", { xhr: 0 }, 0, function (o, p, p2) { 
+pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache();
-    if (o.iO("/")) return _lPage(o, p);
-    if (o === "+") return _lPage(p, p2, true);
+    if (o.iO("/")) {
+        cb = p;
+        if(plus == o) return;
+		return _lPage(o);
+    }
+    if (o === "+")  {
+        plus = p;
+        cb = p2;
+        return _lPage(p, true);
+    }
+	
     if (o === "-") return _lSel(p);
     if (o === "x") return xhr;            
     if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o);
@@ -199,10 +208,10 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
         return $.scripts("c");
     },
 		
-    lPage: function (h, p, pre) { //fire Ajax load, check for hash first
+    lPage: function (h, pre) { //fire Ajax load, check for hash first
          if (h.iO("#")) h = h.split("#")[0];
-         if ($.rq("is") || !$.cache(h)) return _lAjax(h, p, pre);
-         if(p) return p();
+         if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre);
+         if(cb) return cb();
     },
 		
     ld: function ($t, $h) { 
@@ -219,7 +228,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
         });
     },
 		
-    lAjax: function (hin, p, pre) { //execute Ajax load
+    lAjax: function (hin, pre) { //execute Ajax load
         var ispost = $.rq("is");
                 
         xhr = $.ajax({
@@ -233,8 +242,9 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
             
             $.cache($(_parseHTML(h)));
             $.pages([hin, $.cache()]);
+			plus = 0;
 
-            if(p) return(p());
+            if(cb) return(cb());
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
@@ -242,7 +252,7 @@ pO("getPage", { xhr: 0 }, 0, function (o, p, p2) {
                 $.log('Response text : ' + jqXHR.responseText);
                 $.cache($(_parseHTML(jqXHR.responseText)));
                 $.pages([hin, $.cache()]); 
-                if(p) p(error);
+                if(cb) cb(error);
             } catch (e) {}
         },
         async: true
