@@ -187,7 +187,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     if (o.iO("/")) {
         cb = p;
         if(plus == o) return;
-		return _lPage(o);
+        return _lPage(o);
     }
     if (o === "+")  {
         plus = p;
@@ -244,7 +244,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
             
             $.cache($(_parseHTML(h)));
             $.pages([hin, $.cache()]);
-			plus = 0;
+            plus = 0;
 
             if(cb) return(cb());
         },
