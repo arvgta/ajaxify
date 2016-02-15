@@ -211,6 +211,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     lPage: function (h, pre) { //fire Ajax load, check for hash first
          if (h.iO("#")) h = h.split("#")[0];
          if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre);
+		 
+         plus = 0;
          if(cb) return cb();
     },
 		
