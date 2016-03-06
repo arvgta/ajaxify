@@ -48,7 +48,7 @@ Options default values
     prefetch : true, // Plugin pre-fetches pages on hoverIntent or touchstart
  
 // debugging & advanced settings
-    verbosity : 0,  //Debugging level to console: 1 = medium, 2 = verbose
+    verbosity : 0,  //Debugging level to console: default off.  Can be set to 10 and higher (in case of logging enabled) 
     memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
     cb : null, // callback handler on completion of each Ajax request - default null
     pluginon : true // Plugin set "on" or "off" (==false) manually
@@ -281,8 +281,6 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 // Checks for necessary pre-conditions - otherwise gracefully degrades
 // Initialises sub-plugins
 // Calls Pronto
-var fn = jQuery.getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
-
 pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this, options) {
     var o = options;
     if(!o || typeof(o) !== 'string') {
@@ -933,3 +931,5 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
   }
 });
+
+var fn = jQuery.getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
