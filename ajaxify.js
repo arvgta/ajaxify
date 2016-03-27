@@ -84,7 +84,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 (function(a){a.fn.hoverIntent=function(w,e,b){var j={interval:100,sensitivity:7,timeout:0};if(typeof w==="object"){j=a.extend(j,w);}else{if(a.isFunction(e)){j=a.extend(j,{over:w,out:e,selector:b});}else{j=a.extend(j,{over:w,out:w,selector:e});}}var x,d,v,q;var m=function(c){x=c.pageX;d=c.pageY;};var g=function(c,f){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);if(Math.abs(v-x)+Math.abs(q-d)<j.sensitivity){a(f).off("mousemove.hoverIntent",m);f.hoverIntent_s=1;return j.over.apply(f,[c]);}else{v=x;q=d;f.hoverIntent_t=setTimeout(function(){g(c,f);},j.interval);}};var p=function(f,c){c.hoverIntent_t=clearTimeout(c.hoverIntent_t);c.hoverIntent_s=0;return j.out.apply(c,[f]);};var k=function(c){var h=jQuery.extend({},c);var f=this;if(f.hoverIntent_t){f.hoverIntent_t=clearTimeout(f.hoverIntent_t);}if(c.type=="mouseenter"){v=h.pageX;q=h.pageY;a(f).on("mousemove.hoverIntent",m);if(f.hoverIntent_s!=1){f.hoverIntent_t=setTimeout(function(){g(h,f);},j.interval);}}else{a(f).off("mousemove.hoverIntent",m);if(f.hoverIntent_s==1){f.hoverIntent_t=setTimeout(function(){p(h,f);},j.timeout);}}};return this.on({"mouseenter.hoverIntent":k,"mouseleave.hoverIntent":k},j.selector);};})(jQuery);
 
 //Minified idle plugin
-!function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(){l=o(c)}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(){l=t(l,c)})})}}(jQuery);
+!function(n){"use strict";n.fn.idle=function(e){var o,t,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},c=0,u=n.extend({},i,e),l=null;return n(this).on("idle:kick",function(n){c=2}),o=function(n,e){return c&&(1==c&&(e.onActive.call(),console&&console.log("onActive")),c--),c?void 0:(clearTimeout(n),t(e))},t=function(n){var e,o=setTimeout;return e=o(function(){c=1,n.onIdle.call()},n.idle)},this.each(function(){l=t(u),n(this).on(u.events,function(n){l=o(l,u)})})}}(jQuery);
 
 //Module global variables
 var lvl = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
@@ -544,11 +544,9 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 });
 
 pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
-    if(!o) return;
+    if(!o || !idleTime) return;
 	
     if (o === "i") { 
-        if(!idleTime) return;
-			
         $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime });
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
@@ -577,7 +575,8 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         timer = -1;
     },
     slide: function() { 
-        timer = setInterval(_slide1, slideTime); 
+        if(timer + 1) clearInterval(timer);
+		timer = setInterval(_slide1, slideTime); 
     },
     slide1: function() { 
         if(pinned) return;
@@ -616,7 +615,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         img.click(_toggleImg);
         pinned = 0;
     },
-    toggleImg: function() {
+    toggleImg: function(e) {
         if(!parentEl || !img || !img.length) return;
         var src = toggleSlide.imgOn, titl = toggleSlide.titleOn;
         
@@ -631,10 +630,9 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         
         if(!pinned) { //Kickstart in idle sub-plugin after user resumes 
             _slide1();
-            //if(timer + 1) clearInterval(timer);
-            //timer = -1;
-            $(document).trigger("idle:kick");
-        }
+            _slide();
+             $(document).trigger("idle:kick");
+		}
     }
 });
 
