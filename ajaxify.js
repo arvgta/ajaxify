@@ -411,7 +411,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.t = j.filter(function() {return(!($(this).attr("src")));});
     }, {
     rel: function(lk, v) {
-        return($(lk).filter(function(){return($(this).attr("rel").iO(v));}));
+        return $(lk).filter(function(){return($(this).attr("rel").iO(v));});
     }
     }
 );
