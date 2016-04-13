@@ -647,6 +647,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         l = e.currentTarget;
         h = l.href;
         if(!_internal(h)) return false;
+        //Todo - update memory with $(window).scrollTop()
         o = "i";
     }
     
@@ -816,7 +817,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
     $(window).on("popstate", _onPop); // Set handler for popState
     if (prefetch) {
         $(selector).hoverIntent(_prefetch, function(){});
-        $(selector).on("touchstart", _prefetch); // for touchscreens
+        //$(selector).on("touchstart", _prefetch); // for touchscreens
     }
             
     var $body = $("body");
