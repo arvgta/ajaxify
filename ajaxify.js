@@ -817,9 +817,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
     $(window).on("popstate", _onPop); // Set handler for popState
     if (prefetch) {
         $(selector).hoverIntent(_prefetch, function(){});
-        //$(selector).on("touchstart", _prefetch); // for touchscreens
+        $(selector).on("touchend", _prefetch); // for touchscreens
     }
-            
+    
     var $body = $("body");
     $body.on("click.pronto", selector, _click); // Real click handler -> _click()
     $.frms("d", $body); // Select forms in whole body
@@ -827,9 +827,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
     $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
     $.slides("i"); // Init slideshow
   }, 
- prefetch: function(e) { //...target page on hoverIntent or touchstart
+ prefetch: function(e) { //...target page on hoverIntent
        var link = $.rq("v", e); // validate internal URL
-       if ($.rq("=") || !link) return false;
+       if ($.rq("=") || !link) return;
        fn('+', link.href, function() {
             if (previewoff === true) return(false);
             if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
