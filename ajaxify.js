@@ -169,7 +169,7 @@ pO("pages", { d: [] }, 0, function (h) {
             if (d[i][0] == h) return d[i][1];
     }
 	
-    if (typeof h === "object") d.push(h);
+    if (typeof h === "object") if(!$.pages(h[0])) d.push(h);
     if (typeof h === "boolean") return false;
 });
 
@@ -779,6 +779,12 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 
 pO("scroll", 0, { scrolltop: false }, function (o) {
     if(!o) return;
+	
+	if(scrolltop === "s") {
+        if(o === "+")
+    
+        return;
+    }
 
 	if(scrolltop) $(window).scrollTop(0);
     else {
