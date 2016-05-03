@@ -777,6 +777,20 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay);
 });
 
+pO("scroll", 0, { scrolltop: false }, function (o) {
+    if(!o) return;
+
+	if(scrolltop) $(window).scrollTop(0);
+    else {
+	    var url = o;
+	    if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { //if hash in URL
+            var $el = $('#' + url.split('#')[1]), offSet;
+            if ($el.length) offSet = $el.offset().top;
+            if (offSet !== false) $(window).scrollTop(offSet); // ...animate
+        }
+    }
+});
+
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
     if(p) currentURL = p;
@@ -785,17 +799,19 @@ pO("hApi", 0, 0, function (o, p) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, previewoff: true, scrolltop: false, cb: 0 }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, previewoff: true, cb: 0 }, function ($this, h) {
      if(!h) return;
      
      if(h === "i") { 
+         var s = settings;
          if(!$this.length) $.log("Warning - empty content selector passed!");
          $gthis = $this;
-         $.cd(0, 0, settings);
-         $.frms(0, 0, settings);
-         $.slides(0, settings);
-         $.rqTimer(0, settings);
-         $.cd("i", $gthis);
+         $.cd(0, 0, s);
+         $.frms(0, 0, s);
+         $.slides(0, s);
+         $.rqTimer(0, s);
+         $.scroll(0, s);
+		 $.cd("i", $gthis);
          _init_p();
          return $this;
      }
@@ -904,19 +920,11 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
       $.frms("a"); // Ajaxify forms - in content divs only
            
-      _scroll2id(url);
+      $.scroll(url);
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
       _gaCaptureView(url); // Trigger analytics page view
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
-  },
- scroll2id: function(url) { //If hash in URL and hash not standalone at the end or scrolltop set, 
-      if(scrolltop) $(window).scrollTop(0); //always scroll to top
-      else if (url.iO('#') && (url.iO('#') < url.length - 1) && !$.rq("m")) { //if hash in URL
-          var $el = $('#' + url.split('#')[1]), offSet;
-          if ($el.length) offSet = $el.offset().top;
-          if (offSet !== false) $(window).scrollTop(offSet); // ...animate
-      }
   },
  gaCaptureView: function(url) { // Google Analytics support
       url = '/' + url.replace(rootUrl,'');
