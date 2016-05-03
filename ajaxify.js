@@ -868,7 +868,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(_hashChange(link)) {
-          _scroll2id(link.href);
+          $.scroll(link.href);
           if(link.href.substr(-1) !=='#') currentURL = link.href;
           $.hApi("=");
           return true;
