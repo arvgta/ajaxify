@@ -162,16 +162,31 @@ pO("memory", { d: false }, { memoryoff: false }, function (h) {
 // 1) $.pages(<URL>) - returns page with specified URL from internal array
 // 2) $.pages(<jQuery object>) - saves the passed page in internal array
 // 3) $.pages(false) - returns false
-pO("pages", { d: [] }, 0, function (h) {
+pO("pages", { d: [], i: -1 }, 0, function (h) {
     if (typeof h === "string") {
         if(h === "f") d = [];
-        else for (var i = 0; i < d.length; i++)
-            if (d[i][0] == h) return d[i][1];
+        else { 
+            i = _iPage(h);
+			if(i === -1) return;
+			return d[i][1];
+        }
     }
 	
-    if (typeof h === "object") if(!$.pages(h[0])) d.push(h);
+    if (typeof h === "object") {
+        i = _iPage(h[0]);
+        if(i === -1) d.push(h);
+        else d[i] = h;
+    }
+	
     if (typeof h === "boolean") return false;
-});
+}, {
+    iPage: function (h) { //get index of page, undefined if not found
+        for (var i = 0; i < d.length; i++)
+            if (d[i][0] == h) return i;
+        return -1;
+    }
+}
+);
 
 // The GetPage plugin
 // First parameter is a switch: 
