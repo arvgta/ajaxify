@@ -964,8 +964,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
       $.frms("a"); // Ajaxify forms - in content divs only
            
-      $.scroll(url);
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
+      $.scroll(url);
       _gaCaptureView(url); // Trigger analytics page view
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
