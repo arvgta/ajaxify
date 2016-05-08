@@ -180,7 +180,7 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 	
     if (typeof h === "boolean") return false;
 }, {
-    iPage: function (h) { //get index of page, undefined if not found
+    iPage: function (h) { //get index of page, -1 if not found
         for (var i = 0; i < d.length; i++)
             if (d[i][0] == h) return i;
         return -1;
@@ -792,12 +792,36 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay);
 });
 
+// The stateful Offsets plugin
+// Usage: 
+// 1) $.offsets(<URL>) - returns offset with specified URL from internal array
+// 2) $.offsets() - saves the current URL + offset in internal array
+pO("offsets", { d: [], i: -1 }, 0, function (h) {
+    if (typeof h === "string") {
+        i = _iOffset(h);
+        if(i === -1) return;
+        return d[i][1];
+    }
+	
+    var os = [currentURL, $(window).scrollTop()];
+    i = _iOffset(currentURL);
+    if(i === -1) d.push(os);
+    else d[i] = os;
+}, {
+    iOffset: function (h) { //get index of page, -1 if not found
+        for (var i = 0; i < d.length; i++)
+            if (d[i][0] == h) return i;
+        return -1;
+    }
+}
+);
+
 pO("scroll", 0, { scrolltop: false }, function (o) {
     if(!o) return;
 	
 	if(scrolltop === "s") {
-        if(o === "+")
-    
+        if(o === "+") $.offsets();
+        else $(window).scrollTop($.offsets(o));
         return;
     }
 
