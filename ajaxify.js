@@ -916,7 +916,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
           $.scroll(link.href);
           if(link.href.substr(-1) !=='#') currentURL = link.href;
           $.hApi("=");
-          return true;
+          return;
       }
       
       _stopBubbling(e);
