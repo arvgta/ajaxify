@@ -801,27 +801,27 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
     if(i === -1) d.push(os);
     else d[i] = os;
 }, {
-    iOffset: function (h) { //get index of page, -1 if not found
+  iOffset: function (h) { //get index of page, -1 if not found
         for (var i = 0; i < d.length; i++)
             if (d[i][0] == h) return i;
         return -1;
-    }
+  }
 }
 );
 
 pO("scroll", 0, { scrolltop: false }, function (o) {
     if(!o) return;
 	
-	if(scrolltop === "s") {
+    if(scrolltop === "s") {
         if(o === "+") $.offsets();
         else $(window).scrollTop($.offsets(o));
         return;
     }
 
-	if(scrolltop) $(window).scrollTop(0);
+    if(scrolltop) $(window).scrollTop(0);
     else {
-	    var url = o;
-	    if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
+        var url = o;
+        if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
             var $el = $('#' + url.split('#')[1]), offSet;
             if ($el.length) offSet = $el.offset().top;
             if (offSet !== false) $(window).scrollTop(offSet); // ...animate
