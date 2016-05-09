@@ -670,7 +670,6 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
         ispost = false;
         data = null;
         same = false;
-        mode = false;
         push = false;
         return l;
     }
@@ -688,11 +687,6 @@ pO("rq", { ispost: 0, data: 0, same: 0, sema: 0, mode: 0, push: 0, can: 0, e: 0,
     if(o === "e") {
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
-    }
-    
-    if(o === "m") {
-        if(p) mode = p;
-        return mode;
     }
 
     if(o === "p") {
@@ -828,7 +822,7 @@ pO("scroll", 0, { scrolltop: false }, function (o) {
 	if(scrolltop) $(window).scrollTop(0);
     else {
 	    var url = o;
-	    if (url.iO('#') && (url.iO('#') < url.length - 1) /*&& !$.rq("m")*/) { //if hash in URL
+	    if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
             var $el = $('#' + url.split('#')[1]), offSet;
             if ($el.length) offSet = $el.offset().top;
             if (offSet !== false) $(window).scrollTop(offSet); // ...animate
@@ -868,8 +862,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
      }
      
      if(h.iO("/")) {
-         $.rq("h", h);
-         $.rq("m", true);				 
+         $.rq("h", h);				 
          _request(true);
      }
 }, { 
