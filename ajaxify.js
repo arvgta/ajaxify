@@ -368,7 +368,7 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
     addtext: function (t, type) {
         if(!t || !t.length) return;
         if(!type) type = 'text/javascript';
-        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { $.log("Error in apptext: " + t); }
+        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { $.log("Error in apptext: " + t + "\nType: " + type + "\nCode: " + console.debug(e)); }
         
         try { $.globalEval(t); } catch (e1) {
 	        try { eval(t); } catch (e2) {
@@ -377,10 +377,11 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         }
     },
     apptext: function (t, type) { 
-        var scriptNode = document.createElement('script');
+        var scriptNode = document.createElement('script'), $cd0 = $.cd("g").get(0);
         scriptNode.type = type;
         scriptNode.appendChild(document.createTextNode(t));
-        $.cd("g").append(scriptNode);
+        $.log(t);
+        $cd0.appendChild(scriptNode);
     },
     addstyle: function (t) {
         $("head").append('<style type="text/css">' + t + '</style>');
@@ -805,13 +806,13 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
         for (var i = 0; i < d.length; i++)
             if (d[i][0] == h) return i;
         return -1;
-  }
+    }
 }
 );
 
 pO("scroll", 0, { scrolltop: false }, function (o) {
     if(!o) return;
-	
+  
     if(scrolltop === "s") {
         if(o === "+") $.offsets();
         else $(window).scrollTop($.offsets(o));
@@ -819,11 +820,12 @@ pO("scroll", 0, { scrolltop: false }, function (o) {
     }
 
     if(scrolltop) $(window).scrollTop(0);
-    else {
+    else {  
         var url = o;
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
             var $el = $('#' + url.split('#')[1]), offSet;
             if ($el.length) offSet = $el.offset().top;
+            $.log("Offset: " + offSet);
             if (offSet !== false) $(window).scrollTop(offSet); // ...animate
         }
     }
