@@ -525,12 +525,12 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 		
         aniParams = $.extend({
             opacity: 1, // default - no fade
-            width: "100%",
-            height: "100%"
+            width: "100%", // default - no change in width
+            height: "100%" // default - no change in height
         }, aniParams);
 		
         aniParams = $.extend({
-            marginRight: cdwidth - aniParams.width
+            marginRight: cdwidth - aniParams.width //making the content div width self-managing
         }, aniParams);
 		
         from = $.extend({}, aniParams);
@@ -591,7 +591,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     },
     slide: function() { 
         if(timer + 1) clearInterval(timer);
-		timer = setInterval(_slide1, slideTime); 
+        timer = setInterval(_slide1, slideTime); 
     },
     slide1: function() { 
         if(pinned) return;
@@ -647,7 +647,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
             _slide1();
             _slide();
              $(document).trigger("idle:kick");
-		}
+        }
     }
 });
 
@@ -850,7 +850,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
          $.slides(0, s);
          $.rqTimer(0, s);
          $.scroll(0, s);
-		 $.cd("i", $gthis);
+         $.cd("i", $gthis);
          _init_p();
          return $this;
      }
@@ -959,7 +959,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       $.frms("a"); // Ajaxify forms - in content divs only
            
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
-      $.scroll(url);
+      $.scroll(url); // Scroll to respective ID if hash in URL
       _gaCaptureView(url); // Trigger analytics page view
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
@@ -969,7 +969,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url); // the new analytics API
       else if (typeof window._gaq !== 'undefined') window._gaq.push(['_trackPageview', url]);  // the old API					
   },
- exoticKey: function(e) {
+ exoticKey: function(e) { //not a real click, or target = "_blank"
       return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank");
   },
  hashChange: function(link) { // only hash has changed
