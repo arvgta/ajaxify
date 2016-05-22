@@ -380,7 +380,6 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         var scriptNode = document.createElement('script'), $cd0 = $.cd("g").get(0);
         scriptNode.type = type;
         scriptNode.appendChild(document.createTextNode(t));
-        $.log(t);
         $cd0.appendChild(scriptNode);
     },
     addstyle: function (t) {
