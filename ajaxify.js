@@ -824,7 +824,6 @@ pO("scroll", 0, { scrolltop: false }, function (o) {
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
             var $el = $('#' + url.split('#')[1]), offSet;
             if ($el.length) offSet = $el.offset().top;
-            $.log("Offset: " + offSet);
             if (offSet !== false) $(window).scrollTop(offSet); // ...animate
         }
     }
