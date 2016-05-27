@@ -906,11 +906,11 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      if(_hashChange(link)) { // only hash has changed
+      if(_hasHash(link)) { // has hash
           $.scroll(link.href);
           if(link.href.substr(-1) !=='#') currentURL = link.href;
           $.hApi("="); 
-          return false;
+          return true;
       }
       
       _stopBubbling(e);
@@ -973,8 +973,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  exoticKey: function(e) { //not a real click, or target = "_blank"
       return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank");
   },
- hashChange: function(link) { // only hash has changed
-      return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
+ hasHash: function(link) { // has hash
+      return (link.href.split("#").length === 2);
   }
 });
 
