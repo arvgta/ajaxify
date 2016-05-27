@@ -215,10 +215,10 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     if (o === "x") return xhr;            
     if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o);
 }, {
-    lSel: function ($t) { //load page into DOM and handle scripts
+    lSel: function ($t) { //load page into DOM, handle scripts and fetch canonical URL
         pass++;
-        _lDivs($t);
         $.scripts($.rq("s?"));
+        _lDivs($t);
         $.scripts("s");
         $.scripts("a");
         return $.scripts("c");
@@ -234,11 +234,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 		
     ld: function ($t, $h) { 
         $h.find(".ajy-script").each(function() {
-            if(($(this).attr("src"))) {
-                $(this).replaceWith(scri.replace('*', $(this).attr("src")));
-            } else {
-                $(this).replaceWith($(this)[0].outerHTML.replace('<div class="ajy-script"', '<script').replace(/<\/div>$/, '</script>'));
-            }
+            if(!($(this).attr("src"))) $(this).replaceWith('');
+            else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
         });
         $t.html($h.html());
     },
