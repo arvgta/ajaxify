@@ -232,10 +232,13 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     ld: function ($t, $h) { 
-        $h.find(".ajy-script").each(function(){
-            if(!($(this).attr("src"))) $(this).replaceWith('');
-            else $(this).replaceWith(scri.replace('*', $(this).attr("src")));
-        });      
+        $h.find(".ajy-script").each(function() {
+            if(($(this).attr("src"))) {
+                $(this).replaceWith(scri.replace('*', $(this).attr("src")));
+            } else {
+                $(this).replaceWith($(this)[0].outerHTML.replace('<div class="ajy-script"', '<script').replace(/<\/div>$/, '</script>'));
+            }
+        });
         $t.html($h.html());
     },
 		
@@ -328,7 +331,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 // "a" - handle inline scripts
 // "c" - fetch canonical URL
 // otherwise - delta loading
-pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
+pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") {
         if(!$s) $s = $();
         return true;
@@ -338,6 +341,7 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
             
     if (o === "1") { 
         $.detScripts($s);
+        cd0 = $.cd("g").get(0);
         return _addScripts(false, $s, settings);
     }
             
@@ -377,10 +381,10 @@ pO("scripts", { $s : false }, { canonical: true, inline: true, inlinehints: fals
         }
     },
     apptext: function (t, type) { 
-        var scriptNode = document.createElement('script'), $cd0 = $.cd("g").get(0);
+        var scriptNode = document.createElement('script');
         scriptNode.type = type;
         scriptNode.appendChild(document.createTextNode(t));
-        $cd0.appendChild(scriptNode);
+        cd0.appendChild(scriptNode);
     },
     addstyle: function (t) {
         $("head").append('<style type="text/css">' + t + '</style>');
