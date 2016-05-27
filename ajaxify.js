@@ -25,6 +25,7 @@ Options default values
     selector : "a:not(.no-ajaxy)",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : true, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
+    refresh : true, // Refresh the page if clicked link target current page
  
 // visual effects settings
     requestDelay : 0, //in msec - Delay of Pronto request
@@ -841,7 +842,7 @@ pO("hApi", 0, 0, function (o, p) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, previewoff: true, cb: 0 }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: true, previewoff: true, cb: 0 }, function ($this, h) {
      if(!h) return;
      
      if(h === "i") { 
@@ -917,7 +918,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, prev
       
       _stopBubbling(e);
       if($.rq("=")) $.hApi("=");
-      else _request(); // Continue with _request()
+      if(refresh || !$.rq("=")) _request(); // Continue with _request()
   }, 
  request: function(notPush) { // ... new url
       $.rq("p", !notPush); // mode for hApi - replaceState / pushState
