@@ -93,8 +93,8 @@ var lvl = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.his
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
 docType = /<\!DOCTYPE[^>]*>/i,
-tagso = /<(html|head|body|meta|script|link)([\s\>])/gi,
-tagsc = /<\/(html|head|body|meta|script|link)\>/gi,
+tagso = /<(html|head|body|script|link)([\s\>])/gi,
+tagsc = /<\/(html|head|body|script|link)\>/gi,
 
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
