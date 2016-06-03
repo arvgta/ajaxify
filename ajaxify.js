@@ -25,7 +25,7 @@ Options default values
     selector : "a:not(.no-ajaxy)",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : true, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
-    refresh : true, // Refresh the page if clicked link target current page
+    refresh : false, // Refresh the page if clicked link target current page
  
 // visual effects settings
     requestDelay : 0, //in msec - Delay of Pronto request
@@ -839,7 +839,7 @@ pO("hApi", 0, 0, function (o, p) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: true, previewoff: true, cb: 0 }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0 }, function ($this, h) {
      if(!h) return;
      
      if(h === "i") { 
@@ -906,6 +906,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
+      //if(link.href.substr(-1) ==='#') return;
       if(_hashChange(link)) { // only hash has changed
           $.scroll(link.href);
           if(link.href.substr(-1) !=='#') currentURL = link.href;
