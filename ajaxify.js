@@ -104,7 +104,7 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]';
 
 //Minified pO() function
-function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
+function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
@@ -217,10 +217,10 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 }, {
     lSel: function ($t) { //load page into DOM, handle scripts and fetch canonical URL
         pass++;
-        $.scripts($.rq("s?"));
+		$.scripts("s");
         _lDivs($t);
-        $.scripts("s");
-        $.scripts("a");
+        $.scripts($.rq("s?"));
+        //$.scripts("a");
         return $.scripts("c");
     },
 		
@@ -326,8 +326,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 // The stateful Scripts plugin
 // First parameter is switch:
 // "i" - initailise options
-// "a" - handle inline scripts
 // "c" - fetch canonical URL
+// jQuery object - handle one inline script
 // otherwise - delta loading
 pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") {
@@ -343,13 +343,13 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         return _addScripts(false, $s, settings);
     }
             
-    if (o === "a") return _alltxts($s.t);
-
     if (o === "c") {
         if (canonical && $s.can) return $s.can.attr("href");
         else return false;
     }
     
+    if(o instanceof jQuery) return _onetxt(o);
+	
     $.detScripts($s); //fetch all scripts
     _addScripts(o, $s, settings); //delta-loading
 }, {
@@ -361,11 +361,9 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
             _addstyle(d);
         });
     },
-    alltxts: function ($s) {
-        $s.each(function() {
-             var d = $(this).html(), t = $(this).prop('type');
-             if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $(this).hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t);
-        });
+    onetxt: function ($s) {
+        var d = $s.html(), t = $s.prop('type');
+        if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $s.hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t);
     },
     addtext: function (t, type) {
         if(!t || !t.length) return;
@@ -373,8 +371,8 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { $.log("Error in apptext: " + t + "\nType: " + type + "\nCode: " + console.debug(e)); }
         
         try { $.globalEval(t); } catch (e1) {
-	        try { eval(t); } catch (e2) {
-                 $.log("Error in inline script : " + t + "\nError code : " + e2);
+            try { eval(t); } catch (e2) {
+                $.log("Error in inline script : " + t + "\nError code : " + e2);
             }
         }
     },
@@ -382,7 +380,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         var scriptNode = document.createElement('script');
         scriptNode.type = type;
         scriptNode.appendChild(document.createTextNode(t));
-        cd0.appendChild(scriptNode);
+        try { cd0.appendChild(scriptNode); } catch (e)  { $.log("Bad inline script text in apptext: " + t); }
     },
     addstyle: function (t) {
         $("head").append('<style type="text/css">' + t + '</style>');
@@ -405,7 +403,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     },
     addScripts: function (same, $s, st) {
         $s.c.addAll(same, "href", st);
-        $s.s.addAll(same, "src", st);
+        $s.j.addAll(same, "src", st);
     }
 }
 );
@@ -422,10 +420,11 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.c = _rel(lk, "stylesheet");
     $s.y = head.find("style");
     $s.can = _rel(lk, "canonical");
-    $s.s = j.filter(function() {
+	$s.j = j;
+    /*$s.s = j.filter(function() {
          return($(this).attr("src"));
     });
-    $s.t = j.filter(function() {return(!($(this).attr("src")));});
+    $s.t = j.filter(function() {return(!($(this).attr("src")));}); */
     }, {
     rel: function(lk, v) {
         return $(lk).filter(function(){return($(this).attr("rel").iO(v));});
@@ -433,8 +432,11 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     }
 );
 
-pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [] }, { deltas: true }, function ($this, same, PK) {
+pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0, same: 0 }, { deltas: true }, function ($this, SAME, pk) {
     if(!$this.length) return;
+	PK = pk;
+	same = SAME;
+	
     if (PK == "href") {
         $scriptsO = $sCssO;
         $scriptsN = $sCssN;
@@ -442,14 +444,13 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         $scriptsO = $sO;
         $scriptsN = $sN;
     } 
-    if (_allScripts($this, PK)) return true;
-    if (same) { _classAlways($this, PK); return; }
+    if (_allScripts($this)) return true;
     $scriptsN = [];
-    _newArray($this, $scriptsN, $scriptsO, PK);
+    _newArray($this, $scriptsN, $scriptsO);
     if (pass) {
          _findCommon($scriptsO, $scriptsN);
-         _freeOld($scriptsO, PK);
-         _sameScripts($scriptsN, PK);
+         _freeOld($scriptsO);
+         _newScripts($scriptsN);
          $scriptsO = $scriptsN.slice();
     }
     if (PK == "href") {
@@ -460,7 +461,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
          $sN = $scriptsN;
     }
     }, {
-    allScripts: function ($t, PK) {
+    allScripts: function ($t) {
         if (deltas) return false;
         $t.each(function() {
              _iScript($(this)[0], PK);
@@ -468,47 +469,54 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         
         return true;
     },
-    classAlways: function ($t, PK) { 
-        $t.each(function() {
-            if ($(this).attr("data-class") == "always") {
-                 _iScript($(this).attr(PK), PK);
-            }
-        });
-    },
-    sameScripts: function (s, PK) {
-        for (var i = 0; i < s.length; i++)
-             if (s[i][1] === 0) _iScript(s[i][0], PK);
-    },
-    iScript: function ($S, PK) {
-        $("head").append((PK == "href" ? linki : scri).replace("*", $S));
-    },
-    newArray: function ($t, sN, sO, PK) {
-        var d;
-        $t.each(function() {
-             d = [$(this).attr(PK), 0];
-             sN.push(d);
-             if (!pass) sO.push(d);
-        });
-    },
-    findCommon: function (s, sN) {
-        for (var i = 0; i < s.length; i++) {
-             s[i][1] = 2;
-             if (_findScript(s[i][0], sN)) s[i][1] = 1;
+    classAlways: function ($t) { return same && $t.attr("data-class") == "always"; },
+    newScripts: function (sN) {
+        for (var i = 0; i < sN.length; i++) {
+             if (sN[i][1] === 3) { 
+			     $.scripts(sN[i][0]); //insert single inline script
+                 continue;
+             }				 
+             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK)); //insert single external script in the head
         }
     },
-    findScript: function ($S, s) {
-        if ($S)
-            for (var i = 0; i < s.length; i++)
-                if (s[i][0] == $S) {
-                    s[i][1] = 1;
+    iScript: function ($S) {
+	    if($S instanceof jQuery) return $.scripts($S);
+        $("head").append((PK == "href" ? linki : scri).replace("*", $S));
+    },
+    newArray: function ($t, sN, sO) {
+        $t.each(function() {
+            var d, s = $(this), type = 0; 
+            if(!s.attr(PK)) type = 3;			 
+			d = [s, type];
+            sN.push(d);
+            if (!pass) sO.push(d);
+        });
+    },
+    findCommon: function (sO, sN) {
+        for (var i = 0; i < sO.length; i++) {
+            if(sO[i][1] === 3) continue;
+			sO[i][1] = 2;
+            if (_findScript(sO[i][0], sN)) sO[i][1] = 1;
+        }
+    },
+    findScript: function ($S, sN) {
+        var txtF = $S.attr(PK);
+        if (txtF)
+            for (var i = 0; i < sN.length; i++) {
+			   var txtN = sN[i][0].attr(PK);
+			   if (txtF == txtN) {
+                    sN[i][1] = 1;
                     return true;
                 }
+            }
     },
-    freeOld: function (s, PK) {
-        for (var i = 0; i < s.length; i++)
-            if (s[i][1] == 2 && s[i][0]) _removeScript(s[i][0], PK);
+    freeOld: function (sO) {
+        for (var i = 0; i < sO.length; i++) {
+		    var txtO = sO[i][0].attr(PK);
+            if (sO[i][1] == 2 && txtO) _removeScript(txtO);
+		}
     },
-    removeScript: function ($S, PK) {
+    removeScript: function ($S) {
         $((PK == "href" ? linkr : scrr).replace("!", $S)).remove();
     }
     }
