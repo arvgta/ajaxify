@@ -217,10 +217,9 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 }, {
     lSel: function ($t) { //load page into DOM, handle scripts and fetch canonical URL
         pass++;
-		$.scripts("s");
         _lDivs($t);
         $.scripts($.rq("s?"));
-        //$.scripts("a");
+		$.scripts("s");
         return $.scripts("c");
     },
 		
@@ -424,10 +423,6 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.y = head.find("style");
     $s.can = _rel(lk, "canonical");
 	$s.j = j;
-    /*$s.s = j.filter(function() {
-         return($(this).attr("src"));
-    });
-    $s.t = j.filter(function() {return(!($(this).attr("src")));}); */
     }, {
     rel: function(lk, v) {
         return $(lk).filter(function(){return($(this).attr("rel").iO(v));});
