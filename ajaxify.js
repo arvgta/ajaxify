@@ -226,19 +226,20 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     lPage: function (h, pre) { //fire Ajax load, check for hash first
          if (h.iO("#")) h = h.split("#")[0];
          if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre);
+		 else $.scripts("d"); //fetch all scripts
 		 
          plus = 0;
          if(cb) return cb();
     },
 		
     ld: function ($t, $h) { 
-        $h.find(".ajy-script").each(function() {
+        /*$h.find(".ajy-script").each(function() {
                 if(($(this).attr("src"))) {
                    $(this).replaceWith(scri.replace('*', $(this).attr("src")));
               } else {
                   $(this).replaceWith($(this)[0].outerHTML.replace('<div class="ajy-script"', '<script').replace(/<\/div>$/, '</script>'));
               }
-        });
+        });*/
         $t.html($h.html());
     },
 		
@@ -262,7 +263,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
             
             $.cache($(_parseHTML(h)));
             $.pages([hin, $.cache()]);
-            //$.scripts("d"); //fetch all scripts
+            $.scripts("d"); //fetch all scripts
             plus = 0;
 
             if(cb) return(cb());
