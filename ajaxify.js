@@ -916,10 +916,10 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      //if(link.href.substr(-1) ==='#') return;
+      if(link.href.substr(-1) ==='#') return true;
       if(_hashChange(link)) { // only hash has changed
           $.scroll(link.href);
-          if(link.href.substr(-1) !=='#') currentURL = link.href;
+          currentURL = link.href;
           $.hApi("="); 
           return false;
       }
