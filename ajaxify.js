@@ -233,13 +233,6 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     ld: function ($t, $h) { 
-        /*$h.find(".ajy-script").each(function() {
-                if(($(this).attr("src"))) {
-                   $(this).replaceWith(scri.replace('*', $(this).attr("src")));
-              } else {
-                  $(this).replaceWith($(this)[0].outerHTML.replace('<div class="ajy-script"', '<script').replace(/<\/div>$/, '</script>'));
-              }
-        });*/
         $t.html($h.html());
     },
 		
