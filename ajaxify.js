@@ -361,7 +361,8 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         });
     },
     onetxt: function ($s) {
-        var d = $s.html(), t = $s.prop('type');
+        var d, txt = $s.text(), t = $s.prop('type');
+		d = $('<div />').text(txt).html();
         if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $s.hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t);
     },
     addtext: function (t, type) {
