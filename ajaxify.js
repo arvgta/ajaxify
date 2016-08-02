@@ -815,7 +815,7 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 }
 );
 
-pO("scroll", 0, { scrolltop: false }, function (o) {
+pO("scrolly", 0, { scrolltop: false }, function (o) {
     if(!o) return;
   
     if(scrolltop === "s") {
@@ -854,7 +854,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
          $.frms(0, 0, s);
          $.slides(0, s);
          $.rqTimer(0, s);
-         $.scroll(0, s);
+         $.scrolly(0, s);
          $.cd("i", $gthis);
          _init_p();
          return $this;
@@ -912,7 +912,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(link.href.substr(-1) ==='#') return true;
       if(_hashChange(link)) { // only hash has changed
-          $.scroll(link.href);
+          $.scrolly(link.href);
           currentURL = link.href;
           $.hApi("="); 
           return false;
@@ -965,7 +965,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       $.frms("a"); // Ajaxify forms - in content divs only
            
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
-      $.scroll(url); // Scroll to respective ID if hash in URL
+      $.scrolly(url); // Scroll to respective ID if hash in URL
       _gaCaptureView(url); // Trigger analytics page view
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
