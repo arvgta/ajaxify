@@ -828,9 +828,9 @@ pO("scroll", 0, { scrolltop: false }, function (o) {
     else {  
         var url = o;
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
-            var $el = $('#' + url.split('#')[1]), offSet;
-            if ($el.length) offSet = $el.offset().top;
-            if (offSet !== false) $(window).scrollTop(offSet); // ...animate
+            var $el = $('#' + url.split('#')[1]);
+            if (!$el.length) return;
+            $(window).scrollTop($el.offset().top); // ...animate
         }
     }
 });
