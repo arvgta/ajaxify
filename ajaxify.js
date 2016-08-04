@@ -518,7 +518,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     }
 );
 
-pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime: 0 }, function (o, p) {
+pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return;
     
     if(o === "g") return cd;
@@ -539,17 +539,17 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
             marginRight: cdwidth - aniParams.width //making the content div width self-managing
         }, aniParams);
 		
-        from = $.extend({}, aniParams);
+        frm = $.extend({}, aniParams);
 		
-        for(var key in from) {
-            if (from.hasOwnProperty(key)) { 
-                var keyval = cd.css(key), keyOval = from[key];
+        for(var key in frm) {
+            if (frm.hasOwnProperty(key)) { 
+                var keyval = cd.css(key), keyOval = frm[key];
 
                 if((key === "height") && keyOval.iO("%")) { 
                     keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%";
                 }
 
-                from[key] = keyval;    
+                frm[key] = keyval;    
             }
         }     
     }
@@ -560,7 +560,7 @@ pO("cd", { cd: 0, aniTrue: 0, from: 0, cdwidth: 0 }, { aniParams: false, aniTime
 	
     if (o === "1" || o === "2") {
         if(o === "1") cd.stop(true, true);
-        cd.animate(o === "1" ? aniParams : from, aniTime, p);
+        cd.animate(o === "1" ? aniParams : frm, aniTime, p);
     }
 });
 
