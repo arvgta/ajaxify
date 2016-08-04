@@ -559,8 +559,8 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { aniParams: false, aniTime:
     if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2") {
-        if(o === "1") cd.stop(true, true);
-        cd.animate(o === "1" ? aniParams : frm, aniTime, p);
+        if(o === "1") cd.stop(true, true); //stop animation of main content div
+        cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
 });
 
@@ -818,7 +818,7 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 pO("scrolly", 0, { scrolltop: false }, function (o) {
     if(!o) return;
   
-    if(scrolltop === "s") {
+    if(scrolltop === "s") { //smart scroll enabled
         if(o === "+") $.offsets();
         else $(window).scrollTop($.offsets(o));
         return;
@@ -827,10 +827,10 @@ pO("scrolly", 0, { scrolltop: false }, function (o) {
     if(scrolltop) $(window).scrollTop(0);
     else {  
         var url = o;
-        if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL
-            var $el = $('#' + url.split('#')[1]);
-            if (!$el.length) return;
-            $(window).scrollTop($el.offset().top); // ...animate
+        if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
+            var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
+            if (!$el.length) return; //nothing found -> return quickly
+            $(window).scrollTop($el.offset().top); // ...animate to ID
         }
     }
 });
