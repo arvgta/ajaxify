@@ -559,7 +559,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { aniParams: false, aniTime:
     if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2") {
-        if(o === "1") cd.stop(true, true); //stop animation of main content div
+        cd.stop(true, true); //stop animation of main content div
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
 });
