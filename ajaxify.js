@@ -830,7 +830,7 @@ pO("scrolly", 0, { scrolltop: false }, function (o) {
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
             var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
             if (!$el.length) return; //nothing found -> return quickly
-            $(window).scrollTop($el.offset().top); // ...animate to ID
+			$(window).scrollTop($el.offset().top); // ...animate to ID
         }
     }
 });
@@ -965,7 +965,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       $.frms("a"); // Ajaxify forms - in content divs only
            
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
-	  $.scrolly(url); // Scroll to respective ID if hash in URL
+      $.scrolly(url); // Scroll to respective ID if hash in URL
       _gaCaptureView(url); // Trigger analytics page view
       _trigger("render"); // Fire render event
       if(cb) cb(); // Callback user's handler, if specified
