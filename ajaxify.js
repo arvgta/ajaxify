@@ -558,8 +558,9 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { aniParams: false, aniTime:
 	
     if(!aniTrue) { p(); return; }
 	
-    if (o === "1" || o === "2") {
+    if (o === "1" || o === "2" || o === "3") {
         cd.stop(true, true); //stop animation of main content div
+        if(o === "3")  { p(); return; } //if last phase, don't spawn a new animation
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
 });
@@ -830,7 +831,7 @@ pO("scrolly", 0, { scrolltop: false }, function (o) {
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
             var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
             if (!$el.length) return; //nothing found -> return quickly
-			$(window).scrollTop($el.offset().top); // ...animate to ID
+            $(window).scrollTop($el.offset().top); // ...animate to ID
         }
     }
 });
@@ -965,10 +966,12 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       $.frms("a"); // Ajaxify forms - in content divs only
            
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
-      $.scrolly(url); // Scroll to respective ID if hash in URL
-      _gaCaptureView(url); // Trigger analytics page view
-      _trigger("render"); // Fire render event
-      if(cb) cb(); // Callback user's handler, if specified
+      $.cd("3", function() { // Stop animations + finishing off
+          $.scrolly(url); // Scroll to respective ID if hash in URL
+         _gaCaptureView(url); // Trigger analytics page view
+         _trigger("render"); // Fire render event
+         if(cb) cb(); // Callback user's handler, if specified
+      });
   },
  gaCaptureView: function(url) { // Google Analytics support
       url = '/' + url.replace(rootUrl,'');
