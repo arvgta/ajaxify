@@ -831,10 +831,13 @@ pO("scrolly", 0, { scrolltop: false }, function (o) {
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
             var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
             if (!$el.length) return; //nothing found -> return quickly
-			$(window).scrollTop($el.offset().top); // ...animate to ID
+            _wScroll($el.offset().top); // ...animate to ID
         }
     }
-});
+}, {
+   wScroll: function(o) { $(window).scrollTop(o); }
+   }
+);
 
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
