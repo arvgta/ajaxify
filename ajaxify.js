@@ -828,10 +828,11 @@ pO("scrolly", 0, { scrolltop: false }, function (o) {
     if(scrolltop) $(window).scrollTop(0);
     else {  
         var url = o;
+        _wScroll(0); 
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
             var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
             if (!$el.length) return; //nothing found -> return quickly
-            _wScroll($el.offset().top); // ...animate to ID
+           _wScroll($el.offset().top); // ...animate to ID
         }
     }
 }, {
