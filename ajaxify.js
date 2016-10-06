@@ -520,6 +520,8 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
 
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return;
+	
+	if(o === "s") return cd.stop(true, true);
     
     if(o === "g") return cd;
 
@@ -559,7 +561,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { aniParams: false, aniTime:
     if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2" || o === "3") {
-        cd.stop(true, true); //stop animation of main content div
+        if(o === "1") cd.stop(true, true); //stop animation of main content div
         if(o === "3")  { p(); return; } //if last phase, don't spawn a new animation
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
@@ -796,7 +798,7 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 // Usage: 
 // 1) $.offsets(<URL>) - returns offset with specified URL from internal array
 // 2) $.offsets() - saves the current URL + offset in internal array
-pO("offsets", { d: [], i: -1 }, 0, function (h) {
+/*pO("offsets", { d: [], i: -1 }, 0, function (h) {
     if (typeof h === "string") {
         i = _iOffset(h);
         if(i === -1) return;
@@ -815,28 +817,33 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
     }
 }
 );
+*/
 
 pO("scrolly", 0, { scrolltop: false }, function (o) {
     if(!o) return;
   
-    if(scrolltop === "s") { //smart scroll enabled
+/*    if(scrolltop === "s") { //smart scroll enabled
         if(o === "+") $.offsets();
         else $(window).scrollTop($.offsets(o));
         return;
     }
+*/
 
     if(scrolltop) $(window).scrollTop(0);
     else {  
         var url = o;
-        _wScroll(0); 
+        $(window).scrollTop(0);
         if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
-            var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
+			var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
             if (!$el.length) return; //nothing found -> return quickly
-           _wScroll($el.offset().top); // ...animate to ID
+		   _wScrollTo($el); // ...animate to ID
         }
     }
 }, {
-   wScroll: function(o) { $(window).scrollTop(o); }
+   wScrollTo: function(o) { 
+       var off = o.offset(), tp = off.top;
+       $(window).scrollTop(tp); 
+   }
    }
 );
 
