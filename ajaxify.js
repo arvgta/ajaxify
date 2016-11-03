@@ -808,9 +808,9 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
         return d[i][1]; //Return offset that was found
     }
 	
-	//Add page offset
+    //Add page offset
     var u = currentURL, us = u.iO('?') ? u.split('?')[0] : u, os = [us, $(window).scrollTop()];
-	i = _iOffset(us); //get page index
+    i = _iOffset(us); //get page index
     if(i === -1) d.push(os); //doesn't exist -> push to array
     else d[i] = os; //exists -> overwrite
 }, {
@@ -844,7 +844,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
         return;
     }
 	
-	if(scrolltop) $(window).scrollTop(0); //otherwise scroll to top of page
+    if(scrolltop) $(window).scrollTop(0); //otherwise scroll to top of page
 	
 	//default -> do nothing
 	
