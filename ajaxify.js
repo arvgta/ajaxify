@@ -32,7 +32,7 @@ Options default values
     aniTime : 0, //in msec - must be set for animations to work
     aniParams : false, //Animation parameters - see below.  Default = off
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
-    scrolltop : false, // Always scroll to top of page
+    scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
     toggleSlide: false //For toggling sliding - see below.  Default = off
@@ -680,6 +680,7 @@ pO("rq", { ispost: 0, data: 0, same: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, f
         data = null;
         same = false;
         push = false;
+        $.scrolly("+"); //Capture and add position on old page
         return l;
     }
     
@@ -797,19 +798,21 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 
 // The stateful Offsets plugin
 // Usage: 
-// 1) $.offsets(<URL>) - returns offset with specified URL from internal array
+// 1) $.offsets(<URL>) - returns offset of specified URL from internal array
 // 2) $.offsets() - saves the current URL + offset in internal array
-/*pO("offsets", { d: [], i: -1 }, 0, function (h) {
-    if (typeof h === "string") {
-        i = _iOffset(h);
-        if(i === -1) return;
-        return d[i][1];
+pO("offsets", { d: [], i: -1 }, 0, function (h) {
+	if (typeof h === "string") { //Lookup page offset
+        h = h.iO('?') ? h.split('?')[0] : h; //Handle root URL only from dynamic pages
+        i = _iOffset(h); //Fetch offset
+        if(i === -1) return 0; // scrollTop if not found
+        return d[i][1]; //Return offset that was found
     }
 	
-    var os = [currentURL, $(window).scrollTop()];
-    i = _iOffset(currentURL);
-    if(i === -1) d.push(os);
-    else d[i] = os;
+	//Add page offset
+    var u = currentURL, us = u.iO('?') ? u.split('?')[0] : u, os = [us, $(window).scrollTop()];
+	i = _iOffset(us); //get page index
+    if(i === -1) d.push(os); //doesn't exist -> push to array
+    else d[i] = os; //exists -> overwrite
 }, {
   iOffset: function (h) { //get index of page, -1 if not found
         for (var i = 0; i < d.length; i++)
@@ -818,28 +821,33 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     }
 }
 );
-*/
 
-pO("scrolly", 0, { scrolltop: false }, function (o) {
+
+pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     if(!o) return;
   
-/*    if(scrolltop === "s") { //smart scroll enabled
-        if(o === "+") $.offsets();
-        else $(window).scrollTop($.offsets(o));
+    var op = o;
+	
+    if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
+	
+	if(o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
+        var $el = $('#' + o.split('#')[1]); //extract part to the right of hash
+        if (!$el.length) return; //nothing found -> return quickly
+		_wScrollTo($el); // ...animate to ID
         return;
     }
-*/
 
-    if(scrolltop) $(window).scrollTop(0);
-    else {  
-        var url = o;
-        $(window).scrollTop(0);
-        if (url.iO('#') && (url.iO('#') < url.length - 1)) { //if hash in URL and not standalone hash
-			var $el = $('#' + url.split('#')[1]); //extract part to the right of hash
-            if (!$el.length) return; //nothing found -> return quickly
-		   _wScrollTo($el); // ...animate to ID
-        }
+    if(scrolltop === "s") { //smart scroll enabled
+        if(op === "+") $.offsets(); //add page offset
+		if(op === "!") $(window).scrollTop($.offsets(o)); //scroll to stored position of page
+
+        return;
     }
+	
+	if(scrolltop) $(window).scrollTop(0); //otherwise scroll to top of page
+	
+	//default -> do nothing
+	
 }, {
    wScrollTo: function(o) { 
        var off = o.offset(), tp = off.top;
@@ -900,7 +908,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
     $.slides("i"); // Init slideshow
   }, 
  prefetch: function(e) { //...target page on hoverIntent
-	   if(!prefetch) return;
+       if(!prefetch) return;
 	   var link = $.rq("v", e); // validate internal URL
        if ($.rq("=") || !link) return;
        fn('+', link.href, function() {
@@ -980,7 +988,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
            
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
       $.cd("3", function() { // Stop animations + finishing off
-          $.scrolly(url); // Scroll to respective ID if hash in URL
+         $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
          _gaCaptureView(url); // Trigger analytics page view
          _trigger("render"); // Fire render event
          if(cb) cb(); // Callback user's handler, if specified
