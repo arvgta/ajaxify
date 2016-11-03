@@ -833,13 +833,13 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 	if(o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
         var $el = $('#' + o.split('#')[1]); //extract part to the right of hash
         if (!$el.length) return; //nothing found -> return quickly
-		_wScrollTo($el); // ...animate to ID
+        _wScrollTo($el); // ...animate to ID
         return;
     }
 
     if(scrolltop === "s") { //smart scroll enabled
         if(op === "+") $.offsets(); //add page offset
-		if(op === "!") $(window).scrollTop($.offsets(o)); //scroll to stored position of page
+        if(op === "!") $(window).scrollTop($.offsets(o)); //scroll to stored position of page
 
         return;
     }
