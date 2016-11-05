@@ -528,7 +528,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
     if(o === "g") return cd;
 
     if(o === "i") {
-        cd = maincontent ? p.find(maincontent) : p.last();
+        cd = maincontent ? p.filter(maincontent) : p.last();
         aniTrue = aniTime && aniParams;
         cdwidth = cd.width();
         if(!aniTrue) return;
