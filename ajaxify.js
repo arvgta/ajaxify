@@ -832,7 +832,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
 	
 	if(op !== "+" && o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
-        var $el = $('#' + o.split('#')[1]); //extract part to the right of hash
+        var $el = $(o); //extract part to the right of hash
         if (!$el.length) return; //nothing found -> return quickly
         _wScrollTo($el); // ...animate to ID
         return;
