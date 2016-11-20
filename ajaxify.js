@@ -910,7 +910,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   }, 
  prefetch: function(e) { //...target page on hoverIntent
        if(!prefetch) return;
-	   var link = $.rq("v", e); // validate internal URL
+       var link = $.rq("v", e); // validate internal URL
        if ($.rq("=") || !link) return;
        fn('+', link.href, function() {
             if (previewoff === true) return(false);
@@ -934,7 +934,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(link.href.substr(-1) ==='#') return true;
-	  $.scrolly("+");
+      $.scrolly("+");
       if(_hashChange(link)) { // only hash has changed
           $.scrolly(link.href);
           currentURL = link.href;
