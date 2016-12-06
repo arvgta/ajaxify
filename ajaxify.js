@@ -462,7 +462,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     allScripts: function ($t) {
         if (deltas) return false;
         $t.each(function() {
-             _iScript($(this).attr(PK), !$(this).attr("async"));
+            _iScript($(this)[0], $(this).attr("async"));
         });
         
         return true;
@@ -471,7 +471,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     newScripts: function (sN) {
         for (var i = 0; i < sN.length; i++) {
              if (sN[i][1] === 3) { 
-			     $.scripts(sN[i][0]); //insert single inline script
+                 $.scripts(sN[i][0]); //insert single inline script
                  continue;
              }				 
              if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), !sN[i][0].attr("async")); //insert single external script in the head
