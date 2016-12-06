@@ -478,9 +478,9 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         }
     },
     iScript: function ($S, sync) { 
-		if(typeof sync === "undefined") sync = !asyncdef;
-		$.log("Synchronous : " + (sync ? "Yes" : "No"));
-	    if($S instanceof jQuery) return $.scripts($S);
+        if(typeof sync === "undefined") sync = !asyncdef;
+        $.log("Synchronous : " + (sync ? "Yes" : "No"));
+        if($S instanceof jQuery) return $.scripts($S);
         $("head").append((PK == "href" ? linki : scri).replace("*", $S).replace('*', sync ? ' async="false" ' : ''));
     },
     newArray: function ($t, sN, sO) {
