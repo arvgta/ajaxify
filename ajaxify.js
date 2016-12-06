@@ -480,14 +480,14 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     iScript: function ($S, sync) { 
         if(typeof sync === "undefined") sync = !asyncdef;
         $.log("Synchronous : " + (sync ? "Yes" : "No"));
-        if($S instanceof jQuery) return $.scripts($S);
-        $("head").append((PK == "href" ? linki : scri).replace("*", $S).replace('*', sync ? ' async="false" ' : ''));
+        if($S instanceof jQuery) return $.scripts($S); //insert single inline script
+        $("head").append((PK == "href" ? linki : scri).replace("*", $S).replace('*', sync ? ' async="false" ' : '')); //insert single external script
     },
     newArray: function ($t, sN, sO) {
         $t.each(function() {
             var d, s = $(this), type = 0; 
             if(!s.attr(PK)) type = 3;			 
-			d = [s, type];
+            d = [s, type];
             sN.push(d);
             if (!pass) sO.push(d);
         });
@@ -495,7 +495,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     findCommon: function (sO, sN) {
         for (var i = 0; i < sO.length; i++) {
             if(sO[i][1] === 3) continue;
-			sO[i][1] = 2;
+            sO[i][1] = 2;
             if (_findScript(sO[i][0], sN)) sO[i][1] = 1;
         }
     },
@@ -503,8 +503,8 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         var txtF = $S.attr(PK);
         if (txtF)
             for (var i = 0; i < sN.length; i++) {
-			   var txtN = sN[i][0].attr(PK);
-			   if (txtF == txtN) {
+                var txtN = sN[i][0].attr(PK);
+                if (txtF == txtN) {
                     sN[i][1] = 1;
                     return true;
                 }
@@ -512,7 +512,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     },
     freeOld: function (sO) {
         for (var i = 0; i < sO.length; i++) {
-		    var txtO = sO[i][0].attr(PK);
+            var txtO = sO[i][0].attr(PK);
             if (sO[i][1] == 2 && txtO) _removeScript(txtO);
 		}
     },
@@ -525,7 +525,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return;
 	
-	if(o === "s") return cd.stop(true, true);
+    if(o === "s") return cd.stop(true, true);
     
     if(o === "g") return cd;
 
@@ -683,7 +683,6 @@ pO("rq", { ispost: 0, data: 0, same: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, f
         data = null;
         same = false;
         push = false;
-        //$.scrolly("+"); //Capture and add position on old page
         return l;
     }
     
@@ -833,7 +832,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 	
     if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
 	
-	if(op !== "+" && o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
+    if(op !== "+" && o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
         var $el = $('#' + o.split('#')[1]); //fetch the element
         if (!$el.length) return; //nothing found -> return quickly
         _wScrollTo($el); // ...animate to ID
