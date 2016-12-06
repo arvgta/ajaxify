@@ -100,7 +100,7 @@ tagsc = /<\/(html|head|body|script|link)\>/gi,
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
 linki = '<link rel="stylesheet" type="text/css" href="*" />',
-scri = '<script type="text/javascript" src="*" />',
+scri = '<script type="text/javascript" src="*" * />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
@@ -430,7 +430,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     }
 );
 
-pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0, same: 0 }, { deltas: true }, function ($this, SAME, pk) {
+pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0, same: 0 }, { deltas: true, asyncdef: false }, function ($this, SAME, pk) {
     if(!$this.length) return;
 	PK = pk;
 	same = SAME;
@@ -462,7 +462,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     allScripts: function ($t) {
         if (deltas) return false;
         $t.each(function() {
-             _iScript($(this)[0], PK);
+             _iScript($(this).attr(PK), !$(this).attr("async"));
         });
         
         return true;
@@ -474,12 +474,14 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
 			     $.scripts(sN[i][0]); //insert single inline script
                  continue;
              }				 
-             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK)); //insert single external script in the head
+             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), !sN[i][0].attr("async")); //insert single external script in the head
         }
     },
-    iScript: function ($S) {
+    iScript: function ($S, sync) { 
+		if(typeof sync === "undefined") sync = !asyncdef;
+		$.log("Synchronous : " + (sync ? "Yes" : "No"));
 	    if($S instanceof jQuery) return $.scripts($S);
-        $("head").append((PK == "href" ? linki : scri).replace("*", $S));
+        $("head").append((PK == "href" ? linki : scri).replace("*", $S).replace('*', sync ? ' async="false" ' : ''));
     },
     newArray: function ($t, sN, sO) {
         $t.each(function() {
