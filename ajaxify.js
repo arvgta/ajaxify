@@ -480,8 +480,8 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     iScript: function ($S, sync) { 
         if(typeof sync === "undefined") sync = !asyncdef;
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
-		var tag = $((PK == "href" ? linki : scri).replace("*", $S));
-		if(PK != "href") tag.async = !sync;
+        var tag = $((PK == "href" ? linki : scri).replace("*", $S));
+        if(PK != "href") tag.async = !sync;
         $("head").append(tag); //insert single external script
     },
     newArray: function ($t, sN, sO) {
