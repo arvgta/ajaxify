@@ -100,7 +100,7 @@ tagsc = /<\/(html|head|body|script|link)\>/gi,
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
 linki = '<link rel="stylesheet" type="text/css" href="*" />',
-scri = '<script type="text/javascript" src="*" * />',
+scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
@@ -347,7 +347,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         else return false;
     }
 	
-	if (o==="d") return $.detScripts($s); //fetch all scripts
+    if (o==="d") return $.detScripts($s); //fetch all scripts
     
     if (o instanceof jQuery) return _onetxt(o);
 	
@@ -479,9 +479,10 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     },
     iScript: function ($S, sync) { 
         if(typeof sync === "undefined") sync = !asyncdef;
-        $.log("Synchronous : " + (sync ? "Yes" : "No"));
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
-        $("head").append((PK == "href" ? linki : scri).replace("*", $S).replace('*', sync ? ' async="false" ' : '')); //insert single external script
+		var tag = $((PK == "href" ? linki : scri).replace("*", $S));
+		if(PK != "href") tag.async = !sync;
+        $("head").append(tag); //insert single external script
     },
     newArray: function ($t, sN, sO) {
         $t.each(function() {
