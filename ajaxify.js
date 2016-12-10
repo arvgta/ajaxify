@@ -42,6 +42,7 @@ Options default values
  
 // script and style handling settings, prefetch
     deltas : true, // true = deltas loaded, false = all scripts loaded
+	asyncdef : false // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
     inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
     inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
     inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
