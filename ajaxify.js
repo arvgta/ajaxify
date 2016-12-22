@@ -229,7 +229,6 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     lPage: function (h, pre) { //fire Ajax load, check for hash first
          if (h.iO("#")) h = h.split("#")[0];
          if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre);
-		 //else $.scripts("d"); //fetch all scripts
 		 
          plus = 0;
          if(cb) return cb();
@@ -567,7 +566,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
     if(!aniTrue) { p(); return; }
 	
     if (o === "1" || o === "2" || o === "3") {
-        /*if(o === "1")*/ cd.stop(true, true); //stop animation of main content div
+        cd.stop(true, true); //stop animation of main content div
         if(o === "3")  { p(); return; } //if last phase, don't spawn a new animation
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
@@ -837,27 +836,22 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     if(op !== "+" && o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
         var $el = $('#' + o.split('#')[1]); //fetch the element
         if (!$el.length) return; //nothing found -> return quickly
-        _wScrollTo($el); // ...animate to ID
+        _scrll($el.offset().top); // ...animate to ID
         return;
     }
 
     if(scrolltop === "s") { //smart scroll enabled
         if(op === "+") $.offsets(); //add page offset
-        if(op === "!") $(window).scrollTop($.offsets(o)); //scroll to stored position of page
+        if(op === "!") _scrll($.offsets(o)); //scroll to stored position of page
 
         return;
     }
 	
-    if(op !== "+" && scrolltop) $(window).scrollTop(0); //otherwise scroll to top of page
+    if(op !== "+" && scrolltop) _scrll(0); //otherwise scroll to top of page
 	
 	//default -> do nothing
-	
-}, {
-   wScrollTo: function(o) { 
-       var off = o.offset(), tp = off.top;
-       $(window).scrollTop(tp); 
-   }
-   }
+
+}, { scrll: function (o) { $(window).scrollTop(o); } }
 );
 
 pO("hApi", 0, 0, function (o, p) {
