@@ -474,14 +474,16 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
                  $.scripts(sN[i][0]); //insert single inline script
                  continue;
              }				 
-             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), !sN[i][0].attr("async")); //insert single external script in the head
+             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async")); //insert single external script in the head
         }
     },
-    iScript: function ($S, sync) { 
-        if(typeof sync === "undefined") sync = !asyncdef;
+    iScript: function ($S, aSync) { 
+        if(!aSync) aSync = asyncdef; 
+		else aSync = true;
+		
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
         var tag = $((PK == "href" ? linki : scri).replace("*", $S));
-        if(PK != "href") tag.async = !sync;
+        if(PK != "href") tag.async = aSync;
         $("head").append(tag); //insert single external script
     },
     newArray: function ($t, sN, sO) {
