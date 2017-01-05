@@ -479,7 +479,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     },
     iScript: function ($S, aSync) { 
         if(!aSync) aSync = asyncdef; 
-		else aSync = true;
+        else aSync = true;
 		
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
         var tag = $((PK == "href" ? linki : scri).replace("*", $S));
