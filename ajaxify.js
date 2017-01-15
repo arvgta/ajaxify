@@ -221,7 +221,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     lSel: function ($t) { //load page into DOM, handle scripts and fetch canonical URL
         pass++;
         _lDivs($t);
-        $.scripts($.rq("s?"));
+        $.scripts(true);
         $.scripts("s");
         return $.scripts("c");
     },
@@ -666,7 +666,7 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     }
 });
 
-pO("rq", { ispost: 0, data: 0, same: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
     if(o === "=") {
         return h === currentURL; 
     }
@@ -683,7 +683,6 @@ pO("rq", { ispost: 0, data: 0, same: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, f
     if(o === "i") {
         ispost = false;
         data = null;
-        same = false;
         push = false;
         return l;
     }
@@ -707,13 +706,6 @@ pO("rq", { ispost: 0, data: 0, same: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, f
         if(p) push = p;
         return push;
     }
-    
-    if(o === "s") { 
-        var t = p ? p : h;
-        same = (_root(t) === _root(currentURL));
-    }
-    
-    if(o === "s?") return same;
 	
     if(o === "is") {
         if(p) ispost = p;
@@ -758,7 +750,6 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         else h = currentURL; 
                 
         $.rq("i");
-        $.rq("s", h);
                
         if (g == "get") h = _b(h, p);
         else {
@@ -947,7 +938,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  request: function(notPush) { // ... new url
       $.rq("p", !notPush); // mode for hApi - replaceState / pushState
       _trigger("request"); // Fire request event
-      $.rq("s"); // Set "same" variable
       fn($.rq("h"), function(err) { // Call "fn" - handler of parent
           if (err) { 
               $.log('Error in _request : ' + err); 
@@ -970,7 +960,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       var data = e.originalEvent.state, url = data ? data.url : 0;
            
       if (!url || url === currentURL) return;  // Check if data exists
-      $.rq("s", url); // Set "same" variable
       _trigger("request"); // Fire request event
       fn(url, _render); // Call "fn" - handler of parent, continue with _render()
   },
