@@ -339,7 +339,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     if (o === "1") { 
         $.detScripts($s);
         cd0 = $.cd("g").get(0);
-        return _addScripts(false, $s, settings);
+        return _addScripts($s, settings);
     }
             
     if (o === "c") {
@@ -352,7 +352,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     if (o instanceof jQuery) return _onetxt(o);
 	
     $.scripts("d");
-    _addScripts(o, $s, settings); //delta-loading
+    _addScripts($s, settings); //delta-loading
 }, {
     allstyle: function ($s) {
         if (!style || !$s) return;
@@ -403,9 +403,9 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
                  if (txt.iO(d[i])) return true;
          }
     },
-    addScripts: function (same, $s, st) {
-        $s.c.addAll(same, "href", st);
-        $s.j.addAll(same, "src", st);
+    addScripts: function ($s, st) {
+        $s.c.addAll("href", st);
+        $s.j.addAll("src", st);
     }
 }
 );
@@ -430,10 +430,9 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     }
 );
 
-pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0, same: 0 }, { deltas: true, asyncdef: false }, function ($this, SAME, pk) {
+pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
     if(!$this.length) return;
 	PK = pk;
-	same = SAME;
 	
     if (PK == "href") {
         $scriptsO = $sCssO;
@@ -467,7 +466,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         
         return true;
     },
-    classAlways: function ($t) { return same && $t.attr("data-class") == "always"; },
+    classAlways: function ($t) { return $t.attr("data-class") == "always"; },
     newScripts: function (sN) {
         for (var i = 0; i < sN.length; i++) {
              if (sN[i][1] === 3) { 
