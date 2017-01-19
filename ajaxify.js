@@ -473,7 +473,8 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
                  $.scripts(sN[i][0]); //insert single inline script
                  continue;
              }				 
-             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async")); //insert single external script in the head
+             if (_classAlways(sN[i][0])) _removeScript(sN[i][0].attr(PK));
+			 if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async")); //insert single external script in the head
         }
     },
     iScript: function ($S, aSync) { 
