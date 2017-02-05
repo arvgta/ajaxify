@@ -923,18 +923,18 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      if(link.href.substr(-1) ==='#') return true;
-      $.scrolly("+");
-      if(_hashChange(link)) { // only hash has changed
-          $.scrolly(link.href);
-          currentURL = link.href;
-          $.hApi("="); 
-          return false;
+      if(link.href.substr(-1) ==='#') return true; // If standalone hash, enable default behaviour and return ??
+      $.scrolly("+"); // Capture old vertical position of scroll bar
+      if(_hashChange(link)) { // only hash part has changed
+          $.scrolly(link.href); // restore old vertical position of scroll bar
+          currentURL = link.href; // set new URL globally
+          $.hApi("="); // commit new URL to History API
+          return false; // preventDefault and stop bubbling-up
       }
       
-      _stopBubbling(e);
-      if($.rq("=")) $.hApi("=");
-      if(refresh || !$.rq("=")) _request(); // Continue with _request()
+      _stopBubbling(e); // preventDefault and stop bubbling-up from here on, no matter what comes next
+      if($.rq("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
+      if(refresh || !$.rq("=")) _request(); // Continue with _request() when not the same URL or "refresh" parameter set hard
   }, 
  request: function(notPush) { // ... new url
       $.rq("p", !notPush); // mode for hApi - replaceState / pushState
