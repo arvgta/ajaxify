@@ -923,15 +923,12 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      if(link.href.substr(-1) ==='#') return true; // If standalone hash, enable default behaviour and return ??
-      $.scrolly("+"); // Capture old vertical position of scroll bar
-      if(_hashChange(link)) { // only hash part has changed
-          $.scrolly(link.href); // restore old vertical position of scroll bar
-          currentURL = link.href; // set new URL globally
-          $.hApi("="); // commit new URL to History API
-          return false; // preventDefault and stop bubbling-up
+      if(link.href.substr(-1) ==='#' || _hashChange(link)) { // only hash part has changed
+          $.hApi("=", link.href); // commit new URL to History API
+          return true; // If standalone hash, enable default behaviour and return
       }
-      
+
+      $.scrolly("+"); // Capture old vertical position of scroll bar
       _stopBubbling(e); // preventDefault and stop bubbling-up from here on, no matter what comes next
       if($.rq("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
       if(refresh || !$.rq("=")) _request(); // Continue with _request() when not the same URL or "refresh" parameter set hard
