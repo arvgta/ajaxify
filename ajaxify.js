@@ -925,7 +925,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(link.href.substr(-1) ==='#' || _hashChange(link)) { // only hash part has changed
           $.hApi("=", link.href); // commit new URL to History API
-          return true; // If standalone hash, enable default behaviour and return
+          return true; // Enable default behaviour and return - does not invoke a full page load!
       }
 
       $.scrolly("+"); // Capture old vertical position of scroll bar
