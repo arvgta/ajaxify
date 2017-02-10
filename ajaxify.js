@@ -16,7 +16,7 @@ Ajaxifies the whole site, dynamically replacing the div with the ID '#content' a
 If several divs should be swapped, just specify their IDs like this:
 jQuery('#content, #nav').ajaxify();
 
-The plugin can take an arbitrary amount of IDs, however the first one should specify the main content div
+The plugin can take an arbitrary amount of IDs, however the last one in the DOM or the one specified by "maincontent" should specify the main content div
 
 
 Options default values
