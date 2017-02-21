@@ -123,65 +123,66 @@ function _internal(url) {
 function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
 
 // The stateful Cache plugin
-// Usage: 
-// 1) $.cache() - returns currently cached page
-// 2) $.cache(<URL>) - returns page with specified URL
-// 3) $.cache(<jQuery object>) - saves the page in cache
+// Usage - parameter "o" values: 
+// none - returns currently cached page
+// <URL> - returns page with specified URL
+// <jQuery object> - saves the page in cache
+// "f" - flushes the cache
 pO("cache", { d: false }, 0, function (o) {
-    if (!o) return d;
+    if (!o) return d; //nothing passed -> return currently cached page
 	
-    if (typeof o === "string") {
-        if(o === "f") { 
-            $.pages("f");
+    if (typeof o === "string") { //URL or "f" passed
+        if(o === "f") { //"f" passed -> flush
+            $.pages("f"); //delegate flush to $.pages
             $.log("Cache flushed");
-        } else d = $.pages($.memory(o));
+        } else d = $.pages($.memory(o)); //URL passed -> look up page in memory
         
-        return d;
+        return d; //return cached page
     }
 
-    if (typeof o === "object") {
-        d = o;
-        return d;
+    if (typeof o === "object") { //jQuery object passed (whole page)
+        d = o; //store object internally
+        return d; //return it
     }
 });
 
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 pO("memory", { d: false }, { memoryoff: false }, function (h) {
-    d = memoryoff;
-    if (!h || d === true) return false;
-    if (d === false) return h;
-    if (d.iO(", ")) {
-         d = d.split(", ");
-         if (d.iO(h)) return false;
-         else return h;
+    d = memoryoff; //abbreviation of memoryoff
+    if (!h || d === true) return false; //validate input, if memoryoff set to true return false quickly
+    if (d === false) return h; //if memoryoff set to false return the URL quickly
+    if (d.iO(", ")) { //iterate through memoryoff
+         d = d.split(", "); //split memoryoff to array
+         if (d.iO(h)) return false; //is URL in array? -> return false
+         else return h; //otherwise return URL
     }
      
-    return h == d ? false : h;
+    return h == d ? false : h; //single URL in memoryoff -> compare
 });
 		
 // The stateful Pages plugin
-// Usage: 
-// 1) $.pages(<URL>) - returns page with specified URL from internal array
-// 2) $.pages(<jQuery object>) - saves the passed page in internal array
-// 3) $.pages(false) - returns false
+// Usage - parameter "h" values:
+// <URL> - returns page with specified URL from internal array
+// <jQuery object> - saves the passed page in internal array
+// false - returns false
 pO("pages", { d: [], i: -1 }, 0, function (h) {
-    if (typeof h === "string") {
-        if(h === "f") d = [];
-        else { 
-            i = _iPage(h);
-            if(i === -1) return;
-            return d[i][1];
+    if (typeof h === "string") { //URL or "f" passed
+        if(h === "f") d = []; //"f" ? -> flush internal array
+        else { //URL passed
+            i = _iPage(h); //get page index
+            if(i === -1) return; //not found return nothing
+            return d[i][1]; //return entire page
         }
     }
 	
-    if (typeof h === "object") {
-        i = _iPage(h[0]);
-        if(i === -1) d.push(h);
-        else d[i] = h;
+    if (typeof h === "object") { //jQuery object passed [href, <page>]
+        i = _iPage(h[0]); //check whether href in array already?
+        if(i === -1) d.push(h); //no -> add to array
+        else d[i] = h; //update complete object
     }
 	
-    if (typeof h === "boolean") return false;
+    if (typeof h === "boolean") return false; //false in - false out
 }, {
     iPage: function (h) { //get index of page, -1 if not found
         for (var i = 0; i < d.length; i++)
@@ -192,73 +193,72 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 );
 
 // The GetPage plugin
-// First parameter is a switch: 
+// First parameter (o) is a switch: 
 // empty - returns cache
-// <URL> - loads HTML via Ajax
-// "+" - pre-fetches page
-// "-" - loads page into DOM and handle scripts
+// <URL> - loads HTML via Ajax, second parameter "p" must be callback
+// "+" - pre-fetches page, second parameter "p" must be URL, third parameter "p2" must be callback 
+// "-" - loads page into DOM and handle scripts, second parameter "p" must hold selection to load
 // "x" - returns XHR
 // otherwise - returns selection of current page to client
 
 pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
-    if (!o) return $.cache();
+    if (!o) return $.cache(); //nothing passed -> return currently cached page
 
-    if (o.iO("/")) {
-        cb = p;
-        if(plus == o) return;
-        return _lPage(o);
+    if (o.iO("/")) { //URL
+        cb = p; //second parameter "p" must be callback
+        if(plus == o) return; //same URL as in "plus" variable? -> return
+        return _lPage(o); //load page with the URL and return it
     }
-    if (o === "+")  {
-        plus = p;
-        cb = p2;
-        return _lPage(p, true);
+    if (o === "+")  { //pre-fetch page
+        plus = p; //store second parameter "p" in "plus" variable
+        cb = p2; //third parameter "p2" must be callback 
+        return _lPage(p, true); //load page with the URL, indicating a pre-fetch in second parameter (true)
     }
 	
-    if (o === "-") return _lSel(p);
-    if (o === "x") return xhr;            
-    if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o);
+    if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
+    if (o === "x") return xhr; //return xhr object dynamically           
+    if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
 }, {
-    lSel: function ($t) { //load page into DOM, handle scripts and fetch canonical URL
-        pass++;
-        _lDivs($t);
-        $.scripts(true);
-        $.scripts("s");
-        return $.scripts("c");
+    lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
+        pass++; //central increment of "pass" variable
+        _lDivs($t); //load selection specified in "$t" into DOM
+        $.scripts(true); //invoke delta-loading of JS
+        $.scripts("s"); //invoke delta-loading of CSS
+        return $.scripts("c"); //return canonical URL
     },
 		
-    lPage: function (h, pre) { //fire Ajax load, check for hash first
-         if (h.iO("#")) h = h.split("#")[0];
-         if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre);
+    lPage: function (h, pre) { //fire Ajax load, check for hash first, "pre" indicates a prefetch
+         if (h.iO("#")) h = h.split("#")[0]; //get first part before hash
+         if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
 		 
-         plus = 0;
-         if(cb) return cb();
+         plus = 0; //otherwise reset "plus" variable
+         if(cb) return cb(); //fire callback, if given
     },
 		
-    ld: function ($t, $h) { 
+    ld: function ($t, $h) { //load HTML of target selection into DOM
         $t.html($h.html());
     },
 		
-    lDivs: function ($t) { //load target divs into DOM
-        if ($.cache()) $t.each(function() { 
-            _ld($(this), $.cache().find("#" + $(this).attr("id")));
+    lDivs: function ($t) { //load target selections into DOM
+        if ($.cache()) $t.each(function() { //iterate through elements
+            _ld($(this), $.cache().find("#" + $(this).attr("id"))); //load target element into DOM
         });
     },
 		
     lAjax: function (hin, pre) { //execute Ajax load
-        var ispost = $.rq("is");
+        var ispost = $.rq("is"); //POST?
                 
-        xhr = $.ajax({
-        url: hin,
-        type: ispost ? "POST" : "GET",
-        data: ispost ? $.rq("d") : null,
-        success: function(h) {
+        xhr = $.ajax({ //central AJAX load, for both POSTs and GETs
+        url: hin, //URL
+        type: ispost ? "POST" : "GET", //POST or GET?
+        data: ispost ? $.rq("d") : null, //fetch data from $.rq
+        success: function(h) { //success -> "h" holds HTML
             if (!h || !_isHtml(xhr)) {
                 if (!pre) location.href = hin;
             }
             
             $.cache($(_parseHTML(h)));
             $.pages([hin, $.cache()]);
-            //$.scripts("d"); //fetch all scripts
             plus = 0;
 
             if(cb) return(cb());
@@ -430,6 +430,12 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     }
 );
 
+
+// The AddAll plugin
+// Works on a new selection of scripts to apply delta-loading to 
+// pk parameter:
+// "href" - operate on stylesheets in the new selection
+// "src" - operate on JS scripts
 pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
     if(!$this.length) return;
 	PK = pk;
@@ -525,6 +531,16 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     }
 );
 
+// The Cd plugin
+// Manages various operations on the main content div
+// Second parameter (p) is callback
+// First parameter (o) is switch:
+// "s" - stop current animation on the main content div
+// "g" - fetch main content div
+// "i" - initialise (main content div, aniParams, frm)
+// "1" - invoke first phase of animation
+// "2" - invoke second phase of animation
+// "3" - invoke third and last phase of animation
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return;
 	
@@ -574,6 +590,13 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
     }
 });
 
+// The Slides plugin - stands for slideshow / carousel
+// Enable a slideshow on the main content div
+// idleTime must be set to enable the slideshow
+// Also manages a symbol that can be toggled by the user to switch slideshow off / back on
+// Switch (p) values:
+// "i" - initailise
+// "f" - insert the symbol for the user to toggle
 pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
     if(!o || !idleTime) return;
 	
@@ -667,6 +690,22 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     }
 });
 
+// The Rq plugin - stands for request
+// Stores all kinds of and manages data concerning the pending request
+// Simplifies the Pronto plugin by managing request data separately, instead of passing it around...
+// Second parameter (p) : data
+// First parameter (o) values:
+// "=" - check whether internally stored "href" ("h") variable is the same as the global currentURL
+// "v" - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
+// "i" - initialise request defaults and return "l" (currentTarget)
+// "h" - access internal href hard
+// "l" - get internal "l" (currentTarget)
+// "e" - set / get internal "e" (event)
+// "p" - set / get internal "p" (push flag)
+// "is" - set / get internal "ispost" (flag whether request is a POST)
+// "d" - set / get internal "d" (data for central $.ajax())
+// "can" - set / get internal "can" ("href" of canonical URL)
+// "can?" - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
     if(o === "=") {
         return h === currentURL; 
@@ -726,6 +765,11 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
     if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
 
+// The Frms plugin - stands for forms
+// Ajaxify all forms in the specified divs
+// Switch (p) values:
+// "d" - set divs variable
+// "a" - Ajaxify all froms in divs
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
     if (!forms || !o) return;
     
@@ -785,6 +829,12 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     }
 });
 
+
+// The RqTimer plugin - stands for request Timer
+// Works on requestDelay setting
+// Switch (p) values:
+// "-" - clear Timer
+// function - set Timer according to requestDelay, using function in p as a callback
 pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(!o) return;
 
@@ -818,7 +868,11 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 }
 );
 
-
+// The Scrolly plugin - manages scroll effects centrally
+// scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
+// Switch (o) values:
+// "+" - add current page to offsets
+// "-" - scroll to current page offset
 pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     if(!o) return;
   
@@ -847,6 +901,11 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 }, { scrll: function (o) { $(window).scrollTop(o); } }
 );
 
+// The hApi plugin - manages operatios on the History API centrally
+// Second parameter (p) - set global currentURL
+// Switch (o) values:
+// "=" - perform a replaceState, using currentURL
+// otherwise - perform a pushState, using currentURL
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
     if(p) currentURL = p;
@@ -855,6 +914,13 @@ pO("hApi", 0, 0, function (o, p) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
+// The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
+// Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
+// Last element in order of the DOM should be the main content div, unless overriden by "maincontent"
+// Switch (h) values:
+// "i" - initialise Pronto
+// <object> - fetch href part and continue with _request()
+// <URL> - set "h" variable of $.rq hard and continue with _request()
 pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0 }, function ($this, h) {
      if(!h) return;
      
