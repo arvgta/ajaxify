@@ -430,6 +430,12 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     }
 );
 
+
+// The AddAll plugin
+// Works on a new selection of scripts to apply delta-loading to 
+// pk parameter:
+// "href" - operate on stylesheets in the new selection
+// "src" - operate on JS scripts
 pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
     if(!$this.length) return;
 	PK = pk;
@@ -525,6 +531,16 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     }
 );
 
+// The Cd plugin
+// Manages various operations on the main content div
+// Second parameter (p) is callback
+// First parameter (o) is switch:
+// "s" - stop current animation on the main content div
+// "g" - fetch main content div
+// "i" - initialise (main content div, aniParams, frm)
+// "1" - invoke first phase of animation
+// "2" - invoke second phase of animation
+// "3" - invoke third and last phase of animation
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return;
 	
@@ -574,6 +590,13 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
     }
 });
 
+// The Slides plugin - stands for slideshow / carousel
+// Enable a slideshow on the main content div
+// idleTime must be set to enable the slideshow
+// Also manages a symbol that can be toggled by the user to switch slideshow off / back on
+// Switch (p) values:
+// "i" - initailise
+// "f" - insert the symbol for the user to toggle
 pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
     if(!o || !idleTime) return;
 	
@@ -667,6 +690,22 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
     }
 });
 
+// The Rq plugin - stands for request
+// Stores all kinds of and manages data concerning the pending request
+// Simplifies the Pronto plugin by managing request data separately, instead of passing it around...
+// Second parameter (p) : data
+// First parameter (o) values:
+// "=" - check whether internally stored "href" ("h") variable is the same as the global currentURL
+// "v" - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
+// "i" - initialise request defaults and return "l" (currentTarget)
+// "h" - access internal href hard
+// "l" - get internal "l" (currentTarget)
+// "e" - set / get internal "e" (event)
+// "p" - set / get internal "p" (push flag)
+// "is" - set / get internal "ispost" (flag whether request is a POST)
+// "d" - set / get internal "d" (data for central $.ajax())
+// "can" - set / get internal "can" ("href" of canonical URL)
+// "can?" - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
     if(o === "=") {
         return h === currentURL; 
@@ -726,6 +765,11 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
     if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
 });
 
+// The Frms plugin - stands for forms
+// Ajaxify all forms in the specified divs
+// Switch (p) values:
+// "d" - set divs variable
+// "a" - Ajaxify all froms in divs
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
     if (!forms || !o) return;
     
@@ -785,6 +829,12 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     }
 });
 
+
+// The RqTimer plugin - stands for request Timer
+// Works on requestDelay setting
+// Switch (p) values:
+// "-" - clear Timer
+// function - set Timer according to requestDelay, using function in p as a callback
 pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(!o) return;
 
@@ -818,7 +868,11 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 }
 );
 
-
+// The Scrolly plugin - manages scroll effects centrally
+// scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
+// Switch (o) values:
+// "+" - add current page to offsets
+// "-" - scroll to current page offset
 pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     if(!o) return;
   
@@ -847,6 +901,11 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 }, { scrll: function (o) { $(window).scrollTop(o); } }
 );
 
+// The hApi plugin - manages operatios on the History API centrally
+// Second parameter (p) - set global currentURL
+// Switch (o) values:
+// "=" - perform a replaceState, using currentURL
+// otherwise - perform a pushState, using currentURL
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return;
     if(p) currentURL = p;
@@ -855,6 +914,13 @@ pO("hApi", 0, 0, function (o, p) {
     else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
 });
 
+// The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
+// Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
+// Last element in order of the DOM should be the main content div, unless overriden by "maincontent"
+// Switch (h) values:
+// "i" - initialise Pronto
+// <object> - fetch href part and continue with _request()
+// <URL> - set "h" variable of $.rq hard and continue with _request()
 pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0 }, function ($this, h) {
      if(!h) return;
      
