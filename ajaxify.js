@@ -253,15 +253,15 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         type: ispost ? "POST" : "GET", //POST or GET?
         data: ispost ? $.rq("d") : null, //fetch data from $.rq
         success: function(h) { //success -> "h" holds HTML
-            if (!h || !_isHtml(xhr)) {
-                if (!pre) location.href = hin;
+            if (!h || !_isHtml(xhr)) { //HTML empty or not HTML or XML?
+                if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
             }
             
-            $.cache($(_parseHTML(h)));
-            $.pages([hin, $.cache()]);
-            plus = 0;
+            $.cache($(_parseHTML(h))); //Clean HTML and load it into cache
+            $.pages([hin, $.cache()]); //Load object into $.pages, too
+            plus = 0; //Reset "plus" variable, indicating no pre-fetch has happened
 
-            if(cb) return(cb());
+            if(cb) return(cb()); //Call callback if given
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
@@ -272,7 +272,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
                 if(cb) cb(error);
             } catch (e) {}
         },
-        async: true
+        async: true //Explicitly not synchronous!
         });
     },
 		
@@ -282,7 +282,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     parseHTML: function (h) { //process fetched HTML
-        return $.trim(_replD(h));
+        return $.trim(_replD(h)); //trim escaped HTML of entire page
     },
 		
     replD: function (h) { //pre-process HTML so it can be loaded by jQuery
@@ -308,94 +308,94 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
     }
     else return $().pronto(o);
     }, {
-        init: function (s) {
-            if (!api || !pluginon) {
+        init: function (s) { //main intialisation of Pronto and its sub-plugins
+            if (!api || !pluginon) { //History API not defined or Ajaxify turned off manually -> exit / gracefully degrade
                 $.log("Gracefully exiting...");
                 return false;
             }
-            $.log("Ajaxify loaded...", verbosity);
-            $.scripts("i", s);
+            $.log("Ajaxify loaded...", verbosity); //verbosity steers, whether this initialisation message is output and initial verbosity
+            $.scripts("i", s); //Initialse sub-plugins...
             $.cache(0, s);
             $.memory(0, s);
-            return true;
+            return true; //Return success
        }
     }
 );
 
 // The stateful Scripts plugin
-// First parameter is switch:
+// First parameter "o" is switch:
 // "i" - initailise options
 // "c" - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
 pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
-    if (o === "i") {
-        if(!$s) $s = $();
+    if (o === "i") { //Initalise
+        if(!$s) $s = $(); //Start off with empty internal jQuery object
         return true;
     }
     
-    if (o === "s") return _allstyle($s.y);
+    if (o === "s") return _allstyle($s.y); //Handle style tags
             
-    if (o === "1") { 
-        $.detScripts($s);
-        cd0 = $.cd("g").get(0);
-        return _addScripts($s, settings);
+    if (o === "1") { //Initial load initialisation
+        $.detScripts($s); //Fetch scripts from DOM, "pass" variable will be 0
+        cd0 = $.cd("g").get(0); //Load main content div node into "cd0"
+        return _addScripts($s, settings); //Load scripts from DOM into addScripts and initialise it
     }
             
-    if (o === "c") {
-        if (canonical && $s.can) return $s.can.attr("href");
-        else return false;
+    if (o === "c") { //Canonical URL handling
+        if (canonical && $s.can) return $s.can.attr("href"); //Return "href" only
+        else return false; //No canonical found
     }
 	
     if (o==="d") return $.detScripts($s); //fetch all scripts
     
-    if (o instanceof jQuery) return _onetxt(o);
+    if (o instanceof jQuery) return _onetxt(o); //process one inline script only
 	
-    $.scripts("d");
+    $.scripts("d"); //fetch all scripts
     _addScripts($s, settings); //delta-loading
 }, {
-    allstyle: function ($s) {
-        if (!style || !$s) return;
-        $("head").find("style").remove();
-        $s.each(function() {
-            var d = $(this).text();
-            _addstyle(d);
+    allstyle: function ($s) { //Style tag handling
+        if (!style || !$s) return; //Style shut off or selection empty -> return
+        $("head").find("style").remove(); //Remove all style tags in the DOM first
+        $s.each(function() { //Iterate through selection
+            var d = $(this).text(); //Grab text
+            _addstyle(d); //Add single style tag
         });
     },
-    onetxt: function ($s) {
-        var d, txt = $s.text(), t = $s.prop('type');
-        d = $('<div />').text(txt).html();
-        if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $s.hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t);
+    onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
+        var d, txt = $s.text(), t = $s.prop('type'); //Extract text and type
+        d = $('<div />').text(txt).html(); //Create a DIV on the fly, dump in text and extract HTML
+        if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $s.hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t); //Check constraints
     },
-    addtext: function (t, type) {
-        if(!t || !t.length) return;
-        if(!type) type = 'text/javascript';
+    addtext: function (t, type) { //Add one inline JS script - main function
+        if(!t || !t.length) return; //Ensure input
+        if(!type) type = 'text/javascript'; //Validate type
         if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { $.log("Error in apptext: " + t + "\nType: " + type + "\nCode: " + console.debug(e)); }
         
-        try { $.globalEval(t); } catch (e1) {
+        try { $.globalEval(t); } catch (e1) { //instead of appending, we'll try an eval
             try { eval(t); } catch (e2) {
                 $.log("Error in inline script : " + t + "\nError code : " + e2);
             }
         }
     },
-    apptext: function (t, type) { 
-        var scriptNode = document.createElement('script');
+    apptext: function (t, type) { //Append a single inline script to the main content div
+        var scriptNode = document.createElement('script'); //low-level assembly of script node
         scriptNode.type = type;
         scriptNode.appendChild(document.createTextNode(t));
         try { cd0.appendChild(scriptNode); } catch (e)  { $.log("Bad inline script text in apptext: " + t); }
     },
-    addstyle: function (t) {
+    addstyle: function (t) { //add a single style tag
         $("head").append('<style type="text/css">' + t + '</style>');
     },
-    inlineskip: function (txt) {
-        var d = inlineskip;
-        if (d) {
-            d = d.split(", ");
-            for (var i = 0; i < d.length; i++)
-                if (txt.iO(d[i])) return true;
+    inlineskip: function (txt) { //Check, whether to skip this inline JS text
+        var d = inlineskip; //Abbreviation for inlineskip
+        if (d) { //If inlineskip not given, then return quickly
+            d = d.split(", "); //Convert inlineskip to array
+            for (var i = 0; i < d.length; i++) //Scan text against strings to skip
+                if (txt.iO(d[i])) return true; //Text snippet found in text -> skip!
         }
     },
-    inlinehints: function (txt) {
+    inlinehints: function (txt) { //Same as above, but if inline text is found in inlinehints, this inline script will be loaded, even if "inline" === false
          var d = inlinehints;
          if (d) {
              d = d.split(", ");
@@ -403,9 +403,9 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
                  if (txt.iO(d[i])) return true;
          }
     },
-    addScripts: function ($s, st) {
-        $s.c.addAll("href", st);
-        $s.j.addAll("src", st);
+    addScripts: function ($s, st) { //Delta-loading of sylesheets and external JS files
+        $s.c.addAll("href", st); //Stylesheets
+        $s.j.addAll("src", st); //External JS files
     }
 }
 );
@@ -416,15 +416,15 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
 // Fetches all external scripts on the page
 // Fetches all inline scripts on the page
 pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
-    head = pass ? $.getPage("head") : $("head");
-    lk = head.find(pass ? ".ajy-link" : "link");
-    j = pass ? $.getPage("script") : $("script");
-    $s.c = _rel(lk, "stylesheet");
-    $s.y = head.find("style");
-    $s.can = _rel(lk, "canonical");
-	$s.j = j;
+    head = pass ? $.getPage("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+    lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
+    j = pass ? $.getPage("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+    $s.c = _rel(lk, "stylesheet"); //Extract stylesheets
+    $s.y = head.find("style"); //Extract style tags
+    $s.can = _rel(lk, "canonical"); //Extract canonical tag
+	$s.j = j; //Assign JSs to internal selection
     }, {
-    rel: function(lk, v) {
+    rel: function(lk, v) { //Extract files that have specific "rel" attribute only
         return $(lk).filter(function(){return($(this).attr("rel").iO(v));});
     }
     }
