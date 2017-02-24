@@ -105,7 +105,7 @@ scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
-//Minified pO() function
+//Minified pO() function - for documentation of pO() please refer to http://4nf.org/po/
 function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
@@ -542,48 +542,48 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
 // "2" - invoke second phase of animation
 // "3" - invoke third and last phase of animation
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
-    if(!o) return;
+    if(!o) return; //Ensure operator
 	
-    if(o === "s") return cd.stop(true, true);
+    if(o === "s") return cd.stop(true, true); //Stop current animation on the main content div
     
-    if(o === "g") return cd;
+    if(o === "g") return cd; //Fetch main content div
 
-    if(o === "i") {
-        cd = maincontent ? p.filter(maincontent) : p.last();
-        aniTrue = aniTime && aniParams;
-        cdwidth = cd.width();
-        if(!aniTrue) return;
+    if(o === "i") { //Initialise (main content div, aniParams, frm)
+        cd = maincontent ? p.filter(maincontent) : p.last(); //Set to maincontent if given otherwise last element in DOM of selection
+        aniTrue = aniTime && aniParams; //aniTime and aniParams has to be set for animations to work
+        cdwidth = cd.width(); //Abbreviate cd width
+        if(!aniTrue) return; //Animations not enabled -> return
 		
-        aniParams = $.extend({
+        aniParams = $.extend({ //override default aniParams with user aniParams
             opacity: 1, // default - no fade
             width: "100%", // default - no change in width
             height: "100%" // default - no change in height
         }, aniParams);
 		
-        aniParams = $.extend({
+        aniParams = $.extend({ //calculate marginRight
             marginRight: cdwidth - aniParams.width //making the content div width self-managing
         }, aniParams);
 		
-        frm = $.extend({}, aniParams);
+        frm = $.extend({}, aniParams); //store in "frm" ("from" jQuery object) with aniParams
 		
-        for(var key in frm) {
-            if (frm.hasOwnProperty(key)) { 
-                var keyval = cd.css(key), keyOval = frm[key];
+        for(var key in frm) { //iterate through "frm" collection
+            if (frm.hasOwnProperty(key)) { //real key?
+                var keyval = cd.css(key), keyOval = frm[key]; //Populate old / new key value
 
-                if((key === "height") && keyOval.iO("%")) { 
-                    keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%";
+                if((key === "height") && keyOval.iO("%")) { //Treat "height" specially
+                    keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%"; //Calculate new height
                 }
 
-                frm[key] = keyval;    
+                frm[key] = keyval; //Store keyval in "frm"
             }
         }     
     }
 	
-    if(!p) return;
+    if(!p) return; //Ensure data - further operations require data
 	
-    if(!aniTrue) { p(); return; }
+    if(!aniTrue) { p(); return; } //Call callback, if animations disabled
 	
-    if (o === "1" || o === "2" || o === "3") {
+    if (o === "1" || o === "2" || o === "3") { //Phases of animation
         cd.stop(true, true); //stop animation of main content div
         if(o === "3")  { p(); return; } //if last phase, don't spawn a new animation
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
@@ -594,17 +594,17 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
 // Enable a slideshow on the main content div
 // idleTime must be set to enable the slideshow
 // Also manages a symbol that can be toggled by the user to switch slideshow off / back on
-// Switch (p) values:
+// Switch (o) values:
 // "i" - initailise
 // "f" - insert the symbol for the user to toggle
 pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
-    if(!o || !idleTime) return;
+    if(!o || !idleTime) return; //Ensure data
 	
-    if (o === "i") { 
-        $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime });
+    if (o === "i") { //Initialse
+        $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise "idle" plugin
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
-            parentEl: '#content', //parent element, where the above image(s) will be prepended 
+            parentEl: '#content', //parent element, where the image(s) below will be prepended 
             imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
             imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
             titleOn: 'Turn slideshow off', //title tag when on
@@ -612,40 +612,40 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
             imgProps: { marginLeft: '85%', marginTop: '20px' }
         }, toggleSlide);  
 
-        parentEl = toggleSlide.parentEl;
+        parentEl = toggleSlide.parentEl; //Set internal parentEl value
     }
     
-    if (o === "f") _insImg();
+    if (o === "f") _insImg(); //Insert symbol for toggling slideshow on/off
 }, {
-    onIdle: function(){ 
-        _trigger("idle");
-        if(timer + 1) return;                    
-        _slide();
+    onIdle: function(){ //User was not active for given idleTime
+        _trigger("idle"); //Fire generic event
+        if(timer + 1) return; //Timer already set?                   
+        _slide(); //Commence slideshow
     },
-    onActive: function(){ 
-        _trigger("active");
-        if(currEl) currEl.removeClass(addclass);
-        if(timer + 1) clearInterval(timer);
-        timer = -1;
+    onActive: function(){ //User has become active again
+        _trigger("active"); //Fire generic event
+        if(currEl) currEl.removeClass(addclass); //Remove class from currEl
+        if(timer + 1) clearInterval(timer); //If timer set -> clear timer
+        timer = -1; //reset timer value
     },
-    slide: function() { 
-        if(timer + 1) clearInterval(timer);
-        timer = setInterval(_slide1, slideTime); 
+    slide: function() { //Start slideshow
+        if(timer + 1) clearInterval(timer); //If timer set -> clear timer
+        timer = setInterval(_slide1, slideTime); //Set timer and register "slide1" to be called periodically
     },
-    slide1: function() { 
-        if(pinned) return;
-        $().pronto(_nextLink());
+    slide1: function() { //Perform a single slide
+        if(pinned) return; //Check if pinned -> then do nothing
+        $().pronto(_nextLink()); //Get next URL from menu and call Pronto to change to that page programmatically
     }, 
-    nextLink: function() { 
-        var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link;
-        $(menu).each(function(i, v){ 
-            var el = $(this).parent();
-            if(nextLink) return(true);
-            link = v.href;
-            if(!_internal(link)) return(undefined);
-            el.removeClass(addclass);
-            if(!firstValue) firstValue = $(this).parent();
-            if(!firstLink) firstLink = link;
+    nextLink: function() { //Fetch next URL and manage transition to next page
+        var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link; //Declare variables needed with defaults
+        $(menu).each(function(i, v){ //Iterate through menu
+            var el = $(this).parent(); //Get parent of menu element
+            if(nextLink) return(true); //nextLink already found -> return
+            link = v.href; //fetch href of element
+            if(!_internal(link)) return(undefined); //verify internal
+            el.removeClass(addclass); //remove old highlight
+            if(!firstValue) firstValue = $(this).parent(); //populate firstValue
+            if(!firstLink) firstLink = link; //populate firstLink
             if(wasPrev) { 
                 nextLink = link;
                 currEl = el;
@@ -654,38 +654,38 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
             else if(currentURL == link) wasPrev = true;
         });
 			
-        if(!nextLink) { 
-             firstValue.addClass(addclass);
-             nextLink = firstLink;
-             currEl = firstValue;
+        if(!nextLink) { //end of menu found
+             firstValue.addClass(addclass); //highlight firstValue
+             nextLink = firstLink; //start at the top again
+             currEl = firstValue; //set currEl to top value
         }
 		
-        return nextLink;
+        return nextLink; //return next URL
     },
-    insImg: function() {
-        if(!parentEl) return;
+    insImg: function() { //insert symbol for toggling slideshow on / off
+        if(!parentEl) return; //not configurated?
         img = $('<img src ="' + toggleSlide.imgOn + '" title="' + toggleSlide.titleOn + '" />').prependTo(parentEl).css(toggleSlide.imgProps);
         
-        img.click(_toggleImg);
-        pinned = 0;
+        img.click(_toggleImg); //attach click handler to image
+        pinned = 0; //initialise pinned with 0
     },
-    toggleImg: function(e) {
-        if(!parentEl || !img || !img.length) return;
-        var src = toggleSlide.imgOn, titl = toggleSlide.titleOn;
+    toggleImg: function(e) { //toggle slideshow on / off (on clicking of the above symbol)
+        if(!parentEl || !img || !img.length) return; //ensure input
+        var src = toggleSlide.imgOn, titl = toggleSlide.titleOn; //initialise abbreviations
         
-        if(!pinned) { 
-            pinned = 1;
-            src = toggleSlide.imgOff;
-            titl = toggleSlide.titleOff;
-        } else pinned = 0;
+        if(!pinned) { //not pinned a priori
+            pinned = 1; //set pinned to true
+            src = toggleSlide.imgOff; //fetch image URL for "off"
+            titl = toggleSlide.titleOff; //fetch image title for "off"
+        } else pinned = 0; //switch from pinned to not pinned
                 
-        img.attr("src", src);
-        img.attr("title", titl);
+        img.attr("src", src); //dynamically update image src
+        img.attr("title", titl); //dynamically update image title
         
         if(!pinned) { //Kickstart in idle sub-plugin after user resumes 
-            _slide1();
-            _slide();
-             $(document).trigger("idle:kick");
+            _slide1(); //Kickstart with a single slide
+            _slide(); //Commence slideshow
+             $(document).trigger("idle:kick"); //Notify "idle" plugin
         }
     }
 });
@@ -707,24 +707,24 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
 // "can" - set / get internal "can" ("href" of canonical URL)
 // "can?" - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
-    if(o === "=") {
-        return h === currentURL; 
+    if(o === "=") { 
+        return h === currentURL; //check whether internally stored "href" ("h") variable is the same as the global currentURL
     }
     
-    if(o === "v") {
-        if(!p) return false;
-        e = p;
-        l = e.currentTarget;
-        h = l.href;
-        if(!_internal(h)) return false;
-        o = "i";
+    if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
+        if(!p) return false; //ensure data
+        e = p; //store event internally
+        l = e.currentTarget; //extract currentTarget
+        h = l.href; //extract href
+        if(!_internal(h)) return false; //if not internal -> report failure
+        o = "i"; //continue with "i"
     }
     
-    if(o === "i") {
-        ispost = false;
-        data = null;
-        push = false;
-        return l;
+    if(o === "i") { //initialise request defaults and return "l" (currentTarget)
+        ispost = false; //GET assumed
+        data = null; //reset data
+        push = false; //reset push
+        return l; //return "l" (currentTarget)
     }
     
     if(o === "h") { // Access href hard
@@ -733,55 +733,55 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
             h = p;  // Poke in href hard
         }
         
-        return h;
+        return h; //href
     }
     
-    if(o === "l") return l;
-    if(o === "e") {
+    if(o === "l") return l; //return "l" (currentTarget)
+    if(o === "e") { //set / get internal "e" (event)
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
     }
 
-    if(o === "p") {
+    if(o === "p") { //set / get internal "p" (push flag)
         if(p) push = p;
         return push;
     }
 	
-    if(o === "is") {
+    if(o === "is") { //set / get internal "ispost" (flag whether request is a POST)
         if(p) ispost = p;
         return ispost;
     }
 	
-    if(o === "d") {
+    if(o === "d") { //set / get internal "d" (data for central $.ajax())
         if(p) data = p;
         return data;
     }
 	
-    if(o === "can") {
+    if(o === "can") { //set internal "can" ("href" of canonical URL)
         if(p) can = p;
         return can;
     }
 	
-    if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p;
+    if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p; //get internal "can" ("href" of canonical URL)
 });
 
 // The Frms plugin - stands for forms
 // Ajaxify all forms in the specified divs
-// Switch (p) values:
+// Switch (o) values:
 // "d" - set divs variable
-// "a" - Ajaxify all froms in divs
+// "a" - Ajaxify all forms in divs
 pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
-    if (!forms || !o) return;
+    if (!forms || !o) return; //ensure data
     
-    if(o === "d") divs = p;
-    if(o === "a") divs.find(forms).filter(function() {
-        return(_internal($(this).attr("action")));
-    }).submit(function(q) {
-        fm = $(q.target);
-        if (!fm.is("form")) {
-            fm = fm.filter("input[type=submit]").parents("form:first");
-            if (fm.length === 0) {
-                return(true);
+    if(o === "d") divs = p; //set divs variable
+    if(o === "a") divs.find(forms).filter(function() { //Ajaxify all forms in divs
+        return(_internal($(this).attr("action"))); //ensure "action"
+    }).submit(function(q) { //override submit handler
+        fm = $(q.target); // fetch target
+        if (!fm.is("form")) { //is form? -> found
+            fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields 
+            if (fm.length === 0) { //failed?
+                return(true); //degrade to default handler
             }
         }
         
