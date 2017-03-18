@@ -785,30 +785,30 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
             }
         }
         
-        p = _k();
-        var g = "get",
-        m = fm.attr("method");
-        if (m.length > 0 && m.toLowerCase() == "post") g = "post";
+        p = _k(); //Serialise data
+        var g = "get", //assume GET
+        m = fm.attr("method"); //fetch method attribute
+        if (m.length > 0 && m.toLowerCase() == "post") g = "post"; //Override with "post"
         
-        var h, a = fm.attr("action");
-        if (a && a.length > 0) h = a;
-        else h = currentURL; 
+        var h, a = fm.attr("action"); //fetch action attribute
+        if (a && a.length > 0) h = a; //found -> store
+        else h = currentURL; //not found -> select current URL
                 
-        $.rq("i");
+        $.rq("i"); //initialise request
                
-        if (g == "get") h = _b(h, p);
+        if (g == "get") h = _b(h, p); //GET -> copy URL parameters
         else {
-            $.rq("is", true);
-            $.rq("d", p);
+            $.rq("is", true); //set is POST in request data
+            $.rq("d", p); //save data in request data
         }
         
-        _trigger("submit", h);
-        $().pronto({ href: h });
+        _trigger("submit", h); //raise pronto.submit event
+        $().pronto({ href: h }); //programmatically change page
 		
-        return(false);
+        return(false); //success -> disable default behaviour
     });
 }, {
-    k: function () {
+    k: function () { //Serialise data
         var o = fm.serialize();
         var n = $("input[name][type=submit]", fm);
         if (n.length === 0) return o;
@@ -821,7 +821,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         
         return o;
     },
-    b: function (m, n) {
+    b: function (m, n) { //copy URL parameters
         if (m.indexOf("?") > 0) {
             m = m.substring(0, m.indexOf("?"));
         }
@@ -836,10 +836,10 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
 // "-" - clear Timer
 // function - set Timer according to requestDelay, using function in p as a callback
 pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
-    if(!o) return;
+    if(!o) return; //ensure operator
 
-    if(o === "-" && requestTimer) return clearTimeout(requestTimer);
-    if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay);
+    if(o === "-" && requestTimer) return clearTimeout(requestTimer); //clear timer
+    if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay); //set timer
 });
 
 // The stateful Offsets plugin
@@ -874,9 +874,9 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 // "+" - add current page to offsets
 // "-" - scroll to current page offset
 pO("scrolly", 0, { scrolltop: "s" }, function (o) {
-    if(!o) return;
+    if(!o) return; //ensure operator
   
-    var op = o;
+    var op = o; //cache operator
 	
     if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
 	
@@ -907,11 +907,11 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 // "=" - perform a replaceState, using currentURL
 // otherwise - perform a pushState, using currentURL
 pO("hApi", 0, 0, function (o, p) {
-    if(!o) return;
-    if(p) currentURL = p;
+    if(!o) return; //ensure operator
+    if(p) currentURL = p; //if p given -> update current URL
 
-    if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL);
-    else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL);
+    if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL); //perform replaceState
+    else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL); //perform pushState
 });
 
 // The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
@@ -922,29 +922,29 @@ pO("hApi", 0, 0, function (o, p) {
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
 pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0 }, function ($this, h) {
-     if(!h) return;
+     if(!h) return; //ensure data
      
-     if(h === "i") { 
-         var s = settings;
+     if(h === "i") { //request to initialise
+         var s = settings; //abbreviation
          if(!$this.length) $.log("Warning - empty content selector passed!");
-         $gthis = $this;
-         $.cd(0, 0, s);
-         $.frms(0, 0, s);
-         $.slides(0, s);
-         $.rqTimer(0, s);
-         $.scrolly(0, s);
-         $.cd("i", $gthis);
-         _init_p();
-         return $this;
+         $gthis = $this; //copy selection to global selector
+         $.cd(0, 0, s); //initialise content div sub-plugin
+         $.frms(0, 0, s); //initialise forms sub-plugin
+         $.slides(0, s); //initialise slideshow sub-plugin
+         $.rqTimer(0, s); //initialise request timer sub-plugin
+         $.scrolly(0, s); //initialise scroll effects sub-plugin
+         $.cd("i", $gthis); //second phase of initialisation of content div sub-plugin
+         _init_p(); //initialise Pronto sub-plugin
+         return $this; //return jQuery selector for chaining
      }
      
-     if(typeof(h) === "object") { 
+     if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
           $.rq("h", h.href);
           _request();
           return;
      }
      
-     if(h.iO("/")) {
+     if(h.iO("/")) { //jump to internal page programmatically -> default handler
          $.rq("h", h);				 
          _request(true);
      }
@@ -957,7 +957,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
         $(selector).one("touchstart", function(){ prefetch = false;}); // for touchscreens - turn prefetch off    
     }
 	
-    var $body = $("body");
+    var $body = $("body"); //abbreviation
     $body.on("click.pronto", selector, _click); // Real click handler -> _click()
     $.frms("d", $body); // Select forms in whole body
     $.frms("a"); // Ajaxify forms
@@ -967,8 +967,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  prefetch: function(e) { //...target page on hoverIntent
        if(!prefetch) return;
        var link = $.rq("v", e); // validate internal URL
-       if ($.rq("=") || !link) return;
-       fn('+', link.href, function() {
+       if ($.rq("=") || !link) return; //same page or no data
+       fn('+', link.href, function() { //prefetch page
             if (previewoff === true) return(false);
             if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
        });
