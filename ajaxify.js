@@ -70,7 +70,7 @@ You can specify any parameters that are understood by .animate() !
 Toggling sliding parameters (toggleSlide): Default is false (set off) 
 You can override the following toggleSlide parameters:
 { //defaults - if not turned off completely
-    parentEl: '#content', //parent element, where the above image(s) will be prepended 
+    parentEl: '#content', //parent element, where the above images will be prepended 
     imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
     imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
     titleOn: 'Turn slideshow off', //title tag when on
@@ -127,7 +127,7 @@ function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
 // none - returns currently cached page
 // <URL> - returns page with specified URL
 // <jQuery object> - saves the page in cache
-// "f" - flushes the cache
+// f - flushes the cache
 pO("cache", { d: false }, 0, function (o) {
     if (!o) return d; //nothing passed -> return currently cached page
 	
@@ -196,9 +196,9 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 // First parameter (o) is a switch: 
 // empty - returns cache
 // <URL> - loads HTML via Ajax, second parameter "p" must be callback
-// "+" - pre-fetches page, second parameter "p" must be URL, third parameter "p2" must be callback 
-// "-" - loads page into DOM and handle scripts, second parameter "p" must hold selection to load
-// "x" - returns XHR
+// + - pre-fetches page, second parameter "p" must be URL, third parameter "p2" must be callback 
+// - - loads page into DOM and handle scripts, second parameter "p" must hold selection to load
+// x - returns XHR
 // otherwise - returns selection of current page to client
 
 pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
@@ -324,8 +324,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 
 // The stateful Scripts plugin
 // First parameter "o" is switch:
-// "i" - initailise options
-// "c" - fetch canonical URL
+// i - initailise options
+// c - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
 pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
@@ -372,7 +372,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         if(!type) type = 'text/javascript'; //Validate type
         if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { $.log("Error in apptext: " + t + "\nType: " + type + "\nCode: " + console.debug(e)); }
         
-        try { $.globalEval(t); } catch (e1) { //instead of appending, we'll try an eval
+        try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
             try { eval(t); } catch (e2) {
                 $.log("Error in inline script : " + t + "\nError code : " + e2);
             }
@@ -434,8 +434,8 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // The AddAll plugin
 // Works on a new selection of scripts to apply delta-loading to it 
 // pk parameter:
-// "href" - operate on stylesheets in the new selection
-// "src" - operate on JS scripts
+// href - operate on stylesheets in the new selection
+// src - operate on JS scripts
 pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
     if(!$this.length) return; //ensure input
 	PK = pk; //Copy "primary key" into internal variable
@@ -472,14 +472,14 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         
         return true;
     },
-    classAlways: function ($t) { return $t.attr("data-class") == "always"; }, //Check for 'data-class = "always"'
+    classAlways: function ($t) { return $t.attr("data-class") == "always"; }, //Check for data-class = "always"
     newScripts: function (sN) { //Write-out scripts
         for (var i = 0; i < sN.length; i++) { //Iterate through new array
              if (sN[i][1] === 3) { //inline script?
                  $.scripts(sN[i][0]); //insert single inline script
                  continue;
              }				 
-             if (_classAlways(sN[i][0])) _removeScript(sN[i][0].attr(PK)); //in case of 'data-class = "always"' -> remove scripts from DOM
+             if (_classAlways(sN[i][0])) _removeScript(sN[i][0].attr(PK)); //in case of data-class = "always" -> remove scripts from DOM
              if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async")); //insert single external script in the head
         }
     },
@@ -535,12 +535,12 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
 // Manages various operations on the main content div
 // Second parameter (p) is callback
 // First parameter (o) is switch:
-// "s" - stop current animation on the main content div
-// "g" - fetch main content div
-// "i" - initialise (main content div, aniParams, frm)
-// "1" - invoke first phase of animation
-// "2" - invoke second phase of animation
-// "3" - invoke third and last phase of animation
+// s - stop current animation on the main content div
+// g - fetch main content div
+// i - initialise (main content div, aniParams, frm)
+// 1 - invoke first phase of animation
+// 2 - invoke second phase of animation
+// 3 - invoke third and last phase of animation
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return; //Ensure operator
 	
@@ -585,7 +585,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
 	
     if (o === "1" || o === "2" || o === "3") { //Phases of animation
         cd.stop(true, true); //stop animation of main content div
-        if(o === "3")  { p(); return; } //if last phase, don't spawn a new animation
+        if(o === "3")  { p(); return; } //if last phase, do not spawn a new animation
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
 });
@@ -595,16 +595,16 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
 // idleTime must be set to enable the slideshow
 // Also manages a symbol that can be toggled by the user to switch slideshow off / back on
 // Switch (o) values:
-// "i" - initailise
-// "f" - insert the symbol for the user to toggle
+// i - initailise
+// f - insert the symbol for the user to toggle
 pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
     if(!o || !idleTime) return; //Ensure data
 	
-    if (o === "i") { //Initialse
-        $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise "idle" plugin
+    if (o === "i") { //Initialise
+        $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise idle plugin
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
-            parentEl: '#content', //parent element, where the image(s) below will be prepended 
+            parentEl: '#content', //parent element, where the images below will be prepended 
             imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
             imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
             titleOn: 'Turn slideshow off', //title tag when on
@@ -695,17 +695,17 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
 // Simplifies the Pronto plugin by managing request data separately, instead of passing it around...
 // Second parameter (p) : data
 // First parameter (o) values:
-// "=" - check whether internally stored "href" ("h") variable is the same as the global currentURL
-// "v" - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
-// "i" - initialise request defaults and return "l" (currentTarget)
-// "h" - access internal href hard
-// "l" - get internal "l" (currentTarget)
-// "e" - set / get internal "e" (event)
-// "p" - set / get internal "p" (push flag)
-// "is" - set / get internal "ispost" (flag whether request is a POST)
-// "d" - set / get internal "d" (data for central $.ajax())
-// "can" - set / get internal "can" ("href" of canonical URL)
-// "can?" - check whether simple canonical URL is given and return, otherwise return value passed in "p"
+// = - check whether internally stored "href" ("h") variable is the same as the global currentURL
+// v - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
+// i - initialise request defaults and return "l" (currentTarget)
+// h - access internal href hard
+// l - get internal "l" (currentTarget)
+// e - set / get internal "e" (event)
+// p - set / get internal "p" (push flag)
+// is - set / get internal "ispost" (flag whether request is a POST)
+// d - set / get internal "d" (data for central $.ajax())
+// can - set / get internal "can" ("href" of canonical URL)
+// can? - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
     if(o === "=") { 
         return h === currentURL; //check whether internally stored "href" ("h") variable is the same as the global currentURL
@@ -768,9 +768,9 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
 // The Frms plugin - stands for forms
 // Ajaxify all forms in the specified divs
 // Switch (o) values:
-// "d" - set divs variable
-// "a" - Ajaxify all forms in divs
-pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
+// d - set divs variable
+// a - Ajaxify all forms in divs
+pO("frms ", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
     if (!forms || !o) return; //ensure data
     
     if(o === "d") divs = p; //set divs variable
@@ -833,7 +833,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
 // The RqTimer plugin - stands for request Timer
 // Works on requestDelay setting
 // Switch (p) values:
-// "-" - clear Timer
+// - - clear Timer
 // function - set Timer according to requestDelay, using function in p as a callback
 pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(!o) return; //ensure operator
@@ -871,8 +871,8 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 // The Scrolly plugin - manages scroll effects centrally
 // scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
 // Switch (o) values:
-// "+" - add current page to offsets
-// "-" - scroll to current page offset
+// + - add current page to offsets
+// - - scroll to current page offset
 pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     if(!o) return; //ensure operator
   
@@ -896,7 +896,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 	
     if(op !== "+" && scrolltop) _scrll(0); //otherwise scroll to top of page
 	
-	//default -> do nothing
+    //default -> do nothing
 
 }, { scrll: function (o) { $(window).scrollTop(o); } }
 );
@@ -904,7 +904,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 // The hApi plugin - manages operatios on the History API centrally
 // Second parameter (p) - set global currentURL
 // Switch (o) values:
-// "=" - perform a replaceState, using currentURL
+// = - perform a replaceState, using currentURL
 // otherwise - perform a pushState, using currentURL
 pO("hApi", 0, 0, function (o, p) {
     if(!o) return; //ensure operator
@@ -918,7 +918,7 @@ pO("hApi", 0, 0, function (o, p) {
 // Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
 // Last element in order of the DOM should be the main content div, unless overriden by "maincontent"
 // Switch (h) values:
-// "i" - initialise Pronto
+// i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
 pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0 }, function ($this, h) {
@@ -1045,7 +1045,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
          $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
          _gaCaptureView(url); // Trigger analytics page view
          _trigger("render"); // Fire render event
-         if(cb) cb(); // Callback user's handler, if specified
+         if(cb) cb(); // Callback users handler, if specified
       });
   },
  gaCaptureView: function(url) { // Google Analytics support
