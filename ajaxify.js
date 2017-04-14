@@ -363,9 +363,8 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         });
     },
     onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
-        var d, txt = $s.text(), t = $s.prop('type'); //Extract text and type
-        d = $('<div />').text(txt).html(); //Create a DIV on the fly, dump in text and extract HTML
-        if (!d.iO(").ajaxify(") && ((inline && !_inlineskip(d)) || $s.hasClass("ajaxy") || _inlinehints(d))) _addtext(d, t); //Check constraints
+        var txt = $s.text(), t = $s.prop('type'); //Extract text and type
+        if (!txt.iO(").ajaxify(") && ((inline && !_inlineskip(txt)) || $s.hasClass("ajaxy") || _inlinehints(txt))) _addtext(txt, t); //Check constraints
     },
     addtext: function (t, type) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
