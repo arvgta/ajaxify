@@ -236,7 +236,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     ld: function ($t, $h) { //load HTML of target selection into DOM
-        $t.html($h.html());
+        $t.html($h.html()).find(".ajy-script").remove();
     },
 		
     lDivs: function ($t) { //load target selections into DOM
