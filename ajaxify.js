@@ -377,11 +377,10 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
             }
         }
     },
-    apptext: function (t, type) { //Append a single inline script to the main content div
-        var scriptNode = document.createElement('script'); //low-level assembly of script node
-        scriptNode.type = type;
-        scriptNode.appendChild(document.createTextNode(t));
-        try { cd0.appendChild(scriptNode); } catch (e)  { $.log("Bad inline script text in apptext: " + t); }
+    apptext: function (t, type) {  $('<script>')
+    .attr('type', type)
+    .text(t)
+    .appendTo($.cd("g"));
     },
     addstyle: function (t) { //add a single style tag
         $("head").append('<style type="text/css">' + t + '</style>');
