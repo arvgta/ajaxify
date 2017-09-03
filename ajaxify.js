@@ -369,7 +369,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     addtext: function (t, type) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
         if(!type) type = 'text/javascript'; //Validate type
-        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { t = t.replace("<", "< "); }
+        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { t = t.replace(/</g, "< "); }
         
         try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
             try { eval(t); } catch (e2) {
