@@ -313,7 +313,6 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
                 $.log("Gracefully exiting...");
                 return false;
             }
-			//$.htmlPrefilter = function( html ) { return html; };
             $.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
             $.scripts("i", s); //Initialse sub-plugins...
             $.cache(0, s);
