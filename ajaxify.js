@@ -313,6 +313,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
                 $.log("Gracefully exiting...");
                 return false;
             }
+			//$.htmlPrefilter = function( html ) { return html; };
             $.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
             $.scripts("i", s); //Initialse sub-plugins...
             $.cache(0, s);
@@ -369,7 +370,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     addtext: function (t, type) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
         if(!type) type = 'text/javascript'; //Validate type
-        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { t = t.replace(/</g, "< "); }
+        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { }
         
         try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
             try { eval(t); } catch (e2) {
