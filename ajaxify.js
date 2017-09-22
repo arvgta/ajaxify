@@ -987,7 +987,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      if(link.href.substr(-1) ==='#' || _hashChange(link)) { // only hash part has changed
+      if(link.href.substr(-1) ==='#') return true;
+      if(_hashChange(link)) { // only hash part has changed
           $.hApi("=", link.href); // commit new URL to History API
           return true; // Enable default behaviour and return - does not invoke a full page load!
       }
