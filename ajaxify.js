@@ -1,12 +1,12 @@
 /* 
  * ajaxify.js 
  * Ajaxify - A jQuery Ajax Plugin
- * http://4nf.org/ 
+ * https://4nf.org/ 
  * 
  * Copyright Arvind Gupta; MIT Licensed 
  */ 
  
-/* INTERFACE: See also http://4nf.org/interface/
+/* INTERFACE: See also https://4nf.org/interface/
 
 Simplest plugin call:
 
@@ -95,8 +95,8 @@ var lvl = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.his
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
 docType = /<\!DOCTYPE[^>]*>/i,
-tagso = /<(html|head|body|script|link)([\s\>])/gi,
-tagsc = /<\/(html|head|body|script|link)\>/gi,
+tagso = /<(html|head|body|link)([\s\>])/gi,
+tagsc = /<\/(html|head|body|link)\>/gi,
 
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
@@ -216,7 +216,11 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     }
 	
     if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
-    if (o === "x") return xhr; //return xhr object dynamically           
+    if (o === "x") return xhr; //return xhr object dynamically
+    if (o === "script") {   
+         if($.cache()) return $.cache().find(o);
+    }
+
     if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
 }, {
     lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
@@ -236,7 +240,9 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     ld: function ($t, $h) { //load HTML of target selection into DOM
-        $t.html($h.html()).find(".ajy-script").remove();
+        var $c = $h.clone();
+        $c.find("script").remove(); //prevent double firing of scripts
+        $t.html($c.html()); //inject div into primary DOM
     },
 		
     lDivs: function ($t) { //load target selections into DOM
@@ -282,7 +288,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     parseHTML: function (h) { //process fetched HTML
-        return $.trim(_replD(h)); //trim escaped HTML of entire page
+        return $.parseHTML($.trim(_replD(h)), null, true); //trim escaped HTML of entire page
     },
 		
     replD: function (h) { //pre-process HTML so it can be loaded by jQuery
