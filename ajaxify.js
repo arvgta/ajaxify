@@ -95,11 +95,13 @@ var lvl = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.his
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
 docType = /<\!DOCTYPE[^>]*>/i,
-tagso = /<(html|head|body|link)([\s\>])/gi,
+tagso = /<(html|head|link)([\s\>])/gi,
+tagsod = /<(body)([\s\>])/gi,
 tagsc = /<\/(html|head|body|link)\>/gi,
 
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
+divid12 = '<div id="ajy-$1"$2',
 linki = '<link rel="stylesheet" type="text/css" href="*" />',
 scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
@@ -221,6 +223,10 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
          if($.cache()) return $.cache().find(o);
     }
 
+	if (o === "body") {
+        if($.cache()) return $.cache().find("#ajy-" + o);		
+    }
+
     if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
 }, {
     lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
@@ -292,7 +298,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     replD: function (h) { //pre-process HTML so it can be loaded by jQuery
-        return String(h).replace(docType, "").replace(tagso, div12).replace(tagsc, "</div>");
+        return String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>");
     }
 }
 );
@@ -925,7 +931,7 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0 }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0, bodyClasses: false }, function ($this, h) {
      if(!h) return; //ensure data
      
      if(h === "i") { //request to initialise
@@ -1034,6 +1040,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   },
  doRender: function() { // Render HTML
       _trigger("load");  // Fire load event
+      if(bodyClasses) { $('body').attr('class', fn('body').attr('class')); } //Replace body classes from target page
       $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
       $('title').html(fn('title').html()); // Update title
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
