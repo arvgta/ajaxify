@@ -34,6 +34,7 @@ Options default values
     aniParams : false, //Animation parameters - see below.  Default = off
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
     scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
+    bodyClasses : true, // Copy body classes from target page, set to "false" to disable
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
     toggleSlide: false //For toggling sliding - see below.  Default = off
@@ -931,7 +932,7 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0, bodyClasses: false }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0, bodyClasses: true }, function ($this, h) {
      if(!h) return; //ensure data
      
      if(h === "i") { //request to initialise
