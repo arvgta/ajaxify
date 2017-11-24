@@ -447,7 +447,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
+pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: true }, function ($this, pk) {
     if(!$this.length) return; //ensure input
 	PK = pk; //Copy "primary key" into internal variable
 	
@@ -495,13 +495,13 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         }
     },
     iScript: function ($S, aSync) { //insert single script - pre-processing
-        if(!aSync) aSync = asyncdef; //aSync not given -> load default (asyncdef)
-        else aSync = true; //otherwise set aSync to true
-		
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
-        var tag = $((PK == "href" ? linki : scri).replace("*", $S)); //generate tag for external script (stylesheet or external JS)
-        if(PK != "href") tag.async = aSync; //set async for external JS scripts
-        $("head").append(tag); //insert single external script - append to head
+        if(PK == "href") return $(linki.replace("*", $S)).appendTo("head");
+		
+        var script = document.createElement('script');
+        script.type = "text/javascript";
+        script.src = $S;
+        document.head.appendChild(script);
     },
     newArray: function ($t, sN, sO) { //Fill new array and on initial load old one, too
         $t.each(function() { //Iterate through selection
