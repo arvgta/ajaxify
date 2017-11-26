@@ -447,7 +447,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: true }, function ($this, pk) {
+pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
     if(!$this.length) return; //ensure input
 	PK = pk; //Copy "primary key" into internal variable
 	
@@ -501,7 +501,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         var script = document.createElement('script');
         script.type = "text/javascript";
         script.src = $S;
-        script.async = false;
+        script.async = aSync ? true : asyncdef;
         document.head.appendChild(script);
     },
     newArray: function ($t, sN, sO) { //Fill new array and on initial load old one, too
