@@ -501,6 +501,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         var script = document.createElement('script');
         script.type = "text/javascript";
         script.src = $S;
+        script.async = false;
         document.head.appendChild(script);
     },
     newArray: function ($t, sN, sO) { //Fill new array and on initial load old one, too
