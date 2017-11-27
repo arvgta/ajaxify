@@ -1042,7 +1042,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   },
  doRender: function() { // Render HTML
       _trigger("load");  // Fire load event
-      if(bodyClasses) { $('body').attr('class', fn('body').attr('class')); } //Replace body classes from target page
+      //if(bodyClasses) { $('body').attr('class', fn('body').attr('class')); } //Replace body classes from target page
       $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
       $('title').html(fn('title').html()); // Update title
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
