@@ -1072,7 +1072,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   },
  exoticKey: function(e) { //not a real click, or target = "_blank"
       var url = _getURL(e); // Get URL from event
-	  return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank" || url.iO("wp-login") || url.iO("wp-admin"));
+      return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
+          || url.iO("wp-login") || url.iO("wp-admin"));
   },
  hashChange: function(link) { // only hash has changed
       return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
