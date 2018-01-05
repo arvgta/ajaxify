@@ -1050,7 +1050,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   },
  doRender2: function() { // Continue render
       var e = $.rq("e"), // Fetch event 
-      url = typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; // Get URL from event
+      url = _getURL(e); // Get URL from event
       url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
       $.frms("a"); // Ajaxify forms - in content divs only
            
@@ -1062,13 +1062,17 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
          if(cb) cb(); // Callback users handler, if specified
       });
   },
+ getURL: function(e) { // Get URL from event
+      return typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
+  },
  gaCaptureView: function(url) { // Google Analytics support
       url = '/' + url.replace(rootUrl,'');
       if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url); // the new analytics API
       else if (typeof window._gaq !== 'undefined') window._gaq.push(['_trackPageview', url]);  // the old API					
   },
  exoticKey: function(e) { //not a real click, or target = "_blank"
-      return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank");
+      var url = _getURL(e); // Get URL from event
+	  return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank" || url.iO("wp-login") || url.iO("wp-admin"));
   },
  hashChange: function(link) { // only hash has changed
       return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
