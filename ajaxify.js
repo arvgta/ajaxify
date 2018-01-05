@@ -34,7 +34,7 @@ Options default values
     aniParams : false, //Animation parameters - see below.  Default = off
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
     scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
-    bodyClasses : false, // Copy body classes from target page, set to "true" to enable
+    bodyClasses : true, // Copy body classes from target page, set to "false" to disable
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
     toggleSlide: false //For toggling sliding - see below.  Default = off
@@ -933,7 +933,7 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0, bodyClasses: false }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0, bodyClasses: true }, function ($this, h) {
      if(!h) return; //ensure data
      
      if(h === "i") { //request to initialise
@@ -1070,7 +1070,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url); // the new analytics API
       else if (typeof window._gaq !== 'undefined') window._gaq.push(['_trackPageview', url]);  // the old API					
   },
- exoticKey: function(e) { //not a real click, or target = "_blank"
+ exoticKey: function(e) { //not a real click, or target = "_blank", or WP-Admin link
       var url = _getURL(e); // Get URL from event
       return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
           || url.iO("wp-login") || url.iO("wp-admin"));
