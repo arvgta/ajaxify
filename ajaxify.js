@@ -478,7 +478,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
     allScripts: function ($t) {
         if (deltas) return false; //Delta-loading enabled -> return
         $t.each(function() { //Iterate through selection
-            _iScript($(this)[0], $(this).attr("async")); //Write out single script
+            _iScript($(this)[0], $(this).attr("async"), $(this).attr("defer")); //Write out single script
         });
         
         return true;
@@ -491,10 +491,10 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
                  continue;
              }				 
              if (_classAlways(sN[i][0])) _removeScript(sN[i][0].attr(PK)); //in case of data-class = "always" -> remove scripts from DOM
-             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async")); //insert single external script in the head
+             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async"), sN[i][0].attr("defer")); //insert single external script in the head
         }
     },
-    iScript: function ($S, aSync) { //insert single script - pre-processing
+    iScript: function ($S, aSync, deFer) { //insert single script - pre-processing
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
         if(PK == "href") return $(linki.replace("*", $S)).appendTo("head");
 		
@@ -502,6 +502,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         script.type = "text/javascript";
         script.src = $S;
         script.async = aSync ? true : asyncdef;
+        if(deFer) script.defer = true;
         document.head.appendChild(script);
     },
     newArray: function ($t, sN, sO) { //Fill new array and on initial load old one, too
