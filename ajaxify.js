@@ -71,12 +71,12 @@ You can specify any parameters that are understood by .animate() !
 Toggling sliding parameters (toggleSlide): Default is false (set off) 
 You can override the following toggleSlide parameters:
 { //defaults - if not turned off completely
-    parentEl: '#content', //parent element, where the above images will be prepended 
-    imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
-    imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
-    titleOn: 'Turn slideshow off', //title tag when on
-    titleOff: 'Turn slideshow on', //title tag when off
-    imgProps: { marginLeft: '85%', marginTop: '20px' }
+    parentEl: "#content", //parent element, where the above images will be prepended 
+    imgOn: "http://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
+    imgOff: "http://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
+    titleOn: "Turn slideshow off", //title tag when on
+    titleOff: "Turn slideshow on", //title tag when off
+    imgProps: { marginLeft: "85%", marginTop: "20px" }
 }
 
 */
@@ -91,7 +91,7 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 !function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(n){l=o(c)}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(n){l=t(l,c)})})}}(jQuery);
 
 //Module global variables
-var lvl = 0, pass = 0, currentURL = '', rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
+var lvl = 0, pass = 0, currentURL = "", rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -115,15 +115,15 @@ function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexO
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
 
 //Global helpers
-function _trigger(t, e){ e = e ? e : jQuery.rq("e"); jQuery(window).trigger('pronto.' + t, e); }
+function _trigger(t, e){ e = e ? e : jQuery.rq("e"); jQuery(window).trigger("pronto." + t, e); }
 function _internal(url) { 
     if (!url) return false;
-    if(typeof(url) === 'object') url = url.href;
-    if (url==='') return true;
-    return url.substring(0,rootUrl.length) === rootUrl || !url.iO(':');
+    if(typeof(url) === "object") url = url.href;
+    if (url==="") return true;
+    return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":");
 }
 
-function _root(u) { return u.iO('?') ? u.split('?')[0] : u; }
+function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
 
 // The stateful Cache plugin
 // Usage - parameter "o" values: 
