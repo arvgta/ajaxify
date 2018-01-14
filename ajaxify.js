@@ -617,12 +617,12 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise idle plugin
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
-            parentEl: '#content', //parent element, where the images below will be prepended 
-            imgOn: 'http://4nf.org/images/pinOn.gif', //graphic for indicating sliding is on
-            imgOff: 'http://4nf.org/images/pinOff.gif', //graphic for indicating sliding is off
-            titleOn: 'Turn slideshow off', //title tag when on
-            titleOff: 'Turn slideshow on', //title tag when off
-            imgProps: { marginLeft: '85%', marginTop: '20px' }
+            parentEl: "#content", //parent element, where the images below will be prepended 
+            imgOn: "http://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
+            imgOff: "http://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
+            titleOn: "Turn slideshow off", //title tag when on
+            titleOff: "Turn slideshow on", //title tag when off
+            imgProps: { marginLeft: "85%", marginTop: "20px" }
         }, toggleSlide);  
 
         parentEl = toggleSlide.parentEl; //Set internal parentEl value
@@ -775,7 +775,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
         return can;
     }
 	
-    if(o === "can?") return can && can !== p && !p.iO('#') && !p.iO('?') ? can : p; //get internal "can" ("href" of canonical URL)
+    if(o === "can?") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
 });
 
 // The Frms plugin - stands for forms
@@ -852,7 +852,7 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
     if(!o) return; //ensure operator
 
     if(o === "-" && requestTimer) return clearTimeout(requestTimer); //clear timer
-    if(typeof(o) === 'function') requestTimer = setTimeout(o, requestDelay); //set timer
+    if(typeof(o) === "function") requestTimer = setTimeout(o, requestDelay); //set timer
 });
 
 // The stateful Offsets plugin
@@ -861,14 +861,14 @@ pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
 // 2) $.offsets() - saves the current URL + offset in internal array
 pO("offsets", { d: [], i: -1 }, 0, function (h) {
 	if (typeof h === "string") { //Lookup page offset
-        h = h.iO('?') ? h.split('?')[0] : h; //Handle root URL only from dynamic pages
+        h = h.iO("?") ? h.split("?")[0] : h; //Handle root URL only from dynamic pages
         i = _iOffset(h); //Fetch offset
         if(i === -1) return 0; // scrollTop if not found
         return d[i][1]; //Return offset that was found
     }
 	
     //Add page offset
-    var u = currentURL, us1 = u.iO('?') ? u.split('?')[0] : u, us = us1.iO('#') ? us1.split('#')[0] : us1, os = [us, $(window).scrollTop()];
+    var u = currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, $(window).scrollTop()];
     i = _iOffset(us); //get page index
     if(i === -1) d.push(os); //doesn't exist -> push to array
     else d[i] = os; //exists -> overwrite
@@ -893,8 +893,8 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 	
     if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
 	
-    if(op !== "+" && o.iO('#') && (o.iO('#') < o.length - 1)) { //if hash in URL and not standalone hash
-        var $el = $('#' + o.split('#')[1]); //fetch the element
+    if(op !== "+" && o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
+        var $el = $("#" + o.split("#")[1]); //fetch the element
         if (!$el.length) return; //nothing found -> return quickly
         _scrll($el.offset().top); // ...animate to ID
         return;
@@ -981,7 +981,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
        if(!prefetch) return;
        var link = $.rq("v", e); // validate internal URL
        if ($.rq("=") || !link) return; //same page or no data
-       fn('+', link.href, function() { //prefetch page
+       fn("+", link.href, function() { //prefetch page
             if (previewoff === true) return(false);
             if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
        });
@@ -1002,7 +1002,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      if(link.href.substr(-1) ==='#') return true;
+      if(link.href.substr(-1) ==="#") return true;
       if(_hashChange(link)) { // only hash part has changed
           $.hApi("=", link.href); // commit new URL to History API
           return true; // Enable default behaviour and return - does not invoke a full page load!
@@ -1018,7 +1018,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       _trigger("request"); // Fire request event
       fn($.rq("h"), function(err) { // Call "fn" - handler of parent
           if (err) { 
-              $.log('Error in _request : ' + err); 
+              $.log("Error in _request : " + err); 
               _trigger("error", err); 
           }
           
@@ -1026,7 +1026,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       });
   },
  render: function() { // Clear and set timer
-      $.rqTimer('-'); // Clear
+      $.rqTimer("-"); // Clear
       _trigger("beforeload");
       $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
   },
@@ -1043,9 +1043,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   },
  doRender: function() { // Render HTML
       _trigger("load");  // Fire load event
-      if(bodyClasses) { var classes = fn('body').attr('class'); $('body').attr('class', classes ? classes : null); } //Replace body classes from target page
-      $.rq("can", fn('-', $gthis)); // Update DOM and fetch canonical URL
-      $('title').html(fn('title').html()); // Update title
+      if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
+      $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
+      $("title").html(fn("title").html()); // Update title
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
       $.slides("f"); // Finalise slideshow
   },
@@ -1067,9 +1067,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       return typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
   },
  gaCaptureView: function(url) { // Google Analytics support
-      url = '/' + url.replace(rootUrl,'');
-      if (typeof window.ga !== 'undefined') window.ga('send', 'pageview', url); // the new analytics API
-      else if (typeof window._gaq !== 'undefined') window._gaq.push(['_trackPageview', url]);  // the old API					
+      url = "/" + url.replace(rootUrl,"");
+      if (typeof window.ga !== "undefined") window.ga("send", "pageview", url); // the new analytics API
+      else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", url]);  // the old API					
   },
  exoticKey: function(e) { //not a real click, or target = "_blank", or WP-Admin link
       var url = _getURL(e); // Get URL from event
@@ -1077,7 +1077,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
           || url.iO("wp-login") || url.iO("wp-admin"));
   },
  hashChange: function(link) { // only hash has changed
-      return (link.hash && link.href.replace(link.hash, '') === window.location.href.replace(location.hash, '') || link.href === window.location.href + '#');
+      return (link.hash && link.href.replace(link.hash, "") === window.location.href.replace(location.hash, "") || link.href === window.location.href + "#");
   }
 });
 
