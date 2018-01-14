@@ -279,7 +279,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         error: function(jqXHR, status, error) {
         // Try to parse response text
             try { 
-                $.log('Response text : ' + jqXHR.responseText);
+                $.log("Response text : " + jqXHR.responseText);
                 $.cache($(_parseHTML(jqXHR.responseText)));
                 $.pages([hin, $.cache()]); 
                 if(cb) cb(error);
@@ -311,7 +311,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 // Calls Pronto
 pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this, options) {
     var o = options;
-    if(!o || typeof(o) !== 'string') {
+    if(!o || typeof(o) !== "string") {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
                 $this.pronto("i", settings); //Pronto initialisation
@@ -376,13 +376,13 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
         });
     },
     onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
-        var txt = $s.text(), t = $s.prop('type'); //Extract text and type
+        var txt = $s.text(), t = $s.prop("type"); //Extract text and type
         if (!txt.iO(").ajaxify(") && ((inline && !_inlineskip(txt)) || $s.hasClass("ajaxy") || _inlinehints(txt))) _addtext(txt, t); //Check constraints
     },
     addtext: function (t, type) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
-        if(!type) type = 'text/javascript'; //Validate type
-        if(inlineappend || !type.iO('text/javascript')) try { return _apptext(t, type); } catch (e) { }
+        if(!type) type = "text/javascript"; //Validate type
+        if(inlineappend || !type.iO("text/javascript")) try { return _apptext(t, type); } catch (e) { }
         
         try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
             try { eval(t); } catch (e2) {
@@ -390,8 +390,8 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
             }
         }
     },
-    apptext: function (t, type) {  $('<script>')
-    .attr('type', type)
+    apptext: function (t, type) {  $("<script>")
+    .attr("type", type)
     .text(t)
     .appendTo($.cd("g"));
     },
@@ -498,7 +498,7 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
         if(PK == "href") return $(linki.replace("*", $S)).appendTo("head");
 		
-        var script = document.createElement('script');
+        var script = document.createElement("script");
         script.type = "text/javascript";
         script.src = $S;
         script.async = aSync ? true : asyncdef;
