@@ -220,15 +220,12 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 	
     if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
     if (o === "x") return xhr; //return xhr object dynamically
-    if (o === "script") {   
-         if($.cache()) return $.cache().find(o);
-    }
 
-	if (o === "body") {
-        if($.cache()) return $.cache().find("#ajy-" + o);		
-    }
+    if (!$.cache()) return;
+    if (o === "script") return $.cache().find(o); //scripts are not escaped
 
-    if($.cache()) return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
+    return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
+
 }, {
     lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
         pass++; //central increment of "pass" variable
