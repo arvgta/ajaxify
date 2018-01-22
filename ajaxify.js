@@ -131,7 +131,7 @@ function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
 // <URL> - returns page with specified URL
 // <jQuery object> - saves the page in cache
 // f - flushes the cache
-pO("cache", { d: false }, 0, function (o) {
+pO("cache1", { d: false }, 0, function (o) {
     if (!o) return d; //nothing passed -> return currently cached page
 	
     if (typeof o === "string") { //URL or "f" passed
@@ -205,7 +205,7 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 // otherwise - returns selection of current page to client
 
 pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
-    if (!o) return $.cache(); //nothing passed -> return currently cached page
+    if (!o) return $.cache1(); //nothing passed -> return currently cached page
 
     if (o.iO("/")) { //URL
         cb = p; //second parameter "p" must be callback
@@ -221,10 +221,10 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
     if (o === "x") return xhr; //return xhr object dynamically
 
-    if (!$.cache()) return;
-    if (o === "script") return $.cache().find(o); //scripts are not escaped
+    if (!$.cache1()) return;
+    if (o === "script") return $.cache1().find(o); //scripts are not escaped
 
-    return $.cache().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
+    return $.cache1().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
 
 }, {
     lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
@@ -237,7 +237,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 		
     lPage: function (h, pre) { //fire Ajax load, check for hash first, "pre" indicates a prefetch
          if (h.iO("#")) h = h.split("#")[0]; //get first part before hash
-         if ($.rq("is") || !$.cache(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
+         if ($.rq("is") || !$.cache1(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
 		 
          plus = 0; //otherwise reset "plus" variable
          if(cb) return cb(); //fire callback, if given
@@ -250,8 +250,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     },
 		
     lDivs: function ($t) { //load target selections into DOM
-        if ($.cache()) $t.each(function() { //iterate through elements
-            _ld($(this), $.cache().find("#" + $(this).attr("id"))); //load target element into DOM
+        if ($.cache1()) $t.each(function() { //iterate through elements
+            _ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
         });
     },
 		
@@ -267,8 +267,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
                 if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
             }
             
-            $.cache($(_parseHTML(h))); //Clean HTML and load it into cache
-            $.pages([hin, $.cache()]); //Load object into $.pages, too
+            $.cache1($(_parseHTML(h))); //Clean HTML and load it into cache
+            $.pages([hin, $.cache1()]); //Load object into $.pages, too
             plus = 0; //Reset "plus" variable, indicating no pre-fetch has happened
 
             if(cb) return(cb()); //Call callback if given
@@ -277,8 +277,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         // Try to parse response text
             try { 
                 $.log("Response text : " + jqXHR.responseText);
-                $.cache($(_parseHTML(jqXHR.responseText)));
-                $.pages([hin, $.cache()]); 
+                $.cache1($(_parseHTML(jqXHR.responseText)));
+                $.pages([hin, $.cache1()]); 
                 if(cb) cb(error);
             } catch (e) {}
         },
@@ -325,7 +325,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
             }
             $.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
             $.scripts("i", s); //Initialse sub-plugins...
-            $.cache(0, s);
+            $.cache1(0, s);
             $.memory(0, s);
             return true; //Return success
        }
