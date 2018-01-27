@@ -222,6 +222,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     if (o === "x") return xhr; //return xhr object dynamically
 
     if (!$.cache1()) return;
+    if (o === "body") return $.cache1().find("#ajy-" + o);
     if (o === "script") return $.cache1().find(o); //scripts are not escaped
 
     return $.cache1().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
@@ -1040,6 +1041,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
   },
  doRender: function() { // Render HTML
       _trigger("load");  // Fire load event
+      //if(bodyClasses) { $('body').attr('class', fn('body').attr('class')); } //Replace body classes from target page
       if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
       $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
       $("title").html(fn("title").html()); // Update title
