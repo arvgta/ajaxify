@@ -445,53 +445,56 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: [], $sN: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
+pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
     if(!$this.length) return; //ensure input
-	PK = pk; //Copy "primary key" into internal variable
+	if(deltas === "n") return true; //If delta-loading disabled, return quickly
 	
-    if (PK == "href") { //Stylesheets
+	PK = pk; //Copy "primary key" into internal variable
+
+    if(deltas === false) return _allScripts($this); //process all scripts
+    //deltas presumed to be "true" -> proceed with normal delta-loading
+	
+    if(PK == "href") { //Stylesheets
         $scriptsO = $sCssO; //Copy old
-        $scriptsN = $sCssN; //Copy new
     } else { //JS scripts
         $scriptsO = $sO; //Copy old
-        $scriptsN = $sN; //Copy new
-    } 
-    if (_allScripts($this)) return true; //If delta-loading disabled, process all scripts and return quickly
-    $scriptsN = []; //Reset new scripts
-    _newArray($this, $scriptsN, $scriptsO); //Fill new array and on initial load old one, too
-    if (pass) { //not initial load
-         _findCommon($scriptsO, $scriptsN); //Find scripts, common to both
-         _freeOld($scriptsO); //Remove old scripts from DOM
-         _newScripts($scriptsN); //Write-out new scripts
-         $scriptsO = $scriptsN.slice(); //Copy new array to old
     }
-    if (PK == "href") { //Stylesheets
-         $sCssO = $scriptsO; //Copy back old
-         $sCssN = $scriptsN; //Copy back new
-    } else { //JS scripts
-         $sO = $scriptsO; //Copy back old
-         $sN = $scriptsN; //Copy back new
-    }
+
+    if(!pass) _newArray($this); //Fill new array on initial load, nothing more
+    else $this.each(function() { //Iterate through selection
+        var $t = $(this), url = $t.attr(PK), async = $t.attr("async"), defer = $t.attr("defer");
+        if(_classAlways($t)) { //Class always handling
+            _removeScript(url); //remove from DOM
+            _iScript(url, async, defer); //insert back single external script in the head 
+            return;
+        }
+		if(url) { //URL?
+		    if(!_findScript(url)) { // Test, whether new  
+                $scriptsO.push(url); //If yes: Push to old array  
+                _iScript(url, async, defer);
+			}
+            //Otherwise nothing to do
+			return;
+        }
+        
+		if(PK != "href") {  
+            $.scripts($t); //Inline JS script? -> inject into DOM
+        }
+    });
     }, {
     allScripts: function ($t) {
-        if (deltas) return false; //Delta-loading enabled -> return
         $t.each(function() { //Iterate through selection
             _iScript($(this)[0], $(this).attr("async"), $(this).attr("defer")); //Write out single script
         });
         
         return true;
     },
-    classAlways: function ($t) { return $t.attr("data-class") == "always"; }, //Check for data-class = "always"
-    newScripts: function (sN) { //Write-out scripts
-        for (var i = 0; i < sN.length; i++) { //Iterate through new array
-             if (sN[i][1] === 3) { //inline script?
-                 $.scripts(sN[i][0]); //insert single inline script
-                 continue;
-             }				 
-             if (_classAlways(sN[i][0])) _removeScript(sN[i][0].attr(PK)); //in case of data-class = "always" -> remove scripts from DOM
-             if (sN[i][1] === 0 || _classAlways(sN[i][0])) _iScript(sN[i][0].attr(PK), sN[i][0].attr("async"), sN[i][0].attr("defer")); //insert single external script in the head
-        }
+    newArray: function ($t) { //Fill new array on initial load
+        $t.each(function() { //Iterate through selection
+            if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only	 
+        });
     },
+    classAlways: function ($t) { return $t.attr("data-class") == "always"; }, //Check for data-class = "always"
     iScript: function ($S, aSync, deFer) { //insert single script - pre-processing
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
         if(PK == "href") return $(linki.replace("*", $S)).appendTo("head");
@@ -503,38 +506,12 @@ pO("addAll", { $scriptsO: false, $scriptsN: false, $sCssO: [], $sCssN: [], $sO: 
         if(deFer) script.defer = true;
         document.head.appendChild(script);
     },
-    newArray: function ($t, sN, sO) { //Fill new array and on initial load old one, too
-        $t.each(function() { //Iterate through selection
-            var d, s = $(this), type = 0; //Abbreviate - assume new (0)
-            if(!s.attr(PK)) type = 3; //Detect inline script - set type to inline (3)	 
-            d = [s, type]; //Create array record
-            sN.push(d); //Push new record to new array
-            if (!pass) sO.push(d); //Only on initial load -> push new record to old array
-        });
-    },
-    findCommon: function (sO, sN) { //Find scripts common to both old and new
-        for (var i = 0; i < sO.length; i++) { //Iterate through old array
-            if(sO[i][1] === 3) continue; //Skip inline scripts (3)
-            sO[i][1] = 2; //Assume old (2)
-            if (_findScript(sO[i][0], sN)) sO[i][1] = 1; //Detect common (1)
-        }
-    },
-    findScript: function ($S, sN) { //Find single script in new array
-        var txtF = $S.attr(PK); //Extract URL
-        if (txtF)
-            for (var i = 0; i < sN.length; i++) { //Iterate through new array
-                var txtN = sN[i][0].attr(PK); //Extract URL
-                if (txtF == txtN) { //If matching
-                    sN[i][1] = 1; //Set entry in new array to 1 (common)
-                    return true; //Match found -> common!
-                }
-            }
-    },
-    freeOld: function (sO) { //Remove old scripts from DOM
-        for (var i = 0; i < sO.length; i++) { //Iterate through old array
-            var txtO = sO[i][0].attr(PK); //Extract URL
-            if (sO[i][1] == 2 && txtO) _removeScript(txtO); //If old -> remove
-		}
+    findScript: function (url) { //Find URL in old array
+        if(!url) return false;
+        for(var i = 0; i < $scriptsO.length; i++)  //Iterate through old array
+            if(url == $scriptsO[i]) return true; //Match found -> common!
+		
+		return false;
     },
     removeScript: function ($S) { //Remove single script from DOM
         $((PK == "href" ? linkr : scrr).replace("!", $S)).remove(); //Remove script (stylesheet or external JS)
