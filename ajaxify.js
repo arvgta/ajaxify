@@ -43,7 +43,8 @@ Options default values
  
 // script and style handling settings, prefetch
     deltas : true, // true = deltas loaded, false = all scripts loaded
-    asyncdef : false // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
+    asyncdef : false, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
+    alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
     inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
     inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
     inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
@@ -498,7 +499,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
     alwayshnts: function (txt) { //Check whether alwayshints contains string in URL
          if(!txt) return;
 
-		 var d = alwayshints;
+         var d = alwayshints;
          if (d) {
              d = d.split(", ");
              for (var i = 0; i < d.length; i++)
