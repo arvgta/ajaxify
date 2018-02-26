@@ -445,7 +445,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false }, function ($this, pk) {
+pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
     if(!$this.length) return; //ensure input
 	if(deltas === "n") return true; //If delta-loading disabled, return quickly
 	
@@ -463,7 +463,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
     if(!pass) _newArray($this); //Fill new array on initial load, nothing more
     else $this.each(function() { //Iterate through selection
         var $t = $(this), url = $t.attr(PK), async = $t.attr("async"), defer = $t.attr("defer");
-        if(_classAlways($t)) { //Class always handling
+        if(_classAlways($t, url)) { //Class always handling
             _removeScript(url); //remove from DOM
             _iScript(url, async, defer); //insert back single external script in the head 
             return;
@@ -494,7 +494,17 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
             if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only	 
         });
     },
-    classAlways: function ($t) { return $t.attr("data-class") == "always"; }, //Check for data-class = "always"
+    classAlways: function ($t, url) { return $t.attr("data-class") == "always" || _alwayshnts(url); }, //Check for data-class = "always" and alwayshints
+    alwayshnts: function (txt) { //Check whether alwayshints contains string in URL
+         if(!txt) return;
+
+		 var d = alwayshints;
+         if (d) {
+             d = d.split(", ");
+             for (var i = 0; i < d.length; i++)
+                 if (txt.iO(d[i])) return true;
+         }
+    },
     iScript: function ($S, aSync, deFer) { //insert single script - pre-processing
         if($S instanceof jQuery) return $.scripts($S); //insert single inline script
         if(PK == "href") return $(linki.replace("*", $S)).appendTo("head");
