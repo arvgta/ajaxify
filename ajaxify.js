@@ -1031,7 +1031,13 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       _trigger("load");  // Fire load event
       //if(bodyClasses) { $('body').attr('class', fn('body').attr('class')); } //Replace body classes from target page
       if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
-      $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
+	  /*if(bodyClasses) { var classes = fn("body").attr("class"), $body = $("body");
+	      if(!($body.children().length)) $.log("Failed to fetch body tag dynamically - please set bodyClasses: false");
+          else $body.attr("class", classes ? classes : null);
+	  } //Replace body classes from target page */
+
+	  var classes = fn('body').attr("class"); //$body2 =  $("body"); $.log($body2); //.attr("class", classes);
+	  $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
       $("title").html(fn("title").html()); // Update title
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
       $.slides("f"); // Finalise slideshow
