@@ -448,9 +448,9 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // src - operate on JS scripts
 pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
     if(!$this.length) return; //ensure input
-	if(deltas === "n") return true; //If delta-loading disabled, return quickly
+    if(deltas === "n") return true; //If delta-loading disabled, return quickly
 	
-	PK = pk; //Copy "primary key" into internal variable
+    PK = pk; //Copy "primary key" into internal variable
 
     if(deltas === false) return _allScripts($this); //process all scripts
     //deltas presumed to be "true" -> proceed with normal delta-loading
@@ -469,16 +469,16 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
             _iScript(url, async, defer); //insert back single external script in the head 
             return;
         }
-		if(url) { //URL?
-		    if(!_findScript(url)) { // Test, whether new  
+        if(url) { //URL?
+            if(!_findScript(url)) { // Test, whether new  
                 $scriptsO.push(url); //If yes: Push to old array  
                 _iScript(url, async, defer);
-			}
+            }
             //Otherwise nothing to do
-			return;
+            return;
         }
         
-		if(PK != "href") {  
+        if(PK != "href") {  
             $.scripts($t); //Inline JS script? -> inject into DOM
         }
     });
