@@ -44,7 +44,7 @@ Options default values
 // script and style handling settings, prefetch
     deltas : true, // true = deltas loaded, false = all scripts loaded
     asyncdef : false, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
-    alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
+    alwayshints: "leaflet-embed", // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
     inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
     inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
     inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
@@ -446,7 +446,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
+pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false, alwayshints: "leaflet-embed" }, function ($this, pk) {
     if(!$this.length) return; //ensure input
     if(deltas === "n") return true; //If delta-loading disabled, return quickly
 	
