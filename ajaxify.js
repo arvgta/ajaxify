@@ -376,12 +376,12 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     },
     onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
         var txt = $s.text(), t = $s.prop("type"); //Extract text and type
-        if (!txt.iO(").ajaxify(") && ((inline && !_inlineskip(txt)) || $s.hasClass("ajaxy") || _inlinehints(txt))) _addtext(txt, t, $s.attr("id"), $s.attr("class"), $s); //Check constraints
+        if (!txt.iO(").ajaxify(") && ((inline && !_inlineskip(txt)) || $s.hasClass("ajaxy") || _inlinehints(txt))) _addtext(txt, t, $s); //Check constraints
     },
-    addtext: function (t, type, ID, Classes, $s) { //Add one inline JS script - main function
+    addtext: function (t, type, $s) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
         if(!type) type = "text/javascript"; //Validate type
-        if(inlineappend || !type.iO("text/javascript")) try { return _apptext(t, type, ID, Classes, $s); } catch (e) { }
+        if(inlineappend || !type.iO("text/javascript")) try { return _apptext($s); } catch (e) { }
         
         try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
             try { eval(t); } catch (e2) {
@@ -389,7 +389,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
             }
         }
     },
-    apptext: function (t, type, ID, Classes, $s) {  
+    apptext: function ($s) {  
         $s.clone().appendTo($.cd("g"));
     },
     addstyle: function (t) { //add a single style tag
