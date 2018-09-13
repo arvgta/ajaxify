@@ -464,13 +464,13 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
         var $t = $(this), url = $t.attr(PK), async = $t.attr("async"), defer = $t.attr("defer");
         if(_classAlways($t, url)) { //Class always handling
             _removeScript(url); //remove from DOM
-            _iScript(url, async, defer); //insert back single external script in the head 
+            _iScript($t); //insert back single external script in the head 
             return;
         }
         if(url) { //URL?
             if(!_findScript(url)) { // Test, whether new  
                 $scriptsO.push(url); //If yes: Push to old array  
-                _iScript(url, async, defer);
+                _iScript($t);
             }
             //Otherwise nothing to do
             return;
@@ -483,7 +483,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
     }, {
     allScripts: function ($t) {
         $t.each(function() { //Iterate through selection
-            _iScript($(this)[0], $(this).attr("async"), $(this).attr("defer")); //Write out single script
+            _iScript($(this)); //Write out single script
         });
         
         return true;
@@ -504,13 +504,15 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
                  if (txt.iO(d[i])) return true;
          }
     },
-    iScript: function ($S, aSync, deFer) { //insert single script - pre-processing
-        if($S instanceof jQuery) return $.scripts($S); //insert single inline script
-        if(PK == "href") return $(linki.replace("*", $S)).appendTo("head");
-		
-        var script = document.createElement("script");
+    iScript: function ($S) { //insert single script - pre-processing
+        var url = $S.attr(PK);
+
+		if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
+	    if(!url) return $.scripts($S); //insert single inline script
+
+        var script = document.createElement("script"), aSync = $S.attr("async"), deFer = $S.attr("defer");
         script.type = "text/javascript";
-        script.src = $S;
+        script.src = url;
         script.async = aSync ? true : asyncdef;
         if(deFer) script.defer = true;
         document.head.appendChild(script);
