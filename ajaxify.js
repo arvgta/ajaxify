@@ -507,7 +507,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
     iScript: function ($S) { //insert single script - pre-processing
         var url = $S.attr(PK);
 
-		if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
+        if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
 	    if(!url) return $.scripts($S); //insert single inline script
 		
         //Insert single external JS script - we have to go low level to avoid a warning coming from jQuery append()
