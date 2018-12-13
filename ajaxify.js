@@ -126,6 +126,13 @@ function _internal(url) {
 
 function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
 
+function _copyAttributes(el, $S) { //copy all attributes of element generically
+    var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
+    while(attr = attributes.pop()) { //fetch one of all the attributes at a time
+        el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
+    }
+}
+
 // The stateful Cache plugin
 // Usage - parameter "o" values: 
 // none - returns currently cached page
@@ -514,14 +521,8 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
         //But we'll do our best to support all salient attributes
         var script = document.createElement("script");
         script.async = asyncdef; //initialise with asyncdef - may be overwritten in _cloneAttributes
-        _cloneAttributes(script, $S); //clone all attributes of script element generically
+        _copyAttributes(script, $S); //clone all attributes of script element generically
         document.head.appendChild(script); //it doesn't matter much, if we append to head or content div
-    },
-    cloneAttributes: function (el, $S) { //clone all attributes of element generically
-        var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
-        while(attr = attributes.pop()) { //fetch one of all the attributes at a time
-            el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
-        }
     },
     findScript: function (url) { //Find URL in old array
         if(!url) return false;
