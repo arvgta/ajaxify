@@ -513,12 +513,12 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
         //Insert single external JS script - we have to go low level to avoid a warning coming from jQuery append()
         //But we'll do our best to support all salient attributes
         var script = document.createElement("script");
+        script.async = asyncdef; //initialise with asyncdef - may be overwritten in _cloneAttributes
         _cloneAttributes(script, $S); //clone all attributes of script element generically
         document.head.appendChild(script); //it doesn't matter much, if we append to head or content div
     },
-    cloneAttributes: function (el, $S) { //clone all attributes of script element generically
+    cloneAttributes: function (el, $S) { //clone all attributes of element generically
         var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
-        el.async = asyncdef; //initialise with asyncdef - may be overwritten in the while loop
         while(attr = attributes.pop()) { //fetch one of all the attributes at a time
             el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
         }
