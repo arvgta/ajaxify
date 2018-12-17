@@ -126,7 +126,10 @@ function _internal(url) {
 
 function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
 
-function _copyAttributes(el, $S) { //copy all attributes of element generically
+function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
+    if(flush) //delete all old attributes
+        for (var i = el.attributes.length - 1; i >= 0; i--) el.removeAttribute(el.attributes[i].name);
+
     var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
     while(attr = attributes.pop()) { //fetch one of all the attributes at a time
         el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
@@ -255,6 +258,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     ld: function ($t, $h) { //load HTML of target selection into DOM
         var $c = $h.clone();
         $c.find("script").remove(); //prevent double firing of scripts
+        _copyAttributes($t[0], $c, true); //copy tag attributes of element
         $t.html($c.html()); //inject div into primary DOM
     },
 		
@@ -521,7 +525,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
         //But we'll do our best to support all salient attributes
         var script = document.createElement("script");
         script.async = asyncdef; //initialise with asyncdef - may be overwritten in _cloneAttributes
-        _copyAttributes(script, $S); //clone all attributes of script element generically
+        _copyAttributes(script, $S); //copy all attributes of script element generically
         document.head.appendChild(script); //it doesn't matter much, if we append to head or content div
     },
     findScript: function (url) { //Find URL in old array
