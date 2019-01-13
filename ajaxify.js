@@ -127,13 +127,21 @@ function _internal(url) {
 function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
-    if(flush) //delete all old attributes
+    if (flush) //delete all old attributes
         for (var i = el.attributes.length - 1; i >= 0; i--) el.removeAttribute(el.attributes[i].name);
 
     var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
-    while(attr = attributes.pop()) { //fetch one of all the attributes at a time
+    while (attr = attributes.pop()) { //fetch one of all the attributes at a time
         el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
     }
+}
+
+function _searchHints(txt, hints) { //search for text in given hints, which may be array or comma separated string
+    if (!txt || !hints) return; //validate both are given - otherwise quick return
+    if (typeof hints === "string") hints = hints.split(", "); //from here on only an array is allowed
+	
+    for (var i = 0; i < hints.length; i++) //search hints array
+        if (txt.iO(hints[i])) return true; //if single hint found within passed text - return true
 }
 
 // The stateful Cache plugin
@@ -504,17 +512,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
             if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only	 
         });
     },
-    classAlways: function ($t, url) { return $t.attr("data-class") == "always" || _alwayshnts(url); }, //Check for data-class = "always" and alwayshints
-    alwayshnts: function (txt) { //Check whether alwayshints contains string in URL
-         if(!txt) return;
-
-         var d = alwayshints;
-         if (d) {
-             d = d.split(", ");
-             for (var i = 0; i < d.length; i++)
-                 if (txt.iO(d[i])) return true;
-         }
-    },
+    classAlways: function ($t, url) { return $t.attr("data-class") == "always" || _searchHints(url, alwayshints); }, //Check for data-class = "always" and alwayshints
     iScript: function ($S) { //insert single script - pre-processing
         var url = $S.attr(PK);
 
@@ -1061,7 +1059,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       });
   },
  getURL: function(e) { // Get URL from event
-      return typeof(e) !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
+      return typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
   },
  gaCaptureView: function(url) { // Google Analytics support
       url = "/" + url.replace(rootUrl,"");
