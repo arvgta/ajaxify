@@ -170,17 +170,10 @@ pO("cache1", { d: false }, 0, function (o) {
 
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
-pO("memory", { d: false }, { memoryoff: false }, function (h) {
-    d = memoryoff; //abbreviation of memoryoff
-    if (!h || d === true) return false; //validate input, if memoryoff set to true return false quickly
-    if (d === false) return h; //if memoryoff set to false return the URL quickly
-    if (d.iO(", ")) { //iterate through memoryoff
-         d = d.split(", "); //split memoryoff to array
-         if (d.iO(h)) return false; //is URL in array? -> return false
-         else return h; //otherwise return URL
-    }
-     
-    return h == d ? false : h; //single URL in memoryoff -> compare
+pO("memory", 0, { memoryoff: false }, function (h) {
+    if (!h || memoryoff === true) return false; //validate input, if memoryoff set to true return false quickly
+    if (memoryoff === false) return h; //if memoryoff set to false return the URL quickly
+    return _searchHints(h, memoryoff) ? false : h; //apply hints mechanism -> found: return false, otherwise return URL
 });
 		
 // The stateful Pages plugin
