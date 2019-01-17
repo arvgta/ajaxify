@@ -136,7 +136,7 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
     }
 }
 
-function _searchHints(txt, hints) { //search for text in given hints, which may be array or comma separated string
+function _searchHints(txt, hints) { //search for text in given hints, which may be array of strings or comma separated string
     if (!txt || !hints) return; //validate both are given - otherwise quick return
     if (typeof hints === "string") hints = hints.split(", "); //from here on only an array is allowed
 	
@@ -395,7 +395,10 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     },
     onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
         var txt = $s.text(), t = $s.prop("type"); //Extract text and type
-        if (!txt.iO(").ajaxify(") && ((inline && !_inlineskip(txt)) || $s.hasClass("ajaxy") || _inlinehints(txt))) _addtext(txt, t, $s); //Check constraints
+        if (!txt.iO(").ajaxify(") && 
+            ((inline && !_searchHints(txt, inlineskip)) || $s.hasClass("ajaxy") || 
+            _searchHints(txt, inlinehints))
+        ) _addtext(txt, t, $s); //Check constraints
     },
     addtext: function (t, type, $s) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
@@ -413,22 +416,6 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehi
     },
     addstyle: function (t) { //add a single style tag
         $("head").append('<style type="text/css">' + t + '</style>');
-    },
-    inlineskip: function (txt) { //Check, whether to skip this inline JS text
-        var d = inlineskip; //Abbreviation for inlineskip
-        if (d) { //If inlineskip not given, then return quickly
-            d = d.split(", "); //Convert inlineskip to array
-            for (var i = 0; i < d.length; i++) //Scan text against strings to skip
-                if (txt.iO(d[i])) return true; //Text snippet found in text -> skip!
-        }
-    },
-    inlinehints: function (txt) { //Same as above, but if inline text is found in inlinehints, this inline script will be loaded, even if "inline" === false
-         var d = inlinehints;
-         if (d) {
-             d = d.split(", ");
-             for (var i = 0; i < d.length; i++)
-                 if (txt.iO(d[i])) return true;
-         }
     },
     addScripts: function ($s, st) { //Delta-loading of sylesheets and external JS files
         $s.c.addAll("href", st); //Stylesheets
