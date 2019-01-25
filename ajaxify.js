@@ -352,7 +352,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 // c - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
-pO("scripts", { $s : false, cd0 : 0 }, { canonical: true, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
+pO("scripts", { $s : false, cd0 : 0 }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") { //Initalise
         if(!$s) $s = $(); //Start off with empty internal jQuery object
         return true;
