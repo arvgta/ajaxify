@@ -25,7 +25,7 @@ Options default values
     selector : "a:not(.no-ajaxy)",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
     maincontent : false, //Default main content is last element of selection, specify a value like "#content" to override
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
-    canonical : true, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
+    canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
     refresh : false, // Refresh the page if clicked link target current page
  
 // visual effects settings
