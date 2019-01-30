@@ -73,8 +73,8 @@ Toggling sliding parameters (toggleSlide): Default is false (set off)
 You can override the following toggleSlide parameters:
 { //defaults - if not turned off completely
     parentEl: "#content", //parent element, where the above images will be prepended 
-    imgOn: "http://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
-    imgOff: "http://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
+    imgOn: "https://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
+    imgOff: "https://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
     titleOn: "Turn slideshow off", //title tag when on
     titleOff: "Turn slideshow on", //title tag when off
     imgProps: { marginLeft: "85%", marginTop: "20px" }
@@ -109,7 +109,7 @@ scri = '<script type="text/javascript" src="*" />',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
-//Minified pO() function - for documentation of pO() please refer to http://4nf.org/po/
+//Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
@@ -593,8 +593,8 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         
         if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
             parentEl: "#content", //parent element, where the images below will be prepended 
-            imgOn: "http://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
-            imgOff: "http://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
+            imgOn: "https://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
+            imgOff: "https://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
             titleOn: "Turn slideshow off", //title tag when on
             titleOff: "Turn slideshow on", //title tag when off
             imgProps: { marginLeft: "85%", marginTop: "20px" }
