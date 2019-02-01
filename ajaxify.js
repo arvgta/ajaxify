@@ -581,29 +581,14 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
 // The Slides plugin - stands for slideshow / carousel
 // Enable a slideshow on the main content div
 // idleTime must be set to enable the slideshow
-// Also manages a symbol that can be toggled by the user to switch slideshow off / back on
 // Switch (o) values:
 // i - initailise
-// f - insert the symbol for the user to toggle
-pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover", toggleSlide: false }, function (o) {
+pO("slides", { timer: -1, currEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover"}, function (o) {
     if(!o || !idleTime) return; //Ensure data
 	
     if (o === "i") { //Initialise
         $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise idle plugin
-        
-        if(toggleSlide) toggleSlide = $.extend({ //defaults - if not turned off completely
-            parentEl: "#content", //parent element, where the images below will be prepended 
-            imgOn: "https://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
-            imgOff: "https://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
-            titleOn: "Turn slideshow off", //title tag when on
-            titleOff: "Turn slideshow on", //title tag when off
-            imgProps: { marginLeft: "85%", marginTop: "20px" }
-        }, toggleSlide);  
-
-        parentEl = toggleSlide.parentEl; //Set internal parentEl value
     }
-    
-    if (o === "f") _insImg(); //Insert symbol for toggling slideshow on/off
 }, {
     onIdle: function(){ //User was not active for given idleTime
         _trigger("idle"); //Fire generic event
@@ -621,25 +606,24 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         timer = setInterval(_slide1, slideTime); //Set timer and register "slide1" to be called periodically
     },
     slide1: function() { //Perform a single slide
-        if(pinned) return; //Check if pinned -> then do nothing
         $().pronto(_nextLink()); //Get next URL from menu and call Pronto to change to that page programmatically
     }, 
     nextLink: function() { //Fetch next URL and manage transition to next page
-        var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, link; //Declare variables needed with defaults
+        var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, lnk; //Declare variables needed with defaults
         $(menu).each(function(i, v){ //Iterate through menu
             var el = $(this).parent(); //Get parent of menu element
             if(nextLink) return(true); //nextLink already found -> return
-            link = v.href; //fetch href of element
-            if(!_internal(link)) return(undefined); //verify internal
+            lnk = v.href; //fetch href of element
+            if(!_internal(lnk)) return; //verify internal
             el.removeClass(addclass); //remove old highlight
             if(!firstValue) firstValue = $(this).parent(); //populate firstValue
-            if(!firstLink) firstLink = link; //populate firstLink
+            if(!firstLink) firstLink = lnk; //populate firstLink
             if(wasPrev) { 
-                nextLink = link;
+                nextLink = lnk;
                 currEl = el;
                 el.addClass(addclass);
             }
-            else if(currentURL == link) wasPrev = true;
+            else if(currentURL == lnk) wasPrev = true;
         });
 			
         if(!nextLink) { //end of menu found
@@ -649,32 +633,6 @@ pO("slides", { pinned: 0, img: 0, timer: -1, currEl: 0, parentEl: 0}, { idleTime
         }
 		
         return nextLink; //return next URL
-    },
-    insImg: function() { //insert symbol for toggling slideshow on / off
-        if(!parentEl) return; //not configurated?
-        img = $('<img src ="' + toggleSlide.imgOn + '" title="' + toggleSlide.titleOn + '" />').prependTo(parentEl).css(toggleSlide.imgProps);
-        
-        img.click(_toggleImg); //attach click handler to image
-        pinned = 0; //initialise pinned with 0
-    },
-    toggleImg: function(e) { //toggle slideshow on / off (on clicking of the above symbol)
-        if(!parentEl || !img || !img.length) return; //ensure input
-        var src = toggleSlide.imgOn, titl = toggleSlide.titleOn; //initialise abbreviations
-        
-        if(!pinned) { //not pinned a priori
-            pinned = 1; //set pinned to true
-            src = toggleSlide.imgOff; //fetch image URL for "off"
-            titl = toggleSlide.titleOff; //fetch image title for "off"
-        } else pinned = 0; //switch from pinned to not pinned
-                
-        img.attr("src", src); //dynamically update image src
-        img.attr("title", titl); //dynamically update image title
-        
-        if(!pinned) { //Kickstart in idle sub-plugin after user resumes 
-            _slide1(); //Kickstart with a single slide
-            _slide(); //Commence slideshow
-             $(document).trigger("idle:kick"); //Notify "idle" plugin
-        }
     }
 });
 
@@ -1022,7 +980,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
       $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
       $("title").html(fn("title").html()); // Update title
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
-      $.slides("f"); // Finalise slideshow
   },
  doRender2: function() { // Continue render
       var e = $.rq("e"), // Fetch event 
