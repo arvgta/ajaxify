@@ -591,19 +591,15 @@ pO("slides", { timer: false, currEl: 0}, { idleTime: 0, slideTime: 0, menu: fals
     }
 }, {
     onIdle: function(){ //User was not active for given idleTime
-        _trigger("idle"); //Fire generic event
-        if(timer !== false) return; //Timer already set?                   
-        _slide(); //Commence slideshow
+        if(timer !== false) return; //Already idle -> nothing to do		
+        _trigger("idle"); //Fire generic event		
+        timer = setInterval(_slide1, slideTime); //Commence slideshow -> "_slide1" to be called periodically
     },
     onActive: function(){ //User has become active again
         _trigger("active"); //Fire generic event
         if(currEl) currEl.removeClass(addclass); //Remove class from currEl
         if(timer !== false) clearInterval(timer); //If timer set -> clear timer
         timer = false; //reset timer value
-    },
-    slide: function() { //Start slideshow
-        if(timer !== false) clearInterval(timer); //If timer set -> clear timer
-        timer = setInterval(_slide1, slideTime); //Set timer and register "slide1" to be called periodically
     },
     slide1: function() { //Perform a single slide
         $().pronto(_nextLink()); //Get next URL from menu and call Pronto to change to that page programmatically
