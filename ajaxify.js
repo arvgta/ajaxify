@@ -583,7 +583,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
 // idleTime must be set to enable the slideshow
 // Switch (o) values:
 // i - initailise
-pO("slides", { timer: -1, currEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover"}, function (o) {
+pO("slides", { timer: false, currEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover"}, function (o) {
     if(!o || !idleTime) return; //Ensure data
 	
     if (o === "i") { //Initialise
@@ -592,17 +592,17 @@ pO("slides", { timer: -1, currEl: 0}, { idleTime: 0, slideTime: 0, menu: false, 
 }, {
     onIdle: function(){ //User was not active for given idleTime
         _trigger("idle"); //Fire generic event
-        if(timer + 1) return; //Timer already set?                   
+        if(timer !== false) return; //Timer already set?                   
         _slide(); //Commence slideshow
     },
     onActive: function(){ //User has become active again
         _trigger("active"); //Fire generic event
         if(currEl) currEl.removeClass(addclass); //Remove class from currEl
-        if(timer + 1) clearInterval(timer); //If timer set -> clear timer
-        timer = -1; //reset timer value
+        if(timer !== false) clearInterval(timer); //If timer set -> clear timer
+        timer = false; //reset timer value
     },
     slide: function() { //Start slideshow
-        if(timer + 1) clearInterval(timer); //If timer set -> clear timer
+        if(timer !== false) clearInterval(timer); //If timer set -> clear timer
         timer = setInterval(_slide1, slideTime); //Set timer and register "slide1" to be called periodically
     },
     slide1: function() { //Perform a single slide
