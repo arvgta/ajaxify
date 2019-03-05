@@ -691,7 +691,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
     }
 	
     if(o === "is") { //set / get internal "ispost" (flag whether request is a POST)
-        if(p) ispost = p;
+        if(p !== undefined) ispost = p;
         return ispost;
     }
 	
