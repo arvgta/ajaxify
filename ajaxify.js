@@ -588,6 +588,7 @@ pO("slides", { timer: false, currEl: 0}, { idleTime: 0, slideTime: 0, menu: fals
 	
     if (o === "i") { //Initialise
         $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise idle plugin
+        $(window).on("popstate", _onActive); // Set handler for popState
     }
 }, {
     onIdle: function(){ //User was not active for given idleTime
@@ -685,7 +686,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
     }
 
     if(o === "p") { //set / get internal "p" (push flag)
-        if(p) push = p;
+        if(p !== undefined) push = p;
         return push;
     }
 	
