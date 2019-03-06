@@ -605,7 +605,7 @@ pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTim
     },
     slide1: function(push) { //Perform a single slide - "push" indicates History API modus: pushState, otherwise replaceState
         currentLink = _nextLink(); //Get next URL from menu 
-		$().pronto( push ? { href: currentLink } : currentLink); //Call Pronto to change to that page programmatically
+        $().pronto( push ? { href: currentLink } : currentLink); //Call Pronto to change to that page programmatically
     }, 
     nextLink: function() { //Fetch next URL and manage transition to next page
         var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, lnk; //Declare variables needed with defaults
