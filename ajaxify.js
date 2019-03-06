@@ -583,7 +583,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
 // idleTime must be set to enable the slideshow
 // Switch (o) values:
 // i - initailise
-pO("slides", { timer: false, currEl: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover"}, function (o) {
+pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover"}, function (o) {
     if(!o || !idleTime) return; //Ensure data
 	
     if (o === "i") { //Initialise
@@ -594,7 +594,8 @@ pO("slides", { timer: false, currEl: 0}, { idleTime: 0, slideTime: 0, menu: fals
     onIdle: function(){ //User was not active for given idleTime
         if(timer !== false) return; //Already idle -> nothing to do		
         _trigger("idle"); //Fire generic event		
-        timer = setInterval(_slide1, slideTime); //Commence slideshow -> "_slide1" to be called periodically
+        _slide1(true); //Commence slideshow - perform a single slide - indicating pushState
+        timer = setInterval(_slide1, slideTime); //"_slide1" to be called periodically, indicating replaceState
     },
     onActive: function(){ //User has become active again
         _trigger("active"); //Fire generic event
@@ -602,8 +603,9 @@ pO("slides", { timer: false, currEl: 0}, { idleTime: 0, slideTime: 0, menu: fals
         if(timer !== false) clearInterval(timer); //If timer set -> clear timer
         timer = false; //reset timer value
     },
-    slide1: function() { //Perform a single slide
-        $().pronto(_nextLink()); //Get next URL from menu and call Pronto to change to that page programmatically
+    slide1: function(push) { //Perform a single slide - "push" indicates History API modus: pushState, otherwise replaceState
+        currentLink = _nextLink(); //Get next URL from menu 
+		$().pronto( push ? { href: currentLink } : currentLink); //Call Pronto to change to that page programmatically
     }, 
     nextLink: function() { //Fetch next URL and manage transition to next page
         var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, lnk; //Declare variables needed with defaults
@@ -713,7 +715,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
 // Switch (o) values:
 // d - set divs variable
 // a - Ajaxify all forms in divs
-pO("frms ", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
+pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
     if (!forms || !o) return; //ensure data
     
     if(o === "d") divs = p; //set divs variable
