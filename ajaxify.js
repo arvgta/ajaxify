@@ -69,17 +69,6 @@ Animation parameters (aniParams):  Default is false (set off) - specify aniTime 
 More animation parameters:
 You can specify any parameters that are understood by .animate() !
 
-Toggling sliding parameters (toggleSlide): Default is false (set off) 
-You can override the following toggleSlide parameters:
-{ //defaults - if not turned off completely
-    parentEl: "#content", //parent element, where the above images will be prepended 
-    imgOn: "https://4nf.org/images/pinOn.gif", //graphic for indicating sliding is on
-    imgOff: "https://4nf.org/images/pinOff.gif", //graphic for indicating sliding is off
-    titleOn: "Turn slideshow off", //title tag when on
-    titleOff: "Turn slideshow on", //title tag when off
-    imgProps: { marginLeft: "85%", marginTop: "20px" }
-}
-
 */
 
  //Intuitively better understandable shorthand for String.indexOf() - String.iO()
