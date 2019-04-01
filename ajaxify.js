@@ -119,7 +119,12 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
     if (flush) //delete all old attributes
         for (var i = el.attributes.length - 1; i >= 0; i--) el.removeAttribute(el.attributes[i].name);
 
-    var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
+    try { //in case of bad input data, $S may contain garbage or nothing
+        attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
+    } catch(e) {
+        $.log("Bad input data");
+    }
+	
     while (attr = attributes.pop()) { //fetch one of all the attributes at a time
         el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
     }
