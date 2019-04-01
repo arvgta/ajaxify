@@ -120,7 +120,7 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
         for (var i = el.attributes.length - 1; i >= 0; i--) el.removeAttribute(el.attributes[i].name);
 
     var attr, attributes;
-	try { //in case of bad input data, $S may contain garbage or nothing
+    try { //in case of bad input data, $S may contain garbage or nothing
         attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too
     } catch(e) {
         $.log("Bad input data");
