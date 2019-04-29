@@ -664,6 +664,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
         ispost = false; //GET assumed
         data = null; //reset data
         push = false; //reset push
+        can = false; //reset can (canonical URL)
         return l; //return "l" (currentTarget)
     }
     
@@ -698,7 +699,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
     }
 	
     if(o === "can") { //set internal "can" ("href" of canonical URL)
-        if(p) can = p;
+        if(p !== undefined) can = p;
         return can;
     }
 	
