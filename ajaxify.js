@@ -94,7 +94,7 @@ tagsc = /<\/(html|head|body|link)\>/gi,
 div12 = '<div class="ajy-$1"$2',
 divid12 = '<div id="ajy-$1"$2',
 linki = '<link rel="stylesheet" type="text/css" href="*" />',
-scri = '<script type="text/javascript" src="*" />',
+scri = '<script src="*"></script>',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
 
@@ -403,7 +403,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: false, inline: true, inlineh
         $s.clone().appendTo($.cd("g"));
     },
     addstyle: function (t) { //add a single style tag
-        $("head").append('<style type="text/css">' + t + '</style>');
+        $("head").append('<style>' + t + '</style>');
     },
     addScripts: function ($s, st) { //Delta-loading of sylesheets and external JS files
         $s.c.addAll("href", st); //Stylesheets
