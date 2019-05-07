@@ -254,7 +254,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     ld: function ($t, $h) { //load HTML of target selection into DOM
         var $c = $h.clone();
         $c.find("script").remove(); //prevent double firing of scripts
-        _copyAttributes($t[0], $c, true); //copy tag attributes of element
+        //_copyAttributes($t[0], $c, true); //copy tag attributes of element
         $t.html($c.html()); //inject div into primary DOM
     },
 		
