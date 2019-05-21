@@ -11,12 +11,12 @@
 Simplest plugin call:
 
 jQuery('#content').ajaxify();
-Ajaxifies the whole site, dynamically replacing the div with the ID '#content' across pages
+Ajaxifies the whole site, dynamically replacing the element with the ID '#content' across pages
 
-If several divs should be swapped, just specify their IDs like this:
+If several elements should be swapped, just specify their IDs like this:
 jQuery('#content, #nav').ajaxify();
 
-The plugin can take an arbitrary amount of IDs, however the last one in the DOM or the one specified by "maincontent" should specify the main content div
+The plugin can take an arbitrary amount of IDs, however the last one in the DOM or the one specified by "maincontent" should specify the main content element
 
 
 Options default values
@@ -37,7 +37,6 @@ Options default values
     bodyClasses : false, // Copy body classes from target page, set to "true" to disable
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
-    toggleSlide: false //For toggling sliding - see below.  Default = off
     menu: false, //Selector for links in the menu
     addclass: "jqhover", //Class that gets added dynamically to the highlighted element in the slideshow
  
@@ -48,7 +47,7 @@ Options default values
     inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
     inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
     inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
-    inlineappend : true, // append scripts to the main content div, instead of "eval"-ing them
+    inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
     style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
     prefetch : true, // Plugin pre-fetches pages on hoverIntent
  
@@ -255,7 +254,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         var $c = $h.clone();
         $c.find("script").remove(); //prevent double firing of scripts
         //_copyAttributes($t[0], $c, true); //copy tag attributes of element
-        $t.html($c.html()); //inject div into primary DOM
+        $t.html($c.html()); //inject element into primary DOM
     },
 		
     lDivs: function ($t) { //load target selections into DOM
@@ -357,7 +356,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: false, inline: true, inlineh
             
     if (o === "1") { //Initial load initialisation
         $.detScripts($s); //Fetch scripts from DOM, "pass" variable will be 0
-        cd0 = $.cd("g").get(0); //Load main content div node into "cd0"
+        cd0 = $.cd("g").get(0); //Load main content element node into "cd0"
         return _addScripts($s, settings); //Load scripts from DOM into addScripts and initialise it
     }
             
@@ -499,7 +498,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
         var script = document.createElement("script");
         script.async = asyncdef; //initialise with asyncdef - may be overwritten in _cloneAttributes
         _copyAttributes(script, $S); //copy all attributes of script element generically
-        document.head.appendChild(script); //it doesn't matter much, if we append to head or content div
+        document.head.appendChild(script); //it doesn't matter much, if we append to head or content element
     },
     findScript: function (url) { //Find URL in old array
         if(!url) return false;
@@ -515,23 +514,23 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
 );
 
 // The Cd plugin
-// Manages various operations on the main content div
+// Manages various operations on the main content element
 // Second parameter (p) is callback
 // First parameter (o) is switch:
-// s - stop current animation on the main content div
-// g - fetch main content div
-// i - initialise (main content div, aniParams, frm)
+// s - stop current animation on the main content element
+// g - fetch main content element
+// i - initialise (main content element, aniParams, frm)
 // 1 - invoke first phase of animation
 // 2 - invoke second phase of animation
 // 3 - invoke third and last phase of animation
 pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
     if(!o) return; //Ensure operator
 	
-    if(o === "s") return cd.stop(true, true); //Stop current animation on the main content div
+    if(o === "s") return cd.stop(true, true); //Stop current animation on the main content element
     
-    if(o === "g") return cd; //Fetch main content div
+    if(o === "g") return cd; //Fetch main content element
 
-    if(o === "i") { //Initialise (main content div, aniParams, frm)
+    if(o === "i") { //Initialise (main content element, aniParams, frm)
         cd = maincontent ? p.filter(maincontent) : p.last(); //Set to maincontent if given otherwise last element in DOM of selection
         aniTrue = aniTime && aniParams; //aniTime and aniParams has to be set for animations to work
         cdwidth = cd.width(); //Abbreviate cd width
@@ -544,7 +543,7 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
         }, aniParams);
 		
         aniParams = $.extend({ //calculate marginRight
-            marginRight: cdwidth - aniParams.width //making the content div width self-managing
+            marginRight: cdwidth - aniParams.width //making the content element width self-managing
         }, aniParams);
 		
         frm = $.extend({}, aniParams); //store in "frm" ("from" jQuery object) with aniParams
@@ -567,14 +566,14 @@ pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniPar
     if(!aniTrue) { p(); return; } //Call callback, if animations disabled
 	
     if (o === "1" || o === "2" || o === "3") { //Phases of animation
-        cd.stop(true, true); //stop animation of main content div
+        cd.stop(true, true); //stop animation of main content element
         if(o === "3")  { p(); return; } //if last phase, do not spawn a new animation
         cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
     }
 });
 
 // The Slides plugin - stands for slideshow / carousel
-// Enable a slideshow on the main content div
+// Enable a slideshow on the main content element
 // idleTime must be set to enable the slideshow
 // Switch (o) values:
 // i - initailise
@@ -857,7 +856,7 @@ pO("hApi", 0, 0, function (o, p) {
 
 // The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
 // Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
-// Last element in order of the DOM should be the main content div, unless overriden by "maincontent"
+// Last element in order of the DOM should be the main content element, unless overriden by "maincontent"
 // Switch (h) values:
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
@@ -869,12 +868,12 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
          var s = settings; //abbreviation
          if(!$this.length) $.log("Warning - empty content selector passed!");
          $gthis = $this; //copy selection to global selector
-         $.cd(0, 0, s); //initialise content div sub-plugin
+         $.cd(0, 0, s); //initialise content element sub-plugin
          $.frms(0, 0, s); //initialise forms sub-plugin
          $.slides(0, s); //initialise slideshow sub-plugin
          $.rqTimer(0, s); //initialise request timer sub-plugin
          $.scrolly(0, s); //initialise scroll effects sub-plugin
-         $.cd("i", $gthis); //second phase of initialisation of content div sub-plugin
+         $.cd("i", $gthis); //second phase of initialisation of content element sub-plugin
          _init_p(); //initialise Pronto sub-plugin
          return $this; //return jQuery selector for chaining
      }
