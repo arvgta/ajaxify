@@ -384,8 +384,7 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: false, inline: true, inlineh
     },
     addtext: function (t, type, $s) { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
-        if(!type) type = "text/javascript"; //Validate type
-        if(inlineappend || !type.iO("text/javascript")) try { return _apptext($s); } catch (e) { }
+        if(inlineappend || (type && !type.iO("text/javascript"))) try { return _apptext($s); } catch (e) { }
         
         try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
             try { eval(t); } catch (e2) {
