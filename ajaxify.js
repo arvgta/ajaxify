@@ -34,7 +34,7 @@ Options default values
     aniParams : false, //Animation parameters - see below.  Default = off
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
     scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
-    bodyClasses : false, // Copy body classes from target page, set to "true" to disable
+    bodyClasses : false, // Copy body classes from target page, set to "true" to enable
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
     slideTime: 0, //in msec - time between slides
     menu: false, //Selector for links in the menu
@@ -107,7 +107,7 @@ function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostn
 function _trigger(t, e){ e = e ? e : jQuery.rq("e"); jQuery(window).trigger("pronto." + t, e); }
 function _internal(url) { 
     if (!url) return false;
-    if(typeof(url) === "object") url = url.href;
+    if (typeof(url) === "object") url = url.href;
     if (url==="") return true;
     return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":");
 }
@@ -116,7 +116,8 @@ function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
     if (flush) //delete all old attributes
-        for (var i = el.attributes.length - 1; i >= 0; i--) el.removeAttribute(el.attributes[i].name);
+        while(el.attributes.length > 0)
+            el.removeAttribute(el.attributes[0].name);
 
     var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too;
 	
@@ -242,13 +243,18 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
          if ($.rq("is") || !$.cache1(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
 		 
          plus = 0; //otherwise reset "plus" variable
-         if(cb) return cb(); //fire callback, if given
+         if (cb) return cb(); //fire callback, if given
     },
 		
     ld: function ($t, $h) { //load HTML of target selection into DOM
-        var $c = $h.clone();
+        var $c = $h.clone(); //we want to preserve the original target element
         $c.find("script").remove(); //prevent double firing of scripts
-        //_copyAttributes($t[0], $c, true); //copy tag attributes of element
+        if(typeof $c[0] == "undefined") { //target element absent or corrupted
+            $.log("Ajaxify warning: Missing, inconsistent or corrupt element in main jQuery selection" + ($t[0] ? (": #" + $t.attr("id")) : "") 
+                +  " .  Continuing gracefully...");
+            return; //Skip this element and attempt to continue
+        }
+		_copyAttributes($t[0], $c, true); //copy tag attributes of element, flushing the first parameter first
         $t.html($c.html()); //inject element into primary DOM
     },
 		
@@ -274,7 +280,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
             $.pages([hin, $.cache1()]); //Load object into $.pages, too
             plus = 0; //Reset "plus" variable, indicating no pre-fetch has happened
 
-            if(cb) return(cb()); //Call callback if given
+            if (cb) return(cb()); //Call callback if given
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
@@ -311,11 +317,11 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 // Calls Pronto
 pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this, options) {
     var o = options;
-    if(!o || typeof(o) !== "string") {
+    if (!o || typeof(o) !== "string") {
         $(function () { //on DOMReady
             if (_init(settings)) { //sub-plugins initialisation
                 $this.pronto("i", settings); //Pronto initialisation
-                if(deltas) $.scripts("1"); //delta-loading initialisation
+                if (deltas) $.scripts("1"); //delta-loading initialisation
             }
         });
     }
@@ -490,7 +496,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
         //Insert single external JS script - we have to go low level to avoid a warning coming from jQuery append()
         //But we'll do our best to support all salient attributes
         var script = document.createElement("script");
-        script.async = asyncdef; //initialise with asyncdef - may be overwritten in _cloneAttributes
+        script.async = asyncdef; //initialise with asyncdef - may be overwritten in _copyAttributes
         _copyAttributes(script, $S); //copy all attributes of script element generically
         document.head.appendChild(script); //it doesn't matter much, if we append to head or content element
     },
