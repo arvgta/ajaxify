@@ -254,7 +254,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
                 +  " .  Continuing gracefully...");
             return; //Skip this element and attempt to continue
         }
-		_copyAttributes($t[0], $c, true); //copy tag attributes of element, flushing the first parameter first
+        _copyAttributes($t[0], $c, true); //copy tag attributes of element, flushing the first parameter first
         $t.html($c.html()); //inject element into primary DOM
     },
 		
