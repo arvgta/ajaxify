@@ -251,7 +251,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         $c.find("script").remove(); //prevent double firing of scripts
         if(typeof $c[0] == "undefined") { //target element absent or corrupted
             $.log("Ajaxify warning: Missing, inconsistent or corrupt element in main jQuery selection" + ($t[0] ? (": #" + $t.attr("id")) : "") 
-                +  " .  Continuing gracefully...");
+                +  " .  Continuing gracefully... If behaviour of your site is alright, please suppress this warning by setting verbosity: 0");
             return; //Skip this element and attempt to continue
         }
         _copyAttributes($t[0], $c, true); //copy tag attributes of element, flushing the first parameter first
