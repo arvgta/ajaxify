@@ -284,11 +284,12 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
-            try { 
+            try {
+                _trigger("error", error);
                 $.log("Response text : " + jqXHR.responseText);
                 $.cache1($(_parseHTML(jqXHR.responseText)));
-                $.pages([hin, $.cache1()]); 
-                if(cb) cb(error);
+                $.pages([hin, $.cache1()]);
+                if(cb) cb(error); 
             } catch (e) {}
         },
         async: true //Explicitly not synchronous!
