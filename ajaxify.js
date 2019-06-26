@@ -289,7 +289,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
                 $.log("Response text : " + jqXHR.responseText);
                 $.cache1($(_parseHTML(jqXHR.responseText)));
                 $.pages([hin, $.cache1()]);
-                if(cb) cb(error); 
+                if(cb) return cb(error); 
             } catch (e) {}
         },
         async: true //Explicitly not synchronous!
