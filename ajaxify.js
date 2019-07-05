@@ -249,7 +249,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     ld: function ($t, $h) { //load HTML of target selection into DOM
         if(typeof $h[0] == "undefined") { //target element absent or corrupted
              $.log("Ajaxify warning: Missing, inconsistent or corrupt element in main jQuery selection" + ($t[0] ? (": #" + $t.attr("id")) : "") 
-                 +  " .  Continuing gracefully... If behaviour of your site is alright, please suppress this warning by setting verbosity: 0");
+                 +  ".  Continuing gracefully... If behaviour of your site is alright, please suppress this warning by setting verbosity: 0");
             return; //Skip this element and attempt to continue
         }
 		
