@@ -22,11 +22,11 @@ The plugin can take an arbitrary amount of IDs, however the last one in the DOM 
 Options default values
 {
 // basic config parameters
-    selector : "a:not(.no-ajaxy)",  //Selector for elements to ajaxify - without being swapped - e.g. a selection of links
+    selector : "a:not(.no-ajaxy)",  //Selector for elements to trigger swapping - not those to be swapped - e.g. a selection of links
     maincontent : false, //Default main content is last element of selection, specify a value like "#content" to override
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
-    refresh : false, // Refresh the page if clicked link target current page
+    refresh : false, // Refresh the page if link clicked is current page
  
 // visual effects settings
     requestDelay : 0, //in msec - Delay of Pronto request
@@ -248,9 +248,10 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 		
     ld: function ($t, $h) { //load HTML of target selection into DOM
         if(typeof $h[0] == "undefined") { //target element absent or corrupted
-             $.log("Ajaxify warning: Missing, inconsistent or corrupt element in main jQuery selection" + ($t[0] ? (": #" + $t.attr("id")) : "") 
-                 +  ".  Continuing gracefully... If behaviour of your site is alright, please suppress this warning by setting verbosity: 0");
-            return; //Skip this element and attempt to continue
+            $.log("Inserting placeholder for ID: " + $t.attr("id"));
+            var tagN = $t.prop("tagName").toLowerCase();
+            $t = $t.replaceWith("<" + tagN + " id='" + $t.attr("id") + "'></" + tagN + ">"); //insert empty hidden element with id as a placeholder
+            return; //Skip this element and continue - skip the rest of the _ld() function
         }
 		
         var $c = $h.clone(); //we want to preserve the original target element
