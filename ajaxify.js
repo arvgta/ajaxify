@@ -58,6 +58,7 @@ Options default values
     pluginon : true // Plugin set "on" or "off" (==false) manually
 }
 
+
 Animation parameters (aniParams):  Default is false (set off) - specify aniTime and override the following aniParams:
 {
     opacity: 1, //no fade, set to 0 for maximum fade
@@ -67,8 +68,8 @@ Animation parameters (aniParams):  Default is false (set off) - specify aniTime 
 
 More animation parameters:
 You can specify any parameters that are understood by .animate() !
-
 */
+
 
  //Intuitively better understandable shorthand for String.indexOf() - String.iO()
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
