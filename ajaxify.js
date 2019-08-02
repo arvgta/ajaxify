@@ -288,11 +288,12 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         error: function(jqXHR, status, error) {
         // Try to parse response text
             try {
-                _trigger("error", error);
-                $.log("Response text : " + jqXHR.responseText);
-                $.cache1($(_parseHTML(jqXHR.responseText)));
-                $.pages([hin, $.cache1()]);
-                if(cb) return cb(error); 
+                xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
+                _trigger("error", error); //raise general pronto.error event
+                $.log("Response text : " + jqXHR.responseText); //log out debugging information
+                $.cache1($(_parseHTML(jqXHR.responseText))); //attempt to gracefully fill $.cache1
+                $.pages([hin, $.cache1()]); //commit to $.pages
+                if(cb) return cb(error);  //finally, call user's bespoke callback function
             } catch (e) {}
         },
         async: true //Explicitly not synchronous!
