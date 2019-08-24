@@ -49,7 +49,7 @@ Options default values
     inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
     inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
     style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
-    prefetch : true, // Plugin pre-fetches pages on hoverIntent
+    prefetchoff : false, // Plugin pre-fetches pages on hoverIntent - true = set off completely // strings - separated by ", " - hints to select out
  
 // debugging & advanced settings
     verbosity : 0,  //Debugging level to console: default off.  Can be set to 10 and higher (in case of logging enabled) 
@@ -866,7 +866,7 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refresh: false, previewoff: true, cb: 0, bodyClasses: false }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false }, function ($this, h) {
      if(!h) return; //ensure data
      
      if(h === "i") { //request to initialise
@@ -897,9 +897,9 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
  init_p: function() {
     $.hApi("=", window.location.href); // Set initial state
     $(window).on("popstate", _onPop); // Set handler for popState
-    if (prefetch) {
+    if (prefetchoff === false) {
         $(selector).hoverIntent(_prefetch, function(){});
-        $(selector).one("touchstart", function(){ prefetch = false;}); // for touchscreens - turn prefetch off    
+        $(selector).one("touchstart", function(){ prefetchoff = true;}); // for touchscreens - turn prefetch off    
     }
 	
     var $body = $("body"); //abbreviation
@@ -910,18 +910,18 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetch: true, refr
     $.slides("i"); // Init slideshow
   }, 
  prefetch: function(e) { //...target page on hoverIntent
-       if(!prefetch) return;
-       var link = $.rq("v", e); // validate internal URL
-       if ($.rq("=") || !link) return; //same page or no data
-       fn("+", link.href, function() { //prefetch page
+       if(prefetchoff === true) return;
+       var lnk = $.rq("v", e); // validate internal URL
+       if ($.rq("=") || !lnk || _searchHints(lnk, prefetchoff)) return; //same page, no data or selected out
+       fn("+", lnk.href, function() { //prefetch page
             if (previewoff === true) return(false);
-            if (!_isInDivs(link) && (previewoff === false || !$(link).closest(previewoff).length)) _click(e, true);
+            if (!_isInDivs(lnk) && (previewoff === false || !$(lnk).closest(previewoff).length)) _click(e, true);
        });
   },
- isInDivs: function(link) {
+ isInDivs: function(lnk) {
       var is = false;
       $gthis.each(function() {
-          if ($(link).parents("#" + $(this).attr("id")).length > 0) is = true;
+          if ($(lnk).parents("#" + $(this).attr("id")).length > 0) is = true;
       });      
          
       return is;
