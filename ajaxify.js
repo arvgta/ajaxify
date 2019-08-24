@@ -897,7 +897,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  init_p: function() {
     $.hApi("=", window.location.href); // Set initial state
     $(window).on("popstate", _onPop); // Set handler for popState
-    if (prefetchoff === false) {
+    if (prefetchoff !== true) {
         $(selector).hoverIntent(_prefetch, function(){});
         $(selector).one("touchstart", function(){ prefetchoff = true;}); // for touchscreens - turn prefetch off    
     }
