@@ -912,7 +912,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  prefetch: function(e) { //...target page on hoverIntent
        if(prefetchoff === true) return;
        var lnk = $.rq("v", e); // validate internal URL
-       if ($.rq("=") || !lnk || _searchHints(lnk, prefetchoff)) return; //same page, no data or selected out
+       if ($.rq("=") || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
        fn("+", lnk.href, function() { //prefetch page
             if (previewoff === true) return(false);
             if (!_isInDivs(lnk) && (previewoff === false || !$(lnk).closest(previewoff).length)) _click(e, true);
