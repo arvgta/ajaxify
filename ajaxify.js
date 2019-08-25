@@ -32,7 +32,7 @@ Options default values
     requestDelay : 0, //in msec - Delay of Pronto request
     aniTime : 0, //in msec - must be set for animations to work
     aniParams : false, //Animation parameters - see below.  Default = off
-    previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide a jQuery selection to selectively disable
+    previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide hints to selectively disable
     scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
     bodyClasses : false, // Copy body classes from target page, set to "true" to enable
     idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
@@ -915,7 +915,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
        if ($.rq("=") || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
        fn("+", lnk.href, function() { //prefetch page
             if (previewoff === true) return(false);
-            if (!_isInDivs(lnk) && (previewoff === false || !$(lnk).closest(previewoff).length)) _click(e, true);
+            if (!_isInDivs(lnk) && (previewoff === false || !_searchHints(lnk.href, previewoff))) _click(e, true);
        });
   },
  isInDivs: function(lnk) {
