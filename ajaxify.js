@@ -899,7 +899,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
     $(window).on("popstate", _onPop); // Set handler for popState
     if (prefetchoff !== true) {
         $(document).hoverIntent(_prefetch, function(){}, selector); //this type of call also handles dynamically inserted links
-        $(document).one("touchstart", function(){ prefetchoff = true;}); // for touchscreens - turn prefetch off    
+        $(document).on("touchstart", selector, _prefetch); // for touchscreens - same thing  
     }
 	
     var $body = $("body"); //abbreviation
