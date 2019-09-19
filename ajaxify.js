@@ -97,6 +97,7 @@ linki = '<link rel="stylesheet" type="text/css" href="*" />',
 scri = '<script src="*"></script>',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
+lastevent = null; //global variable for storing last event, used to prevent prefetch if link is already clicked
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
@@ -162,9 +163,10 @@ pO("cache1", { d: false }, 0, function (o) {
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 pO("memory", 0, { memoryoff: false }, function (h) {
-    if (!h || memoryoff === true) return false; //validate input, if memoryoff set to true return false quickly
-    if (memoryoff === false) return h; //if memoryoff set to false return the URL quickly
-    return _searchHints(h, memoryoff) ? false : h; //apply hints mechanism -> found: return false, otherwise return URL
+     if (!h || memoryoff === true) return false; //validate input, if memoryoff set to true return false quickly
+     if (memoryoff === false) return h; //if memoryoff set to false return the URL quickly
+     var lnk= $.rq("v", $.rq("e")); //getting clicked link for reading class attribute
+     return (_searchHints(h, memoryoff) || _searchHints(lnk.getAttribute("class"), memoryoff)) ? false : h; //apply hints mechanism -> found: return false, otherwise return URL (added class attribute check)
 });
 		
 // The stateful Pages plugin
@@ -275,8 +277,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         type: ispost ? "POST" : "GET", //POST or GET?
         data: ispost ? $.rq("d") : null, //fetch data from $.rq
         success: function(h) { //success -> "h" holds HTML
-            if (!h || !_isHtml(xhr)) { //HTML empty or not HTML or XML?
-                if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
+            if (!h || !_getState(xhr)) { //HTML empty or not HTML or XML? (changed isHtml just to check if request is successful)
+                 if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
             }
             
             $.cache1($(_parseHTML(h))); //Clean HTML and load it into cache
@@ -303,6 +305,10 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
     isHtml: function (x) { //restrict interesting MIME types - only HTML / XML
         var d;
         return (d = x.getResponseHeader("Content-Type")), d && (d.iO("text/html") || d.iO("text/xml"));
+    },
+	
+    getState: function(x) {
+            return x.readyState; // return xhr readyState
     },
 		
     parseHTML: function (h) { //process fetched HTML
@@ -899,7 +905,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
     $(window).on("popstate", _onPop); // Set handler for popState
     if (prefetchoff !== true) {
         $(document).hoverIntent(_prefetch, function(){}, selector); //this type of call also handles dynamically inserted links
-        $(document).on("touchstart", selector, _prefetch); // for touchscreens - same thing  
+        //  $(document).on("touchstart", selector, _prefetch); // for touchscreens - same thing  
+        $(document).one("touchstart", function(){ prefetchoff = true;}); //reversed change from line above because history is not pushing for mobile devices
     }
 	
     var $body = $("body"); //abbreviation
@@ -912,10 +919,14 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  prefetch: function(e) { //...target page on hoverIntent
        if(prefetchoff === true) return;
        var lnk = $.rq("v", e); // validate internal URL
-       if ($.rq("=") || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
+       if ($.rq("=") || !lnk || _searchHints(lnk.href, prefetchoff) || _searchHints(lnk.getAttribute("class"), prefetchoff)) return; //same page, no data or selected out (added class attribute check)
+       var leventlnk=$.rq("v", lastevent); //getting last event link for comparison
+       if (lnk.href==leventlnk.href) return; //if links are same, stop prefetch
+        
+       lastevent = e; //store last event
        fn("+", lnk.href, function() { //prefetch page
             if (previewoff === true) return(false);
-            if (!_isInDivs(lnk) && (previewoff === false || !_searchHints(lnk.href, previewoff))) _click(e, true);
+            if (!_isInDivs(lnk) && (previewoff === false || !_searchHints(lnk.href, previewoff) || _searchHints(lnk.getAttribute("class"), prefetchoff))) _click(e, true);
        });
   },
  isInDivs: function(lnk) {
@@ -934,6 +945,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  click: function(e, mode) { //...handler for normal clicks
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
+      lastevent = e; //store last event
       if(link.href.substr(-1) ==="#") return true;
       if(_hashChange(link)) { // only hash part has changed
           $.hApi("=", link.href); // commit new URL to History API
@@ -977,7 +989,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       _trigger("load");  // Fire load event
       if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
       $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
-      $("title").html(fn("title").html()); // Update title
+      let title = fn("title"); //get title
+      $("title").html((title != undefined) ? title.html() : ''); //set title.html if it's not undefined
       $.cd("2", _doRender2); // Animate back - continue with _doRender2()
   },
  doRender2: function() { // Continue render
