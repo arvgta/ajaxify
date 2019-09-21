@@ -900,6 +900,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
     if (prefetchoff !== true) {
         $(document).hoverIntent(_prefetch, function(){}, selector); //this type of call also handles dynamically inserted links
         //$(document).on("touchstart", selector, _prefetch); // ToDo - for touchscreens - same thing -> usage of "on" / "one" unclear
+		//Comment Edin:  history is not pushing for mobile devices
     }
 	
     var $body = $("body"); //abbreviation
