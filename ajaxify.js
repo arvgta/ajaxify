@@ -641,35 +641,38 @@ pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTim
 // First parameter (o) values:
 // = - check whether internally stored "href" ("h") variable is the same as the global currentURL
 // v - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
-// i - initialise request defaults and return "l" (currentTarget)
+// i - initialise request defaults and return "c" (currentTarget)
 // h - access internal href hard
-// l - get internal "l" (currentTarget)
+// c - get internal "c" (currentTarget)
 // e - set / get internal "e" (event)
 // p - set / get internal "p" (push flag)
 // is - set / get internal "ispost" (flag whether request is a POST)
 // d - set / get internal "d" (data for central $.ajax())
 // can - set / get internal "can" ("href" of canonical URL)
 // can? - check whether simple canonical URL is given and return, otherwise return value passed in "p"
-pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, function (o, p) {
     if(o === "=") { 
-        return h === currentURL; //check whether internally stored "href" ("h") variable is the same as the global currentURL
+        return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
+        || h === l; //or href of last request ("l")
     }
+
+    if(o === "!") return l = h; //store "l" (last request) on successful completion of request
     
     if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
         if(!p) return false; //ensure data
         e = p; //store event internally
-        l = e.currentTarget; //extract currentTarget
-        h = l.href; //extract href
+        c = e.currentTarget; //extract currentTarget
+        h = c.href; //extract href
         if(!_internal(h)) return false; //if not internal -> report failure
         o = "i"; //continue with "i"
     }
     
-    if(o === "i") { //initialise request defaults and return "l" (currentTarget)
+    if(o === "i") { //initialise request defaults and return "c" (currentTarget)
         ispost = false; //GET assumed
         data = null; //reset data
         push = false; //reset push
         can = false; //reset can (canonical URL)
-        return l; //return "l" (currentTarget)
+        return c; //return "c" (currentTarget)
     }
     
     if(o === "h") { // Access href hard
@@ -681,7 +684,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
         return h; //href
     }
     
-    if(o === "l") return l; //return "l" (currentTarget)
+    if(o === "c") return c; //return "c" (currentTarget)
     if(o === "e") { //set / get internal "e" (event)
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
