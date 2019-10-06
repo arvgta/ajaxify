@@ -210,8 +210,6 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache1(); //nothing passed -> return currently cached page
 
-    if(o === "a") {(xhr && xhr.readyState!=4) ? xhr.abort() : false; return;}
-
     if (o.iO("/")) { //URL
         cb = p; //second parameter "p" must be callback
         if(plus == o) return; //same URL as in "plus" variable? -> return
@@ -271,7 +269,6 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 		
     lAjax: function (hin, pre) { //execute Ajax load
         var ispost = $.rq("is"); //POST?
-        if (pre) $.rq("xs","ap"); else $.rq("xs","as");
                 
         xhr = $.ajax({ //central AJAX load, for both POSTs and GETs
         url: hin, //URL
@@ -290,7 +287,6 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
-            if (status=='abort') return;
             try {
                 xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
                 _trigger("error", error); //raise general pronto.error event
@@ -299,9 +295,6 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
                 $.pages([hin, $.cache1()]); //commit to $.pages
                 if(cb) return cb(error);  //finally, call user's bespoke callback function
             } catch (e) {}
-        },
-        complete: function() {
-            $.rq("xs","c");
         },
         async: true //Explicitly not synchronous!
         });
@@ -657,24 +650,13 @@ pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTim
 // d - set / get internal "d" (data for central $.ajax())
 // can - set / get internal "can" ("href" of canonical URL)
 // can? - check whether simple canonical URL is given and return, otherwise return value passed in "p"
-pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false, xs: "c" }, 0, function (o, p) {
+pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, function (o, p) {
     if(o === "=") { 
         return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
         || h === l; //or href of last request ("l")
     }
 
-    if (o === "xs") {
-        if (p) xs=p;
-        return xs;
-    }
-
-    if (o === "isOK") {
-        if (xs=="as" && !p) $.getPage("a");
-        if (xs=="as" && p) return false;
-        if (xs=="ap" && p) $.getPage("a");
-        if (!p) l=h;
-        return true;
-    }
+    if(o === "!") return l = h; //store "l" (last request) on successful completion of request
     
     if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
         if(!p) return false; //ensure data
@@ -933,7 +915,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
   }, 
  prefetch: function(e) { //...target page on hoverIntent
        if(prefetchoff === true) return;
-       if (!$.rq("isOK", true)) return;
        var lnk = $.rq("v", e); // validate internal URL
        if ($.rq("=") || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
        fn("+", lnk.href, function() { //prefetch page
@@ -955,7 +936,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       e.stopImmediatePropagation();
  },
  click: function(e, mode) { //...handler for normal clicks
-      if (!$.rq("isOK")) return;
       var link = $.rq("v", e);  // validate internal URL
       if(!link || _exoticKey(e)) return; // Ignore everything but normal click
       if(link.href.substr(-1) ==="#") return true;
@@ -970,6 +950,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       if(refresh || !$.rq("=")) _request(); // Continue with _request() when not the same URL or "refresh" parameter set hard
   }, 
  request: function(notPush) { // ... new url
+      $.rq("!"); //we're serious about this request - disable further fetches on same URL
       $.rq("p", !notPush); // mode for hApi - replaceState / pushState
       _trigger("request"); // Fire request event
       fn($.rq("h"), function(err) { // Call "fn" - handler of parent
