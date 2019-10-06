@@ -210,7 +210,7 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache1(); //nothing passed -> return currently cached page
 	
-    if (o === "a") { if (xhr && xhr.readyState!=4) return xhr.abort(); }
+    if (o === "a") { if (xhr && xhr.readyState!=4) xhr.abort(); return;  }
 
     if (o.iO("/")) { //URL
         cb = p; //second parameter "p" must be callback
