@@ -26,7 +26,7 @@ Options default values
     maincontent : false, //Default main content is last element of selection, specify a value like "#content" to override
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
-    refresh : false, // Refresh the page if link clicked is current page
+    refresh : false, // Refresh the page even if link clicked is current page
  
 // visual effects settings
     requestDelay : 0, //in msec - Delay of Pronto request
@@ -209,6 +209,8 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 
 pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache1(); //nothing passed -> return currently cached page
+	
+    if (o === "a") { if (xhr && xhr.readyState!=4) xhr.abort(); return;  }
 
     if (o.iO("/")) { //URL
         cb = p; //second parameter "p" must be callback
@@ -641,35 +643,38 @@ pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTim
 // First parameter (o) values:
 // = - check whether internally stored "href" ("h") variable is the same as the global currentURL
 // v - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
-// i - initialise request defaults and return "l" (currentTarget)
+// i - initialise request defaults and return "c" (currentTarget)
 // h - access internal href hard
-// l - get internal "l" (currentTarget)
+// c - get internal "c" (currentTarget)
 // e - set / get internal "e" (event)
 // p - set / get internal "p" (push flag)
 // is - set / get internal "ispost" (flag whether request is a POST)
 // d - set / get internal "d" (data for central $.ajax())
 // can - set / get internal "can" ("href" of canonical URL)
 // can? - check whether simple canonical URL is given and return, otherwise return value passed in "p"
-pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (o, p) {
+pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, function (o, p) {
     if(o === "=") { 
-        return h === currentURL; //check whether internally stored "href" ("h") variable is the same as the global currentURL
+        return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
+        || h === l; //or href of last request ("l")
     }
+
+    if(o === "!") return l = h; //store href in "l" (last request)
     
     if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
         if(!p) return false; //ensure data
         e = p; //store event internally
-        l = e.currentTarget; //extract currentTarget
-        h = l.href; //extract href
+        c = e.currentTarget; //extract currentTarget
+        h = c.href; //extract href
         if(!_internal(h)) return false; //if not internal -> report failure
         o = "i"; //continue with "i"
     }
     
-    if(o === "i") { //initialise request defaults and return "l" (currentTarget)
+    if(o === "i") { //initialise request defaults and return "c" (currentTarget)
         ispost = false; //GET assumed
         data = null; //reset data
-        push = false; //reset push
+        push = true; //assume we want to push URL to the History API
         can = false; //reset can (canonical URL)
-        return l; //return "l" (currentTarget)
+        return c; //return "c" (currentTarget)
     }
     
     if(o === "h") { // Access href hard
@@ -681,7 +686,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, l: 0, h: 0}, 0, function (
         return h; //href
     }
     
-    if(o === "l") return l; //return "l" (currentTarget)
+    //if(o === "c") return c; //return "c" (currentTarget)
     if(o === "e") { //set / get internal "e" (event)
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
@@ -866,7 +871,7 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false }, function ($this, h) {
+pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, passCount: false }, function ($this, h) {
      if(!h) return; //ensure data
      
      if(h === "i") { //request to initialise
@@ -899,7 +904,8 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
     $(window).on("popstate", _onPop); // Set handler for popState
     if (prefetchoff !== true) {
         $(document).hoverIntent(_prefetch, function(){}, selector); //this type of call also handles dynamically inserted links
-        $(document).one("touchstart", function(){ prefetchoff = true;}); // for touchscreens - turn prefetch off    
+        //$(document).on("touchstart", selector, _prefetch); // ToDo - for touchscreens - same thing
+        //Comment Edin:  history is not pushing for mobile devices
     }
 	
     var $body = $("body"); //abbreviation
@@ -931,22 +937,23 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       e.stopPropagation();
       e.stopImmediatePropagation();
  },
- click: function(e, mode) { //...handler for normal clicks
-      var link = $.rq("v", e);  // validate internal URL
-      if(!link || _exoticKey(e)) return; // Ignore everything but normal click
-      if(link.href.substr(-1) ==="#") return true;
-      if(_hashChange(link)) { // only hash part has changed
-          $.hApi("=", link.href); // commit new URL to History API
+ click: function(e, notPush) { //...handler for normal clicks
+      var lnk = $.rq("v", e);  // validate internal URL
+      if(!lnk || _exoticKey(e)) return; // Ignore everything but normal click
+      if(lnk.href.substr(-1) ==="#") return true;
+      if(_hashChange(lnk)) { // only hash part has changed
+          $.hApi("=", lnk.href); // commit new URL to History API
           return true; // Enable default behaviour and return - does not invoke a full page load!
       }
 
       $.scrolly("+"); // Capture old vertical position of scroll bar
       _stopBubbling(e); // preventDefault and stop bubbling-up from here on, no matter what comes next
       if($.rq("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
-      if(refresh || !$.rq("=")) _request(); // Continue with _request() when not the same URL or "refresh" parameter set hard
+      if(refresh || !$.rq("=")) _request(notPush); // Continue with _request() when not the same URL or "refresh" parameter set hard
   }, 
  request: function(notPush) { // ... new url
-      $.rq("p", !notPush); // mode for hApi - replaceState / pushState
+      $.rq("!"); //we're serious about this request - disable further fetches on same URL
+      if(notPush) $.rq("p", false); // mode for hApi - replaceState / pushState
       _trigger("request"); // Fire request event
       fn($.rq("h"), function(err) { // Call "fn" - handler of parent
           if (err) { 
@@ -965,6 +972,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  onPop: function(e) { // Handle back/forward navigation
       $.rq("i"); //Initialise request in general
       $.rq("e", e); //Initialise request event
+      $.rq("p", false); //We don't want to re-push
       $.scrolly("+");
             
       var data = e.originalEvent.state, url = data ? data.url : 0;
@@ -991,6 +999,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
          $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
          _gaCaptureView(url); // Trigger analytics page view
          _trigger("render"); // Fire render event
+         if(passCount) $("#" + passCount).html("Pass: " + pass);
          if(cb) cb(); // Callback users handler, if specified
       });
   },
