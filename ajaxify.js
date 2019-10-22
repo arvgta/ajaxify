@@ -354,7 +354,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 // c - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
-pO("scripts", { $s : false, cd0 : 0 }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
+pO("scripts", { $s : false }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") { //Initalise
         if(!$s) $s = $(); //Start off with empty internal jQuery object
         return true;
@@ -364,7 +364,6 @@ pO("scripts", { $s : false, cd0 : 0 }, { canonical: false, inline: true, inlineh
             
     if (o === "1") { //Initial load initialisation
         $.detScripts($s); //Fetch scripts from DOM, "pass" variable will be 0
-        cd0 = $.cd("g").get(0); //Load main content element node into "cd0"
         return _addScripts($s, settings); //Load scripts from DOM into addScripts and initialise it
     }
             
@@ -745,7 +744,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         else h = currentURL; //not found -> select current URL
                 
         $.rq("i"); //initialise request
-        $.rq("p", false); //Don't push (twice)
+        //$.rq("p", false); //Don't push (twice)
                
         if (g == "get") h = _b(h, p); //GET -> copy URL parameters
         else {
@@ -862,7 +861,7 @@ pO("hApi", 0, 0, function (o, p) {
     if(p) currentURL = p; //if p given -> update current URL
 
     if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL); //perform replaceState
-    else history.pushState({ url: currentURL }, "state-" + currentURL, currentURL); //perform pushState
+    else if (currentURL !== window.location.href) history.pushState({ url: currentURL }, "state-" + currentURL, currentURL); //perform pushState
 });
 
 // The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
