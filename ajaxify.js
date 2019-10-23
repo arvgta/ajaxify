@@ -653,8 +653,9 @@ pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTim
 // can? - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, function (o, p) {
     if(o === "=") { 
-        return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
+        if(p) return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
         || h === l; //or href of last request ("l")
+        return h === currentURL; //for click requests
     }
 
     if(o === "!") return l = h; //store href in "l" (last request)
@@ -918,7 +919,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  prefetch: function(e) { //...target page on hoverIntent
        if(prefetchoff === true) return;
        var lnk = $.rq("v", e); // validate internal URL
-       if ($.rq("=") || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
+       if ($.rq("=", true) || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
        fn("+", lnk.href, function() { //prefetch page
             if (previewoff === true) return(false);
             if (!_isInDivs(lnk) && (previewoff === false || !_searchHints(lnk.href, previewoff))) _click(e, true);
