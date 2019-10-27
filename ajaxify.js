@@ -207,11 +207,9 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 // x - returns XHR
 // otherwise - returns selection of current page to client
 
-pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) { 
+pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) { 
     if (!o) return $.cache1(); //nothing passed -> return currently cached page
 	
-    if (o === "a") { if (xhr && xhr.readyState!=4) xhr.abort(); return;  }
-
     if (o.iO("/")) { //URL
         cb = p; //second parameter "p" must be callback
         if(plus == o) return; //same URL as in "plus" variable? -> return
@@ -223,6 +221,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         return _lPage(p, true); //load page with the URL, indicating a pre-fetch in second parameter (true)
     }
 	
+    if (o === "a") { if (xhr && xhr.readyState !== 4) xhr.abort(); return; }
+    if (o === "s") return ((xhr) ? xhr.readyState : 4) + rt; //return xhr ready state together with request type(rt)
     if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
     if (o === "x") return xhr; //return xhr object dynamically
 
@@ -271,7 +271,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
 		
     lAjax: function (hin, pre) { //execute Ajax load
         var ispost = $.rq("is"); //POST?
-                
+        if (pre) rt="p"; else rt="c"; //store request type (p-prefetch, c-click)
+
         xhr = $.ajax({ //central AJAX load, for both POSTs and GETs
         url: hin, //URL
         type: ispost ? "POST" : "GET", //POST or GET?
@@ -289,6 +290,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0 }, 0, function (o, p, p2) {
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
+            if (status === 'abort') {plus=0; return;} // handler for $.getPage("a") aborted requests, to avoid error
             try {
                 xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
                 _trigger("error", error); //raise general pronto.error event
@@ -659,7 +661,16 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     }
 
     if(o === "!") return l = h; //store href in "l" (last request)
-    
+
+    if (o === "isOK") {
+        let xs=$.getPage("s");
+        if (!xs.iO("4") && !p) $.getPage("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
+        if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
+        if (xs==="1p" && p) return true; //if xhr is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
+        //([semaphore options for requests] $.getPage("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
+        return true;
+    }
+
     if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
         if(!p) return false; //ensure data
         e = p; //store event internally
@@ -918,6 +929,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
   }, 
  prefetch: function(e) { //...target page on hoverIntent
        if(prefetchoff === true) return;
+       if (!$.rq("isOK", true)) return; //semaphore check for prefetch requests
        var lnk = $.rq("v", e); // validate internal URL
        if ($.rq("=", true) || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
        fn("+", lnk.href, function() { //prefetch page
@@ -939,6 +951,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       e.stopImmediatePropagation();
  },
  click: function(e, notPush) { //...handler for normal clicks
+      if (!$.rq("isOK")) return; //semaphore check for click requests
       var lnk = $.rq("v", e);  // validate internal URL
       if(!lnk || _exoticKey(e)) return; // Ignore everything but normal click
       if(lnk.href.substr(-1) ==="#") return true;
