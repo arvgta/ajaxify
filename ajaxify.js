@@ -531,52 +531,27 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
 // 1 - invoke first phase of animation
 // 2 - invoke second phase of animation
 // 3 - invoke third and last phase of animation
-pO("cd", { cd: 0, aniTrue: 0, frm: 0, cdwidth: 0 }, { maincontent: false, aniParams: false, aniTime: 0 }, function (o, p) {
+pO("cd", { cd: 0 }, { maincontent: false, fadeTime: 0 }, function (o, p) {
     if(!o) return; //Ensure operator
 	
     if(o === "s") return cd.stop(true, true); //Stop current animation on the main content element
     
     if(o === "g") return cd; //Fetch main content element
 
-    if(o === "i") { //Initialise (main content element, aniParams, frm)
+    if(o === "i") { //Initialise (main content element)
         cd = maincontent ? p.filter(maincontent) : p.last(); //Set to maincontent if given otherwise last element in DOM of selection
-        aniTrue = aniTime && aniParams; //aniTime and aniParams has to be set for animations to work
-        cdwidth = cd.width(); //Abbreviate cd width
-        if(!aniTrue) return; //Animations not enabled -> return
-		
-        aniParams = $.extend({ //override default aniParams with user aniParams
-            opacity: 1, // default - no fade
-            width: "100%", // default - no change in width
-            height: "100%" // default - no change in height
-        }, aniParams);
-		
-        aniParams = $.extend({ //calculate marginRight
-            marginRight: cdwidth - aniParams.width //making the content element width self-managing
-        }, aniParams);
-		
-        frm = $.extend({}, aniParams); //store in "frm" ("from" jQuery object) with aniParams
-		
-        for(var key in frm) { //iterate through "frm" collection
-            if (frm.hasOwnProperty(key)) { //real key?
-                var keyval = cd.css(key), keyOval = frm[key]; //Populate old / new key value
-
-                if((key === "height") && keyOval.iO("%")) { //Treat "height" specially
-                    keyval = 10000 / +keyOval.substr(0, keyOval.iO("%")-1) + "%"; //Calculate new height
-                }
-
-                frm[key] = keyval; //Store keyval in "frm"
-            }
-        }     
+	    return;
     }
 	
     if(!p) return; //Ensure data - further operations require data
 	
-    if(!aniTrue) { p(); return; } //Call callback, if animations disabled
+    if(!fadeTime) { p(); return; } //Call callback, if animations disabled
 	
     if (o === "1" || o === "2" || o === "3") { //Phases of animation
         cd.stop(true, true); //stop animation of main content element
         if(o === "3")  { p(); return; } //if last phase, do not spawn a new animation
-        cd.animate(o === "1" ? aniParams : frm, aniTime, p); //new animation
+        if(o === "1") cd.fadeOut(fadeTime, p);
+		else cd.fadeIn(fadeTime, p);
     }
 });
 
