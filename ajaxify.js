@@ -30,8 +30,6 @@ Options default values
  
 // visual effects settings
     requestDelay : 0, //in msec - Delay of Pronto request
-    aniTime : 0, //in msec - must be set for animations to work
-    aniParams : false, //Animation parameters - see below.  Default = off
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide hints to selectively disable
     scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
     bodyClasses : false, // Copy body classes from target page, set to "true" to enable
@@ -59,15 +57,6 @@ Options default values
 }
 
 
-Animation parameters (aniParams):  Default is false (set off) - specify aniTime and override the following aniParams:
-{
-    opacity: 1, //no fade, set to 0 for maximum fade
-    width: "100%", //in percent -  "100%" means no change
-    height: "100%" //in percent -  "100%" means no change
-}
-
-More animation parameters:
-You can specify any parameters that are understood by .animate() !
 */
 
 
