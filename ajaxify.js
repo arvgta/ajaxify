@@ -933,42 +933,42 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
      fn(url, _render); // Call "fn" - handler of parent, continue with _render()
   },
  doRender: function() { // Render HTML
-      _trigger("load");  // Fire load event
-      if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
-      $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
-      $("title").html(fn("title").html()); // Update title
-      _doRender2(); // Continue with _doRender2()
+     _trigger("load");  // Fire load event
+     if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
+     $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
+     $("title").html(fn("title").html()); // Update title
+     _doRender2(); // Continue with _doRender2()
   },
  doRender2: function() { // Continue render
-      var e = $.rq("e"), // Fetch event 
-      url = _getURL(e); // Get URL from event
-      url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
-      $.frms("a"); // Ajaxify forms - in content divs only
+     var e = $.rq("e"), // Fetch event 
+     url = _getURL(e); // Get URL from event
+     url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
+     $.frms("a"); // Ajaxify forms - in content divs only
            
-      $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
+     $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
 
       // Stop animations + finishing off
-      $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
-      _gaCaptureView(url); // Trigger analytics page view
-      _trigger("render"); // Fire render event
-      if(passCount) $("#" + passCount).html("Pass: " + pass);
-      if(cb) cb(); // Callback users handler, if specified
+     $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
+     _gaCaptureView(url); // Trigger analytics page view
+     _trigger("render"); // Fire render event
+     if(passCount) $("#" + passCount).html("Pass: " + pass);
+     if(cb) cb(); // Callback users handler, if specified
   },
  getURL: function(e) { // Get URL from event
-      return typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
+     return typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
   },
  gaCaptureView: function(url) { // Google Analytics support
-      url = "/" + url.replace(rootUrl,"");
-      if (typeof window.ga !== "undefined") window.ga("send", "pageview", url); // the new analytics API
-      else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", url]);  // the old API					
+     url = "/" + url.replace(rootUrl,"");
+     if (typeof window.ga !== "undefined") window.ga("send", "pageview", url); // the new analytics API
+     else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", url]);  // the old API					
   },
  exoticKey: function(e) { //not a real click, or target = "_blank", or WP-Admin link
-      var url = _getURL(e); // Get URL from event
-      return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
+     var url = _getURL(e); // Get URL from event
+     return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
           || url.iO("wp-login") || url.iO("wp-admin"));
   },
  hashChange: function(link) { // only hash has changed
-      return (link.hash && link.href.replace(link.hash, "") === window.location.href.replace(location.hash, "") || link.href === window.location.href + "#");
+     return (link.hash && link.href.replace(link.hash, "") === window.location.href.replace(location.hash, "") || link.href === window.location.href + "#");
   }
 });
 
