@@ -741,19 +741,6 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     }
 });
 
-
-// The RqTimer plugin - stands for request Timer
-// Works on requestDelay setting
-// Switch (p) values:
-// - - clear Timer
-// function - set Timer according to requestDelay, using function in p as a callback
-pO("rqTimer", { requestTimer: 0 }, { requestDelay: 0 }, function (o) {
-    if(!o) return; //ensure operator
-
-    if(o === "-" && requestTimer) return clearTimeout(requestTimer); //clear timer
-    if(typeof(o) === "function") requestTimer = setTimeout(o, requestDelay); //set timer
-});
-
 // The stateful Offsets plugin
 // Usage: 
 // 1) $.offsets(<URL>) - returns offset of specified URL from internal array
@@ -833,7 +820,7 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, passCount: false }, function ($this, h) {
+pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
      if(!h) return; //ensure data
      
      if(h === "i") { //request to initialise
@@ -843,7 +830,6 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
          $.cd(0, 0, s); //initialise content element sub-plugin
          $.frms(0, 0, s); //initialise forms sub-plugin
          $.slides(0, s); //initialise slideshow sub-plugin
-         $.rqTimer(0, s); //initialise request timer sub-plugin
          $.scrolly(0, s); //initialise scroll effects sub-plugin
          $.cd("i", $gthis); //second phase of initialisation of content element sub-plugin
          _init_p(); //initialise Pronto sub-plugin
@@ -927,22 +913,24 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
           _render(); // continue with _render()
       });
   },
- render: function() { // Clear and set timer
-      $.rqTimer("-"); // Clear
-      _trigger("beforeload");
-      $.rqTimer(_doRender); // Set
+ render: function() { // Clear and set timer for requestDelay
+     _trigger("beforeload");
+     if(requestDelay) { //only needs handling if requestDelay set (not 0)
+         if(requestTimer) clearTimeout(requestTimer); // Clear
+         requestTimer = setTimeout(_doRender, requestDelay); // Set - unconditionally
+     } else _doRender(); //requestDelay is 0 -> continue
   },
  onPop: function(e) { // Handle back/forward navigation
-      $.rq("i"); //Initialise request in general
-      $.rq("e", e); //Initialise request event
-      $.rq("p", false); //We don't want to re-push
-      $.scrolly("+");
+     $.rq("i"); //Initialise request in general
+     $.rq("e", e); //Initialise request event
+     $.rq("p", false); //We don't want to re-push
+     $.scrolly("+");
             
-      var data = e.originalEvent.state, url = data ? data.url : 0;
+     var data = e.originalEvent.state, url = data ? data.url : 0;
            
-      if (!url || url === currentURL) return;  // Check if data exists
-      _trigger("request"); // Fire request event
-      fn(url, _render); // Call "fn" - handler of parent, continue with _render()
+     if (!url || url === currentURL) return;  // Check if data exists
+     _trigger("request"); // Fire request event
+     fn(url, _render); // Call "fn" - handler of parent, continue with _render()
   },
  doRender: function() { // Render HTML
       _trigger("load");  // Fire load event
