@@ -516,14 +516,9 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
 // First parameter (o) is switch:
 // s - stop current animation on the main content element
 // g - fetch main content element
-// i - initialise (main content element, aniParams, frm)
-// 1 - invoke first phase of animation
-// 2 - invoke second phase of animation
-// 3 - invoke third and last phase of animation
-pO("cd", { cd: 0 }, { maincontent: false, fadeTime: 0 }, function (o, p) {
+// i - initialise (main content element)
+pO("cd", { cd: 0 }, { maincontent: false}, function (o, p) {
     if(!o) return; //Ensure operator
-	
-    if(o === "s") return cd.stop(true, true); //Stop current animation on the main content element
     
     if(o === "g") return cd; //Fetch main content element
 
@@ -532,16 +527,7 @@ pO("cd", { cd: 0 }, { maincontent: false, fadeTime: 0 }, function (o, p) {
 	    return;
     }
 	
-    if(!p) return; //Ensure data - further operations require data
-	
-    if(!fadeTime) { p(); return; } //Call callback, if animations disabled
-	
-    if (o === "1" || o === "2" || o === "3") { //Phases of animation
-        cd.stop(true, true); //stop animation of main content element
-        if(o === "3")  { p(); return; } //if last phase, do not spawn a new animation
-        if(o === "1") cd.fadeOut(fadeTime, p);
-		else cd.fadeIn(fadeTime, p);
-    }
+    if(p) p(); //Should be unreachable, but just for safety purposes
 });
 
 // The Slides plugin - stands for slideshow / carousel
@@ -944,7 +930,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
  render: function() { // Clear and set timer
       $.rqTimer("-"); // Clear
       _trigger("beforeload");
-      $.rqTimer(function() { $.cd("1", _doRender); }); // Set.  Animate to
+      $.rqTimer(_doRender); // Set
   },
  onPop: function(e) { // Handle back/forward navigation
       $.rq("i"); //Initialise request in general
@@ -963,7 +949,7 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
       $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
       $("title").html(fn("title").html()); // Update title
-      $.cd("2", _doRender2); // Animate back - continue with _doRender2()
+      _doRender2(); // Continue with _doRender2()
   },
  doRender2: function() { // Continue render
       var e = $.rq("e"), // Fetch event 
@@ -972,13 +958,13 @@ pO("pronto", { $gthis: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, 
       $.frms("a"); // Ajaxify forms - in content divs only
            
       $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
-      $.cd("3", function() { // Stop animations + finishing off
-         $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
-         _gaCaptureView(url); // Trigger analytics page view
-         _trigger("render"); // Fire render event
-         if(passCount) $("#" + passCount).html("Pass: " + pass);
-         if(cb) cb(); // Callback users handler, if specified
-      });
+
+      // Stop animations + finishing off
+      $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
+      _gaCaptureView(url); // Trigger analytics page view
+      _trigger("render"); // Fire render event
+      if(passCount) $("#" + passCount).html("Pass: " + pass);
+      if(cb) cb(); // Callback users handler, if specified
   },
  getURL: function(e) { // Get URL from event
       return typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
