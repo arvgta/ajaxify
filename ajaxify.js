@@ -66,9 +66,6 @@ String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 //Minified hoverIntent plugin
 !function(a){"use strict";"function"==typeof define&&define.amd?define(["jquery"],a):jQuery&&!jQuery.fn.hoverIntent&&a(jQuery)}(function(a){"use strict";var d,e,b={interval:100,sensitivity:6,timeout:0},c=0,f=function(a){d=a.pageX,e=a.pageY},g=function(a,b,c,h){return Math.sqrt((c.pX-d)*(c.pX-d)+(c.pY-e)*(c.pY-e))<h.sensitivity?(b.off(c.event,f),delete c.timeoutId,c.isActive=!0,a.pageX=d,a.pageY=e,delete c.pX,delete c.pY,h.over.apply(b[0],[a])):(c.pX=d,c.pY=e,c.timeoutId=setTimeout(function(){g(a,b,c,h)},h.interval),void 0)},h=function(a,b,c,d){return delete b.data("hoverIntent")[c.id],d.apply(b[0],[a])};a.fn.hoverIntent=function(d,e,i){var j=c++,k=a.extend({},b);a.isPlainObject(d)?(k=a.extend(k,d),a.isFunction(k.out)||(k.out=k.over)):k=a.isFunction(e)?a.extend(k,{over:d,out:e,selector:i}):a.extend(k,{over:d,out:d,selector:e});var l=function(b){var c=a.extend({},b),d=a(this),e=d.data("hoverIntent");e||d.data("hoverIntent",e={});var i=e[j];i||(e[j]=i={id:j}),i.timeoutId&&(i.timeoutId=clearTimeout(i.timeoutId));var l=i.event="mousemove.hoverIntent.hoverIntent"+j;if("mouseenter"===b.type){if(i.isActive)return;i.pX=c.pageX,i.pY=c.pageY,d.off(l,f).on(l,f),i.timeoutId=setTimeout(function(){g(c,d,i,k)},k.interval)}else{if(!i.isActive)return;d.off(l,f),i.timeoutId=setTimeout(function(){h(c,d,i,k.out)},k.timeout)}};return this.on({"mouseenter.hoverIntent":l,"mouseleave.hoverIntent":l},k.selector)}});
 
-//Minified idle plugin
-!function(n){"use strict";n.fn.idle=function(e){var t,o,i={idle:6e4,events:"mousemove keydown mousedown touchstart",onIdle:function(){},onActive:function(){}},u=!1,c=n.extend({},i,e),l=null;return n(this).on("idle:kick",{},function(n){l=o(c)}),t=function(n,e){return u&&(e.onActive.call(),u=!1),clearTimeout(n),o(e)},o=function(n){var e,t=setTimeout;return e=t(function(){u=!0,n.onIdle.call()},n.idle)},this.each(function(){l=o(c),n(this).on(c.events,function(n){l=t(l,c)})})}}(jQuery);
-
 //Module global variables
 var lvl = 0, pass = 0, currentURL = "", rootUrl = getRootUrl(), api = window.history && window.history.pushState && window.history.replaceState,
 
@@ -530,63 +527,6 @@ pO("cd", { cd: 0 }, { maincontent: false}, function (o, p) {
     if(p) p(); //Should be unreachable, but just for safety purposes
 });
 
-// The Slides plugin - stands for slideshow / carousel
-// Enable a slideshow on the main content element
-// idleTime must be set to enable the slideshow
-// Switch (o) values:
-// i - initailise
-pO("slides", { timer: false, currEl: 0, currentLink: 0}, { idleTime: 0, slideTime: 0, menu: false, addclass: "jqhover"}, function (o) {
-    if(!o || !idleTime) return; //Ensure data
-	
-    if (o === "i") { //Initialise
-        $(document).idle({ onIdle: _onIdle, onActive: _onActive, idle: idleTime }); //Initialise idle plugin
-        $(window).on("popstate", _onActive); // Set handler for popState
-    }
-}, {
-    onIdle: function(){ //User was not active for given idleTime
-        if(timer !== false) return; //Already idle -> nothing to do		
-        _trigger("idle"); //Fire generic event		
-        _slide1(true); //Commence slideshow - perform a single slide - indicating pushState
-        timer = setInterval(_slide1, slideTime); //"_slide1" to be called periodically, indicating replaceState
-    },
-    onActive: function(){ //User has become active again
-        _trigger("active"); //Fire generic event
-        if(currEl) currEl.removeClass(addclass); //Remove class from currEl
-        if(timer !== false) clearInterval(timer); //If timer set -> clear timer
-        timer = false; //reset timer value
-    },
-    slide1: function(push) { //Perform a single slide - "push" indicates History API modus: pushState, otherwise replaceState
-        currentLink = _nextLink(); //Get next URL from menu 
-        $().pronto( push ? { href: currentLink } : currentLink); //Call Pronto to change to that page programmatically
-    }, 
-    nextLink: function() { //Fetch next URL and manage transition to next page
-        var wasPrev = false, firstValue = false, firstLink = false, nextLink = false, lnk; //Declare variables needed with defaults
-        $(menu).each(function(i, v){ //Iterate through menu
-            var el = $(this).parent(); //Get parent of menu element
-            if(nextLink) return(true); //nextLink already found -> return
-            lnk = v.href; //fetch href of element
-            if(!_internal(lnk)) return; //verify internal
-            el.removeClass(addclass); //remove old highlight
-            if(!firstValue) firstValue = $(this).parent(); //populate firstValue
-            if(!firstLink) firstLink = lnk; //populate firstLink
-            if(wasPrev) { 
-                nextLink = lnk;
-                currEl = el;
-                el.addClass(addclass);
-            }
-            else if(currentURL == lnk) wasPrev = true;
-        });
-			
-        if(!nextLink) { //end of menu found
-             firstValue.addClass(addclass); //highlight firstValue
-             nextLink = firstLink; //start at the top again
-             currEl = firstValue; //set currEl to top value
-        }
-		
-        return nextLink; //return next URL
-    }
-});
-
 // The Rq plugin - stands for request
 // Stores all kinds of and manages data concerning the pending request
 // Simplifies the Pronto plugin by managing request data separately, instead of passing it around...
@@ -647,7 +587,6 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
         return h; //href
     }
     
-    //if(o === "c") return c; //return "c" (currentTarget)
     if(o === "e") { //set / get internal "e" (event)
         if(p) e = p;
         return e ? e : h; // Return "e" or if not given "h"
@@ -829,7 +768,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
          $gthis = $this; //copy selection to global selector
          $.cd(0, 0, s); //initialise content element sub-plugin
          $.frms(0, 0, s); //initialise forms sub-plugin
-         $.slides(0, s); //initialise slideshow sub-plugin
+         if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
          $.scrolly(0, s); //initialise scroll effects sub-plugin
          $.cd("i", $gthis); //second phase of initialisation of content element sub-plugin
          _init_p(); //initialise Pronto sub-plugin
@@ -860,7 +799,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
     $.frms("d", $body); // Select forms in whole body
     $.frms("a"); // Ajaxify forms
     $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
-    $.slides("i"); // Init slideshow
+    if($.slides) $.slides("i"); // Init slideshow
   }, 
  prefetch: function(e) { //...target page on hoverIntent
        if(prefetchoff === true) return;
