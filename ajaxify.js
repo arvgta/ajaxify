@@ -876,10 +876,8 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
      if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
      $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
      $("title").html(fn("title").html()); // Update title
-     _doRender2(); // Continue with _doRender2()
-  },
- doRender2: function() { // Continue render
-     var e = $.rq("e"), // Fetch event 
+     
+	 var e = $.rq("e"), // Fetch event 
      url = _getURL(e); // Get URL from event
      url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
      $.frms("a"); // Ajaxify forms - in content divs only
