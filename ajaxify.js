@@ -16,14 +16,13 @@ Ajaxifies the whole site, dynamically replacing the element with the ID '#conten
 If several elements should be swapped, just specify their IDs like this:
 jQuery('#content, #nav').ajaxify();
 
-The plugin can take an arbitrary amount of IDs, however the last one in the DOM or the one specified by "maincontent" should specify the main content element
+The plugin can take an arbitrary amount of IDs
 
 
 Options default values
 {
 // basic config parameters
     selector : "a:not(.no-ajaxy)",  //Selector for elements to trigger swapping - not those to be swapped - e.g. a selection of links
-    maincontent : false, //Default main content is last element of selection, specify a value like "#content" to override
     forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
     canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
     refresh : false, // Refresh the page even if link clicked is current page
@@ -83,6 +82,7 @@ linki = '<link rel="stylesheet" type="text/css" href="*" />',
 scri = '<script src="*"></script>',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
+inlineclass = "ajy-inline";
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var i=n[o];t+=e?",\n":"",t+="function"==typeof i?"_"+o+" = "+iLog(i.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(i)),e++}return t+";"}function pO(n,r,t,e,o,i){var s="",a="",f="",l="",u="",g="",p=!1,c=!1,v=mbp;if(!n||!e)return void alert("Error in pO(): Missing parameter");if(funStr=e.toString(),funStr=iLog(funStr,n),s=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),u=getParamNames(e),p=u.iO("$this"),c=u.iO("options"),g=u.replace("$this, ",""),g="$this"==u?"":g,t&&!c&&(g+=""===g?"options":", options"),r&&(a=JSON2Str(r)),t&&(f="var settings = $.extend("+JSON.stringify(t)+", options);\n",f+=JSON2Str(t,1)),o&&(l=JSON2Str(o)),t||(v=v.replace(/\(options/g,"(")),p||(v=v.replace("var $this = $(this);","")),v=v.replace(/fnn/g,p?"fn."+n:n).replace(/Name/g,s).replace("funStr",funStr).replace("pVars",a).replace("pSettings",f).replace("pFns",l).replace("args",u).replace("arg0",g),codedump&&console.log(v),!i)try{jQuery.globalEval(v)}catch(S){alert("Error : "+S+" | "+v)}}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(void 0!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}",n.replace(/return /g,"return --lvl, ").replace(/return;/g,"return --lvl, undefined;")):n}var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
@@ -222,6 +222,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
     lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
         pass++; //central increment of "pass" variable
         _lDivs($t); //load selection specified in "$t" into DOM
+        $("body").remove("." + inlineclass); //remove all previously dynamically added inline scripts
         $.scripts(true); //invoke delta-loading of JS
         $.scripts("s"); //invoke delta-loading of CSS
         return $.scripts("c"); //return canonical URL
@@ -392,8 +393,8 @@ pO("scripts", { $s : false }, { canonical: false, inline: true, inlinehints: fal
             }
         }
     },
-    apptext: function ($s) {  
-        $s.clone().appendTo($.cd("g"));
+    apptext: function ($s) { //Add one inline JS script - commit
+        $s.clone().addClass(inlineclass).appendTo("body"); //label with inlineclass to make dynamic removal later on easy
     },
     addstyle: function (t) { //add a single style tag
         $("head").append('<style>' + t + '</style>');
@@ -507,25 +508,6 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
     }
 );
 
-// The Cd plugin
-// Manages various operations on the main content element
-// Second parameter (p) is callback
-// First parameter (o) is switch:
-// s - stop current animation on the main content element
-// g - fetch main content element
-// i - initialise (main content element)
-pO("cd", { cd: 0 }, { maincontent: false}, function (o, p) {
-    if(!o) return; //Ensure operator
-    
-    if(o === "g") return cd; //Fetch main content element
-
-    if(o === "i") { //Initialise (main content element)
-        cd = maincontent ? p.filter(maincontent) : p.last(); //Set to maincontent if given otherwise last element in DOM of selection
-	    return;
-    }
-	
-    if(p) p(); //Should be unreachable, but just for safety purposes
-});
 
 // The Rq plugin - stands for request
 // Stores all kinds of and manages data concerning the pending request
@@ -754,7 +736,6 @@ pO("hApi", 0, 0, function (o, p) {
 
 // The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
 // Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
-// Last element in order of the DOM should be the main content element, unless overriden by "maincontent"
 // Switch (h) values:
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
@@ -766,11 +747,9 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
          var s = settings; //abbreviation
          if(!$this.length) $.log("Warning - empty content selector passed!");
          $gthis = $this; //copy selection to global selector
-         $.cd(0, 0, s); //initialise content element sub-plugin
          $.frms(0, 0, s); //initialise forms sub-plugin
          if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
          $.scrolly(0, s); //initialise scroll effects sub-plugin
-         $.cd("i", $gthis); //second phase of initialisation of content element sub-plugin
          _init_p(); //initialise Pronto sub-plugin
          return $this; //return jQuery selector for chaining
      }
@@ -875,7 +854,6 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
      _trigger("load");  // Fire load event
      if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
      $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
-     $("title").html(fn("title").html()); // Update title
      
 	 var e = $.rq("e"), // Fetch event 
      url = _getURL(e); // Get URL from event
@@ -883,6 +861,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
      $.frms("a"); // Ajaxify forms - in content divs only
            
      $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
+     $("title").html(fn("title").html()); // Update title
 
       // Stop animations + finishing off
      $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
