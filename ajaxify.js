@@ -32,10 +32,6 @@ Options default values
     previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide hints to selectively disable
     scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
     bodyClasses : false, // Copy body classes from target page, set to "true" to enable
-    idleTime: 0, //in msec - master switch for slideshow / carousel - default "off"
-    slideTime: 0, //in msec - time between slides
-    menu: false, //Selector for links in the menu
-    addclass: "jqhover", //Class that gets added dynamically to the highlighted element in the slideshow
  
 // script and style handling settings, prefetch
     deltas : true, // true = deltas loaded, false = all scripts loaded
@@ -220,7 +216,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
 }, {
     lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
         pass++; //central increment of "pass" variable
-        _lDivs($t); //load selection specified in "$t" into DOM
+        _lEls($t); //load selection specified in "$t" into DOM
         $("body > script").remove("." + inlineclass); //remove all previously dynamically added inline scripts
         $.scripts(true); //invoke delta-loading of JS
         $.scripts("s"); //invoke delta-loading of CSS
@@ -249,7 +245,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         $t.html($c.html()); //inject element into primary DOM
     },
 	
-    lDivs: function ($t) { //load target selections into DOM
+    lEls: function ($t) { //load target selections into DOM
         if ($.cache1()) $t.each(function() { //iterate through elements
             _ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
         });
@@ -276,7 +272,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         },
         error: function(jqXHR, status, error) {
         // Try to parse response text
-            if (status === 'abort') {plus=0; return;} // handler for $.getPage("a") aborted requests, to avoid error
+            if (status === 'abort') {plus=0; return;} // handler for fn("a") aborted requests, to avoid error
             try {
                 xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
                 _trigger("error", error); //raise general pronto.error event
@@ -408,9 +404,9 @@ pO("scripts", { $s : false }, { canonical: false, inline: true, inlinehints: fal
 // Fetches all external scripts on the page
 // Fetches all inline scripts on the page
 pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
-    head = pass ? $.getPage("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+    head = pass ? fn("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
     lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-    j = pass ? $.getPage("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+    j = pass ? fn("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
     $s.c = _rel(lk, "stylesheet"); //Extract stylesheets
     $s.y = head.find("style"); //Extract style tags
     $s.can = _rel(lk, "canonical"); //Extract canonical tag
@@ -529,11 +525,11 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     if(o === "!") return l = h; //store href in "l" (last request)
 
     if (o === "isOK") {
-        let xs=$.getPage("s");
-        if (!xs.iO("4") && !p) $.getPage("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
+        let xs=fn("s");
+        if (!xs.iO("4") && !p) fn("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
         if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
         if (xs==="1p" && p) return true; //if xhr is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
-        //([semaphore options for requests] $.getPage("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
+        //([semaphore options for requests] fn("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
         return true;
     }
 
