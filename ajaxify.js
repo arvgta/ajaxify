@@ -245,7 +245,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         $t.html($c.html()); //inject element into primary DOM
     },
 	
-    lEls: function ($t) { //load target selections into DOM
+    lEls: function ($t) { //load target selection into DOM
         if ($.cache1()) $t.each(function() { //iterate through elements
             _ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
         });
