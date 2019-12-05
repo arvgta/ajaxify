@@ -288,7 +288,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
 	
     isHtml: function (x) { //restrict interesting MIME types - only (X)HTML / FORM-family
         var d;
-        return (d = x.getResponseHeader("Content-Type")), d && (d.iO("html") || d.iO("form"));
+        return (d = x.getResponseHeader("Content-Type")), d && (d.iO("html") || d.iO("form-"));
     },
 	
     parseHTML: function (h) { //process fetched HTML
