@@ -505,6 +505,8 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
 // Second parameter (p) : data
 // First parameter (o) values:
 // = - check whether internally stored "href" ("h") variable is the same as the global currentURL
+// ! - update last request ("l") variable with passed href
+// ? - Edin's intelligent plausibility check - can spawn an external XHR abort
 // v - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
 // i - initialise request defaults and return "c" (currentTarget)
 // h - access internal href hard
@@ -524,7 +526,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 
     if(o === "!") return l = h; //store href in "l" (last request)
 
-    if (o === "isOK") {
+    if(o === "?") { //Edin previously called this "isOK" - powerful intelligent plausibility check
         let xs=fn("s");
         if (!xs.iO("4") && !p) fn("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
         if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
@@ -772,7 +774,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
     }, 
     prefetch: function(e) { //...target page on hoverIntent
         if(prefetchoff === true) return;
-        if (!$.rq("isOK", true)) return; //semaphore check for prefetch requests
+        if (!$.rq("?", true)) return; //semaphore check for prefetch requests
         var lnk = $.rq("v", e); // validate internal URL
         if ($.rq("=", true) || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
         fn("+", lnk.href, function() { //prefetch page
@@ -794,7 +796,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
         e.stopImmediatePropagation();
     },
     click: function(e, notPush) { //...handler for normal clicks
-        if (!$.rq("isOK")) return; //semaphore check for click requests
+        if(!$.rq("?")) return; //semaphore check for click requests
         var lnk = $.rq("v", e);  // validate internal URL
         if(!lnk || _exoticKey(e)) return; // Ignore everything but normal click
         if(lnk.href.substr(-1) ==="#") return true;
