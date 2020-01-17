@@ -617,7 +617,6 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         else h = currentURL; //not found -> select current URL
                 
         $.rq("i"); //initialise request
-        //$.rq("p", false); //Don't push (twice)
                
         if (g == "get") h = _b(h, p); //GET -> copy URL parameters
         else {
