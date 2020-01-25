@@ -510,7 +510,6 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
 // v - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
 // i - initialise request defaults and return "c" (currentTarget)
 // h - access internal href hard
-// c - get internal "c" (currentTarget)
 // e - set / get internal "e" (event)
 // p - set / get internal "p" (push flag)
 // is - set / get internal "ispost" (flag whether request is a POST)
