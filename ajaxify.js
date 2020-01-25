@@ -515,8 +515,8 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
 // p - set / get internal "p" (push flag)
 // is - set / get internal "ispost" (flag whether request is a POST)
 // d - set / get internal "d" (data for central $.ajax())
-// can - set / get internal "can" ("href" of canonical URL)
-// can? - check whether simple canonical URL is given and return, otherwise return value passed in "p"
+// C - set / get internal "can" ("href" of canonical URL)
+// c - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, function (o, p) {
     if(o === "=") { 
         if(p) return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
@@ -581,12 +581,12 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
         return data;
     }
 	
-    if(o === "can") { //set internal "can" ("href" of canonical URL)
+    if(o === "C") { //set internal "can" ("href" of canonical URL)
         if(p !== undefined) can = p;
         return can;
     }
 	
-    if(o === "can?") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
+    if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
 });
 
 // The Frms plugin - stands for forms
@@ -845,11 +845,11 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
     doRender: function() { // Render HTML
         _trigger("load");  // Fire load event
         if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
-        $.rq("can", fn("-", $gthis)); // Update DOM and fetch canonical URL
+        $.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
         
         var e = $.rq("e"), // Fetch event 
         url = _getURL(e); // Get URL from event
-        url = $.rq("can?", url); // Fetch canonical if no hash or parameters in URL
+        url = $.rq("c", url); // Fetch canonical if no hash or parameters in URL
         $.frms("a"); // Ajaxify forms - in content divs only
             
         $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
