@@ -81,7 +81,7 @@ scrr = 'script[src*="!"]';
 inlineclass = "ajy-inline";
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
-var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var s=n[o];t+=e?",\n":"",t+="function"==typeof s?"_"+o+" = "+iLog(s.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(s)),e++}return t+";"}function pO(n,r,t,e,o,s){var i,a,l,f="",g="",u="",p="",c="",S=mbp;if(n&&e){if(funStr=iLog(funStr=e.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),a=(p=getParamNames(e)).iO("$this"),l=p.iO("options"),c=p.replace("$this, ",""),c="$this"==p?"":c,t&&!l&&(c+=""===c?"options":", options"),r&&(f=JSON2Str(r)),t&&(g="var settings = $.extend("+JSON.stringify(t)+", options);\n",g+=JSON2Str(t,1)),o&&(u=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),a||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,a?"fn."+n:n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",f).replace("pSettings",g).replace("pFns",u).replace("args",p).replace("arg0",c),codedump&&console.log(S),!s)try{jQuery.globalEval(S)}catch(n){alert("Error : "+n+" | "+S)}}else alert("Error in pO(): Missing parameter")}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(null!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}").replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;"):n}pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
+//var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var s=n[o];t+=e?",\n":"",t+="function"==typeof s?"_"+o+" = "+iLog(s.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(s)),e++}return t+";"}function pO(n,r,t,e,o,s){var i,a,l,f="",g="",u="",p="",c="",S=mbp;if(n&&e){if(funStr=iLog(funStr=e.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),a=(p=getParamNames(e)).iO("$this"),l=p.iO("options"),c=p.replace("$this, ",""),c="$this"==p?"":c,t&&!l&&(c+=""===c?"options":", options"),r&&(f=JSON2Str(r)),t&&(g="var settings = $.extend("+JSON.stringify(t)+", options);\n",g+=JSON2Str(t,1)),o&&(u=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),a||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,a?"fn."+n:n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",f).replace("pSettings",g).replace("pFns",u).replace("args",p).replace("arg0",c),codedump&&console.log(S),!s)try{jQuery.globalEval(S)}catch(n){alert("Error : "+n+" | "+S)}}else alert("Error in pO(): Missing parameter")}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(null!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}").replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;"):n}pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
@@ -537,8 +537,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
         if(!p) return false; //ensure data
         e = p; //store event internally
-        c = e.currentTarget; //extract currentTarget
-        h = c.href; //extract href
+        h = typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //extract href
         if(!_internal(h)) return false; //if not internal -> report failure
         o = "i"; //continue with "i"
     }
@@ -548,7 +547,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
         data = null; //reset data
         push = true; //assume we want to push URL to the History API
         can = false; //reset can (canonical URL)
-        return c; //return "c" (currentTarget)
+        return h; //return "h" (href)
     }
     
     if(o === "h") { // Access href hard
@@ -774,17 +773,17 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
     prefetch: function(e) { //...target page on hoverIntent
         if(prefetchoff === true) return;
         if (!$.rq("?", true)) return; //semaphore check for prefetch requests
-        var lnk = $.rq("v", e); // validate internal URL
-        if ($.rq("=", true) || !lnk || _searchHints(lnk.href, prefetchoff)) return; //same page, no data or selected out
-        fn("+", lnk.href, function() { //prefetch page
+        var href = $.rq("v", e); // validate internal URL
+        if ($.rq("=", true) || !href || _searchHints(href, prefetchoff)) return; //same page, no data or selected out
+        fn("+", href, function() { //prefetch page
                 if (previewoff === true) return(false);
-                if (!_isInDivs(lnk) && (previewoff === false || !_searchHints(lnk.href, previewoff))) _click(e, true);
+                if (!_isInDivs() && (previewoff === false || !_searchHints(href, previewoff))) _click(e, true);
         });
     },
-    isInDivs: function(lnk) {
+    isInDivs: function() {
         var is = false;
         $gthis.each(function() {
-            if ($(lnk).parents("#" + $(this).attr("id")).length > 0) is = true;
+            if ($($.rq("e")).parents("#" + $(this).attr("id")).length > 0) is = true;
         });      
             
         return is;
@@ -796,11 +795,11 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
     },
     click: function(e, notPush) { //...handler for normal clicks
         if(!$.rq("?")) return; //semaphore check for click requests
-        var lnk = $.rq("v", e);  // validate internal URL
-        if(!lnk || _exoticKey(e)) return; // Ignore everything but normal click
-        if(lnk.href.substr(-1) ==="#") return true;
-        if(_hashChange(lnk)) { // only hash part has changed
-            $.hApi("=", lnk.href); // commit new URL to History API
+        var href = $.rq("v", e);  // validate internal URL
+        if(!href || _exoticKey()) return; // Ignore everything but normal click
+        if(href.substr(-1) ==="#") return true;
+        if(_hashChange()) { // only hash part has changed
+            $.hApi("=", href); // commit new URL to History API
             return true; // Enable default behaviour and return - does not invoke a full page load!
         }
 
@@ -846,36 +845,33 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
         if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
         $.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
         
-        var e = $.rq("e"), // Fetch event 
-        url = _getURL(e); // Get URL from event
-        url = $.rq("c", url); // Fetch canonical if no hash or parameters in URL
+        var href = $.rq("h"), // Retrieve href 
+        href = $.rq("c", href); // Fetch canonical if no hash or parameters in URL
         $.frms("a"); // Ajaxify forms - in content divs only
             
-        $.hApi($.rq("p") ? "+" : "=", url); // Push new state to the stack on new url
+        $.hApi($.rq("p") ? "+" : "=", href); // Push new state to the stack on new url
         $("title").html(fn("title").html()); // Update title
 
         // Stop animations + finishing off
         $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
-        _gaCaptureView(url); // Trigger analytics page view
+        _gaCaptureView(href); // Trigger analytics page view
         _trigger("render"); // Fire render event
         if(passCount) $("#" + passCount).html("Pass: " + pass);
         if(cb) cb(); // Callback users handler, if specified
     },
-    getURL: function(e) { // Get URL from event
-        return typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e;					
+    gaCaptureView: function(href) { // Google Analytics support
+        href = "/" + href.replace(rootUrl,"");
+        if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); // the new analytics API
+        else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);  // the old API					
     },
-    gaCaptureView: function(url) { // Google Analytics support
-        url = "/" + url.replace(rootUrl,"");
-        if (typeof window.ga !== "undefined") window.ga("send", "pageview", url); // the new analytics API
-        else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", url]);  // the old API					
-    },
-    exoticKey: function(e) { //not a real click, or target = "_blank", or WP-Admin link
-        var url = _getURL(e); // Get URL from event
+    exoticKey: function() { //not a real click, or target = "_blank", or WP-Admin link
+        var href = $.rq("h"), e = $.rq("e"); //Shorthands for href and event
         return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
-            || url.iO("wp-login") || url.iO("wp-admin"));
+            || href.iO("wp-login") || href.iO("wp-admin"));
     },
-    hashChange: function(link) { // only hash has changed
-        return (link.hash && link.href.replace(link.hash, "") === window.location.href.replace(location.hash, "") || link.href === window.location.href + "#");
+    hashChange: function() { // only hash has changed
+        var e = $.rq("e");
+		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
     }
 });
 
