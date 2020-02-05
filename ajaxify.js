@@ -81,7 +81,7 @@ scrr = 'script[src*="!"]';
 inlineclass = "ajy-inline";
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
-//var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var s=n[o];t+=e?",\n":"",t+="function"==typeof s?"_"+o+" = "+iLog(s.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(s)),e++}return t+";"}function pO(n,r,t,e,o,s){var i,a,l,f="",g="",u="",p="",c="",S=mbp;if(n&&e){if(funStr=iLog(funStr=e.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),a=(p=getParamNames(e)).iO("$this"),l=p.iO("options"),c=p.replace("$this, ",""),c="$this"==p?"":c,t&&!l&&(c+=""===c?"options":", options"),r&&(f=JSON2Str(r)),t&&(g="var settings = $.extend("+JSON.stringify(t)+", options);\n",g+=JSON2Str(t,1)),o&&(u=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),a||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,a?"fn."+n:n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",f).replace("pSettings",g).replace("pFns",u).replace("args",p).replace("arg0",c),codedump&&console.log(S),!s)try{jQuery.globalEval(S)}catch(n){alert("Error : "+n+" | "+S)}}else alert("Error in pO(): Missing parameter")}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(null!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}").replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;"):n}pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
+var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var s=n[o];t+=e?",\n":"",t+="function"==typeof s?"_"+o+" = "+iLog(s.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(s)),e++}return t+";"}function pO(n,r,t,e,o,s){var i,a,l,f="",g="",u="",p="",c="",S=mbp;if(n&&e){if(funStr=iLog(funStr=e.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),a=(p=getParamNames(e)).iO("$this"),l=p.iO("options"),c=p.replace("$this, ",""),c="$this"==p?"":c,t&&!l&&(c+=""===c?"options":", options"),r&&(f=JSON2Str(r)),t&&(g="var settings = $.extend("+JSON.stringify(t)+", options);\n",g+=JSON2Str(t,1)),o&&(u=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),a||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,a?"fn."+n:n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",f).replace("pSettings",g).replace("pFns",u).replace("args",p).replace("arg0",c),codedump&&console.log(S),!s)try{jQuery.globalEval(S)}catch(n){alert("Error : "+n+" | "+S)}}else alert("Error in pO(): Missing parameter")}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(null!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}").replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;"):n}pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
 
 //getRootUrl() from Baluptons history.js
 function getRootUrl(){var a=window.location.protocol+"//"+(window.location.hostname||window.location.host);if(window.location.port||!1)a+=":"+window.location.port;return a+="/",a;}
@@ -536,8 +536,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 
     if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
         if(!p) return false; //ensure data
-        e = p; //store event internally
-        h = typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //extract href
+        _setE(p); //Set event and href in one go
         if(!_internal(h)) return false; //if not internal -> report failure
         o = "i"; //continue with "i"
     }
@@ -560,7 +559,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     }
     
     if(o === "e") { //set / get internal "e" (event)
-        if(p) e = p;
+        if(p) _setE(p);	//Set event and href in one go
         return e ? e : h; // Return "e" or if not given "h"
     }
 
@@ -585,6 +584,11 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     }
 	
     if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
+}, {
+    setE: function (p) { //Set event and href in one go
+        e = p;
+        h = typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //extract href
+   }
 });
 
 // The Frms plugin - stands for forms
