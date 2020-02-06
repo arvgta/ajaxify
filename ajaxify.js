@@ -587,7 +587,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 }, {
     setE: function (p) { //Set event and href in one go
         e = p;
-        h = typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //extract href
+        h = typeof e !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e; //extract href (link/form submit/history pop)
    }
 });
 
@@ -620,7 +620,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         if (a && a.length > 0) h = a; //found -> store
         else h = currentURL; //not found -> select current URL
                 
-        $.rq("i"); //initialise request
+        $.rq("v", q); //validate request
                
         if (g == "get") h = _b(h, p); //GET -> copy URL parameters
         else {
@@ -749,7 +749,6 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
     }
     
     if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
-        $.rq("h", h.href);
         _request();
         return;
     }
