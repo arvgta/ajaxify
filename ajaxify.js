@@ -109,12 +109,12 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
     }
 }
 
-function _searchHints(txt, hints) { //search for text in given hints, which may be array of strings or comma separated string
-    if (!txt || !hints) return; //validate both are given - otherwise quick return
-    if (typeof hints === "string") hints = hints.split(", "); //from here on only an array is allowed
-	
-    for (var i = 0; i < hints.length; i++) //search hints array
-        if (txt.iO(hints[i])) return true; //if single hint found within passed text - return true
+function Hints(hints) {  var myHints = (typeof hints === 'string') ? hints.split(", ") : false; //hints are passed as a comma separated string
+    this.find = function(txt) {
+        if (!txt || !myHints) return; //validate both are given - otherwise quick return
+        for (var i = 0; i < myHints.length; i++) //search hints array
+            if (txt.iO(myHints[i])) return true; //if single hint found within passed text - return true
+    };
 }
 
 // The stateful Cache plugin
@@ -143,10 +143,11 @@ pO("cache1", { d: false }, 0, function (o) {
 
 // The stateful Memory plugin
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
-pO("memory", 0, { memoryoff: false }, function (h) {
+pO("memory", 0, { memoryoff: false, hints: 0 }, function (h) {
+    if(!hints) hints = new Hints(memoryoff); //create Hints object during first pass
     if (!h || memoryoff === true) return false; //validate input, if memoryoff set to true return false quickly
     if (memoryoff === false) return h; //if memoryoff set to false return the URL quickly
-    return _searchHints(h, memoryoff) ? false : h; //apply hints mechanism -> found: return false, otherwise return URL
+    return hints.find(h) ? false : h; //apply hints mechanism -> found: return false, otherwise return URL
 });
 
 // The stateful Pages plugin
@@ -336,9 +337,11 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 // c - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
-pO("scripts", { $s : false }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
+pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") { //Initalise
         if(!$s) $s = $(); //Start off with empty internal jQuery object
+        if(!inlhints) inlhints = new Hints(inlinehints); //create Hints object during initialisation
+        if(!skphints) skphints = new Hints(inlineskip); //create Hints object during initialisation
         return true;
     }
     
@@ -372,8 +375,8 @@ pO("scripts", { $s : false }, { canonical: false, inline: true, inlinehints: fal
     onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
         var txt = $s.text(), t = $s.prop("type"); //Extract text and type
         if (!txt.iO(").ajaxify(") && 
-            ((inline && !_searchHints(txt, inlineskip)) || $s.hasClass("ajaxy") || 
-            _searchHints(txt, inlinehints))
+            ((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || 
+            inlhints.find(txt))
         ) _addtext(txt, t, $s); //Check constraints
     },
     addtext: function (t, type, $s) { //Add one inline JS script - main function
@@ -423,7 +426,8 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
+pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
+    if(!hints) hints = new Hints(alwayshints); //create Hints object during first pass
     if(!$this.length) return; //ensure input
     if(deltas === "n") return true; //If delta-loading disabled, return quickly
 	
@@ -472,7 +476,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0 }, { deltas: true, asyn
             if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only	 
         });
     },
-    classAlways: function ($t, url) { return $t.attr("data-class") == "always" || _searchHints(url, alwayshints); }, //Check for data-class = "always" and alwayshints
+    classAlways: function ($t, url) { return $t.attr("data-class") == "always" || hints.find(url); }, //Check for data-class = "always" and alwayshints
     iScript: function ($S) { //insert single script - pre-processing
         var url = $S.attr(PK);
 
@@ -734,13 +738,15 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
+pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
     if(!h) return; //ensure data
     
     if(h === "i") { //request to initialise
         var s = settings; //abbreviation
         if(!$this.length) $.log("Warning - empty content selector passed!");
         $gthis = $this; //copy selection to global selector
+        if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
+        if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
         $.frms(0, 0, s); //initialise forms sub-plugin
         if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
         $.scrolly(0, s); //initialise scroll effects sub-plugin
@@ -778,10 +784,10 @@ pO("pronto", { $gthis: 0, requestTimer: 0 }, { selector: "a:not(.no-ajaxy)", pre
         if(prefetchoff === true) return;
         if (!$.rq("?", true)) return; //semaphore check for prefetch requests
         var href = $.rq("v", e); // validate internal URL
-        if ($.rq("=", true) || !href || _searchHints(href, prefetchoff)) return; //same page, no data or selected out
+        if ($.rq("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
         fn("+", href, function() { //prefetch page
                 if (previewoff === true) return(false);
-                if (!_isInDivs() && (previewoff === false || !_searchHints(href, previewoff))) _click(e, true);
+                if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
         });
     },
     isInDivs: function() {
