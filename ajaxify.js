@@ -109,11 +109,10 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
     }
 }
 
-function Hints(hints) {  var myHints = (typeof hints === 'string') ? hints.split(", ") : false; //hints are passed as a comma separated string
+function Hints(hints) {  var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
     this.find = function(txt) {
         if (!txt || !myHints) return; //validate both are given - otherwise quick return
-        for (var i = 0; i < myHints.length; i++) //search hints array
-            if (txt.iO(myHints[i])) return true; //if single hint found within passed text - return true
+        return myHints.some(h => txt.iO(h)); // iterate through items, on first positive match return true
     };
 }
 
