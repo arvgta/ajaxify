@@ -112,7 +112,7 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
 function Hints(hints) {  var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
     this.find = function(txt) {
         if (!txt || !myHints) return; //validate both are given - otherwise quick return
-        return myHints.some(h => txt.iO(h)); // iterate through items, on first positive match return true
+        return myHints.some( function(h) { return txt.iO(h) } ); // iterate through items, on first positive match return true
     };
 }
 
