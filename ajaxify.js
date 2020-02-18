@@ -95,8 +95,6 @@ function _internal(url) {
     return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":");
 }
 
-function _root(u) { return u.iO("?") ? u.split("?")[0] : u; }
-
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
     if (flush) //delete all old attributes
         while(el.attributes.length > 0)
@@ -171,12 +169,8 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
     }
 	
     if (typeof h === "boolean") return false; //false in - false out
-}, {
-    iPage: function (h) { //get index of page, -1 if not found
-        for (var i = 0; i < d.length; i++)
-            if (d[i][0] == h) return i;
-        return -1;
-    }
+}, {    
+	iPage: h => { for (var i = 0; i < d.length; i++) if (d[i][0] == h) return i; return -1; }
 });
 
 // The GetPage plugin
