@@ -155,22 +155,17 @@ pO("memory", 0, { memoryoff: false, hints: 0 }, function (h) {
 pO("pages", { d: [], i: -1 }, 0, function (h) {
     if (typeof h === "string") { //URL or "f" passed
         if(h === "f") d = []; //"f" ? -> flush internal array
-        else { //URL passed
-            i = _iPage(h); //get page index
-            if(i === -1) return; //not found return nothing
-            return d[i][1]; //return entire page
-        }
+        else if((i=_iPage(h)) !== -1) return d[i][1]; //get page index - return entire page / not found - do nothing
     }
 	
     if (typeof h === "object") { //jQuery object passed [href, <page>]
-        i = _iPage(h[0]); //check whether href in array already?
-        if(i === -1) d.push(h); //no -> add to array
-        else d[i] = h; //update complete object
+        if((i=_iPage(h)) === -1) d.push(h); //check whether href in array already? / no -> add to array
+        else d[i] = h; //yes -> update complete object
     }
 	
     if (typeof h === "boolean") return false; //false in - false out
-}, {    
-	iPage: h => { for (var i = 0; i < d.length; i++) if (d[i][0] == h) return i; return -1; }
+}, 
+{    iPage: h => d.findIndex(e => e[0] == h) //find index of page within array
 });
 
 // The GetPage plugin
