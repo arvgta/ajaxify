@@ -165,7 +165,7 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 	
     if (typeof h === "boolean") return false; //false in - false out
 }, 
-{    iPage: h => d.findIndex(e => e[0] == h) //find index of page within array
+{    iPage: h => d.findIndex((e,i) => d[i][0] == h) //find index of page within array
 });
 
 // The GetPage plugin
