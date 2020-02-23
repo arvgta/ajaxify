@@ -543,8 +543,10 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     
     if(o === "h") { // Access href hard
         if(p) {
-            e = 0;  // Reset e
-            h = p;  // Poke in href hard
+            switch (typeof p) {
+                case 'string': e = 0;  // Reset e -> default handler
+                default: h = (p.href) ? p.href : p;  // Poke in href hard
+            }
         }
         
         return h; //href
@@ -579,7 +581,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 }, {
     setE: function (p) { //Set event and href in one go
         e = p;
-        h = typeof e !== "string" ? e.currentTarget.href || e.originalEvent.state.url : e; //extract href
+        h = typeof e !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e; //extract href (link/form submit/history pop)
    }
 });
 
@@ -612,8 +614,8 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         if (a && a.length > 0) h = a; //found -> store
         else h = currentURL; //not found -> select current URL
                 
-        $.rq("i"); //initialise request
-               
+        $.rq("v", q); //validate request
+        
         if (g == "get") h = _b(h, p); //GET -> copy URL parameters
         else {
             $.rq("is", true); //set is POST in request data
@@ -626,24 +628,16 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
         return(false); //success -> disable default behaviour
     });
 }, {
-    k: function () { //Serialise data
-        var o = fm.serialize();
-        var n = $("input[name][type=submit]", fm);
-        if (n.length === 0) return o;
-        var p = n.attr("name") + "=" + n.val();
-        if (o.length > 0) {
-            o += "&" + p;
-        } else {
-            o = p;
-        }
-        
-        return o;
+    k: () => { //Serialise data
+        let o = fm.serialize(), 
+            n = $("input[name][type=submit]", fm);
+
+        if (!n.length) return o; else n = `${n.attr("name")}=${n.val()}`;
+        return (o.length) ? `${o}&${n}` : n;
     },
-    b: function (m, n) { //copy URL parameters
-        if (m.indexOf("?") > 0) {
-            m = m.substring(0, m.indexOf("?"));
-        }
-        return m + "?" + n;
+    b: (m, n) => { //copy URL parameters
+        if (m.iO("?")) m = m.substring(0, m.iO("?"));
+        return `${m}?${n}`;
     }
 });
 
@@ -743,7 +737,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
     }
     
     if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
-        $.rq("h", h.href);
+        $.rq("h", h);
         _request();
         return;
     }
