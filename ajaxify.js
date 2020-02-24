@@ -543,10 +543,8 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
     
     if(o === "h") { // Access href hard
         if(p) {
-            switch (typeof p) {
-                case 'string': e = 0;  // Reset e -> default handler
-                default: h = (p.href) ? p.href : p;  // Poke in href hard
-            }
+            if (typeof p === "string") e = 0; // Reset e -> default handler
+            h = (p.href) ? p.href : p;  // Poke in href hard
         }
         
         return h; //href
