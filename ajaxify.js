@@ -240,7 +240,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         });
     },
 		
-    lAjax: function (hin, pre) { //execute Ajax load
+    lAjax: (hin, pre) => { //execute Ajax load
         var ispost = $.rq("is"); //POST?
         if (pre) rt="p"; else rt="c"; //store request type (p-prefetch, c-click)
 
@@ -248,7 +248,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         url: hin, //URL
         type: ispost ? "POST" : "GET", //POST or GET?
         data: ispost ? $.rq("d") : null, //fetch data from $.rq
-        success: function(h) { //success -> "h" holds HTML
+        success: h => { //success -> "h" holds HTML
             if (!h || !_isHtml(xhr)) { //HTML empty or not HTML or XML?
                 if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
             }
@@ -259,7 +259,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
 
             if (cb) return(cb()); //Call callback if given
         },
-        error: function(jqXHR, status, error) {
+        error: (jqXHR, status, error) => {
         // Try to parse response text
             if (status === 'abort') {plus=0; return;} // handler for fn("a") aborted requests, to avoid error
             try {
@@ -275,16 +275,16 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         });
     },
 	
-    isHtml: function (x) { //restrict interesting MIME types - only (X)HTML / FORM-family
+    isHtml: x => { //restrict interesting MIME types - only (X)HTML / FORM-family
         var d;
         return (d = x.getResponseHeader("Content-Type")), d && (d.iO("html") || d.iO("form-"));
     },
 	
-    parseHTML: function (h) { //process fetched HTML
+    parseHTML: h => { //process fetched HTML
         return $.parseHTML($.trim(_replD(h)), null, true); //trim escaped HTML of entire page
     },
 	
-    replD: function (h) { //pre-process HTML so it can be loaded by jQuery
+    replD: h => { //pre-process HTML so it can be loaded by jQuery
         return String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>");
     }
 });
@@ -306,7 +306,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
     }
     else return $().pronto(o);
 }, {
-    init: function (s) { //main intialisation of Pronto and its sub-plugins
+    init: s => { //main intialisation of Pronto and its sub-plugins
         if (!api || !pluginon) { //History API not defined or Ajaxify turned off manually -> exit / gracefully degrade
             $.log("Gracefully exiting...");
             return false;
@@ -352,7 +352,7 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inli
     $.scripts("d"); //fetch all scripts
     _addScripts($s, settings); //delta-loading
 }, {
-    allstyle: function ($s) { //Style tag handling
+    allstyle: $s => { //Style tag handling
         if (!style || !$s) return; //Style shut off or selection empty -> return
         $("head").find("style").remove(); //Remove all style tags in the DOM first
         $s.each(function() { //Iterate through selection
@@ -360,14 +360,14 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inli
             _addstyle(d); //Add single style tag
         });
     },
-    onetxt: function ($s) { //Add one inline JS script - pre-processing / validation
+    onetxt: $s => { //Add one inline JS script - pre-processing / validation
         var txt = $s.text(), t = $s.prop("type"); //Extract text and type
         if (!txt.iO(").ajaxify(") && 
             ((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || 
             inlhints.find(txt))
         ) _addtext(txt, t, $s); //Check constraints
     },
-    addtext: function (t, type, $s) { //Add one inline JS script - main function
+    addtext: (t, type, $s) => { //Add one inline JS script - main function
         if(!t || !t.length) return; //Ensure input
         if(inlineappend || (type && !type.iO("text/javascript"))) try { return _apptext($s); } catch (e) { }
         
@@ -377,13 +377,13 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inli
             }
         }
     },
-    apptext: function ($s) { //Add one inline JS script - commit
+    apptext: $s => { //Add one inline JS script - commit
         $s.clone().addClass(inlineclass).appendTo("body"); //label with inlineclass to make dynamic removal later on easy
     },
-    addstyle: function (t) { //add a single style tag
+    addstyle: t => { //add a single style tag
         $("head").append('<style>' + t + '</style>');
     },
-    addScripts: function ($s, st) { //Delta-loading of sylesheets and external JS files
+    addScripts: ($s, st) => { //Delta-loading of sylesheets and external JS files
         $s.c.addAll("href", st); //Stylesheets
         $s.j.addAll("src", st); //External JS files
     }
