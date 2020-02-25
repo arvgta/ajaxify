@@ -108,9 +108,9 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
 }
 
 function Hints(hints) {  var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
-    this.find = function(txt) {
-        if (!txt || !myHints) return; //validate both are given - otherwise quick return
-        return myHints.some(h => txt.iO(h)); // iterate through items, on first positive match return true
+    this.find = t => { //find hints within passed text (t)
+        if (!t || !myHints) return; //validate both text to search for and hints are given - otherwise quick return
+        return myHints.some(h => t.iO(h)); // iterate through items, on first positive match return true
     };
 }
 
@@ -203,7 +203,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
     return $.cache1().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
 
 }, {
-    lSel: function ($t) { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
+    lSel: $t => { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
         pass++; //central increment of "pass" variable
         _lEls($t); //load selection specified in "$t" into DOM
         $("body > script").remove("." + inlineclass); //remove all previously dynamically added inline scripts
@@ -212,7 +212,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         return $.scripts("c"); //return canonical URL
     },
 	
-    lPage: function (h, pre) { //fire Ajax load, check for hash first, "pre" indicates a prefetch
+    lPage: (h, pre) => { //fire Ajax load, check for hash first, "pre" indicates a prefetch
         if (h.iO("#")) h = h.split("#")[0]; //get first part before hash
         if ($.rq("is") || !$.cache1(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
 		
