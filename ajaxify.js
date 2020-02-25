@@ -220,7 +220,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         if (cb) return cb(); //fire callback, if given
     },
 	
-    ld: function ($t, $h) { //load HTML of target selection into DOM
+    ld: ($t, $h) => { //load HTML of target selection into DOM
         if(typeof $h[0] == "undefined") { //target element absent or corrupted
             $.log("Inserting placeholder for ID: " + $t.attr("id"));
             var tagN = $t.prop("tagName").toLowerCase();
@@ -234,7 +234,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         $t.html($c.html()); //inject element into primary DOM
     },
 	
-    lEls: function ($t) { //load target selection into DOM
+    lEls: $t => { //load target selection into DOM
         if ($.cache1()) $t.each(function() { //iterate through elements
             _ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
         });
