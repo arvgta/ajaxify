@@ -802,7 +802,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         $.rq("!"); //we're serious about this request - disable further fetches on same URL
         if(notPush) $.rq("p", false); // mode for hApi - replaceState / pushState
         _trigger("request"); // Fire request event
-        fn($.rq("h"), function(err) { // Call "fn" - handler of parent
+        fn($.rq("h"), err => { // Call "fn" - handler of parent
             if (err) { 
                 $.log("Error in _request : " + err); 
                 _trigger("error", err); 
