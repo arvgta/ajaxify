@@ -403,7 +403,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.can = _rel(lk, "canonical"); //Extract canonical tag
 	$s.j = j; //Assign JSs to internal selection
     }, {
-    rel: function(lk, v) { //Extract files that have specific "rel" attribute only
+    rel: (lk, v) => { //Extract files that have specific "rel" attribute only
         return $(lk).filter(function(){return($(this).attr("rel").iO(v));});
     }
 });
@@ -452,20 +452,20 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
         }
     });
 }, {
-    allScripts: function ($t) {
+    allScripts: $t => {
         $t.each(function() { //Iterate through selection
             _iScript($(this)); //Write out single script
         });
         
         return true;
     },
-    newArray: function ($t) { //Fill new array on initial load
+    newArray: $t => { //Fill new array on initial load
         $t.each(function() { //Iterate through selection
             if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only	 
         });
     },
-    classAlways: function ($t, url) { return $t.attr("data-class") == "always" || hints.find(url); }, //Check for data-class = "always" and alwayshints
-    iScript: function ($S) { //insert single script - pre-processing
+    classAlways: ($t, url) => { return $t.attr("data-class") == "always" || hints.find(url); }, //Check for data-class = "always" and alwayshints
+    iScript: $S => { //insert single script - pre-processing
         var url = $S.attr(PK);
 
         if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
@@ -478,14 +478,14 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
         _copyAttributes(script, $S); //copy all attributes of script element generically
         document.head.appendChild(script); //it doesn't matter much, if we append to head or content element
     },
-    findScript: function (url) { //Find URL in old array
+    findScript: url => { //Find URL in old array
         if(!url) return false;
         for(var i = 0; i < $scriptsO.length; i++)  //Iterate through old array
             if(url == $scriptsO[i]) return true; //Match found -> common!
 		
 		return false;
     },
-    removeScript: function ($S) { //Remove single script from DOM
+    removeScript: $S => { //Remove single script from DOM
         $((PK == "href" ? linkr : scrr).replace("!", $S)).remove(); //Remove script (stylesheet or external JS)
     }
 });
@@ -577,7 +577,7 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 	
     if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
 }, {
-    setE: function (p) { //Set event and href in one go
+    setE: p => { //Set event and href in one go
         e = p;
         h = typeof e !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e; //extract href (link/form submit/history pop)
    }
@@ -657,7 +657,7 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
     if(i === -1) d.push(os); //doesn't exist -> push to array
     else d[i] = os; //exists -> overwrite
 }, {
-  iOffset: function (h) { //get index of page, -1 if not found
+  iOffset: h => { //get index of page, -1 if not found
         for (var i = 0; i < d.length; i++)
             if (d[i][0] == h) return i;
         return -1;
@@ -696,7 +696,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     //default -> do nothing
 
 }, {
-    scrll: function (o) { $(window).scrollTop(o); } 
+    scrll: o => { $(window).scrollTop(o); } 
 });
 
 // The hApi plugin - manages operatios on the History API centrally
@@ -745,7 +745,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         _request(true);
     }
 }, { 
-    init_p: function() {
+    init_p: () => {
         $.hApi("=", window.location.href); // Set initial state
         $(window).on("popstate", _onPop); // Set handler for popState
         if (prefetchoff !== true) {
@@ -760,7 +760,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         $.frms("d", $gthis); // Every further pass - select forms in content div(s) only
         if($.slides) $.slides("i"); // Init slideshow
     }, 
-    prefetch: function(e) { //...target page on hoverIntent
+    prefetch: e => { //...target page on hoverIntent
         if(prefetchoff === true) return;
         if (!$.rq("?", true)) return; //semaphore check for prefetch requests
         var href = $.rq("v", e); // validate internal URL
@@ -770,7 +770,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
                 if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
         });
     },
-    isInDivs: function() {
+    isInDivs: () => {
         var is = false;
         $gthis.each(function() {
             if ($($.rq("e")).parents("#" + $(this).attr("id")).length > 0) is = true;
@@ -778,12 +778,12 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
             
         return is;
     },
-    stopBubbling: function(e) { // Stop "bubbling-up"
+    stopBubbling: e => { // Stop "bubbling-up"
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
     },
-    click: function(e, notPush) { //...handler for normal clicks
+    click: (e, notPush) => { //...handler for normal clicks
         if(!$.rq("?")) return; //semaphore check for click requests
         var href = $.rq("v", e);  // validate internal URL
         if(!href || _exoticKey()) return; // Ignore everything but normal click
@@ -798,7 +798,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         if($.rq("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
         if(refresh || !$.rq("=")) _request(notPush); // Continue with _request() when not the same URL or "refresh" parameter set hard
     }, 
-    request: function(notPush) { // ... new url
+    request: notPush => { // ... new url
         $.rq("!"); //we're serious about this request - disable further fetches on same URL
         if(notPush) $.rq("p", false); // mode for hApi - replaceState / pushState
         _trigger("request"); // Fire request event
@@ -811,14 +811,14 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
             _render(); // continue with _render()
         });
     },
-    render: function() { // Clear and set timer for requestDelay
+    render: () => { // Clear and set timer for requestDelay
         _trigger("beforeload");
         if(requestDelay) { //only needs handling if requestDelay set (not 0)
             if(requestTimer) clearTimeout(requestTimer); // Clear
             requestTimer = setTimeout(_doRender, requestDelay); // Set - unconditionally
         } else _doRender(); //requestDelay is 0 -> continue
     },
-    onPop: function(e) { // Handle back/forward navigation
+    onPop: e => { // Handle back/forward navigation
         $.rq("i"); //Initialise request in general
         $.rq("e", e); //Initialise request event
         $.rq("p", false); //We don't want to re-push
@@ -830,7 +830,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         _trigger("request"); // Fire request event
         fn(url, _render); // Call "fn" - handler of parent, continue with _render()
     },
-    doRender: function() { // Render HTML
+    doRender: () => { // Render HTML
         _trigger("load");  // Fire load event
         if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
         $.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
@@ -849,17 +849,17 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         if(passCount) $("#" + passCount).html("Pass: " + pass);
         if(cb) cb(); // Callback users handler, if specified
     },
-    gaCaptureView: function(href) { // Google Analytics support
+    gaCaptureView: href => { // Google Analytics support
         href = "/" + href.replace(rootUrl,"");
         if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); // the new analytics API
         else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);  // the old API					
     },
-    exoticKey: function() { //not a real click, or target = "_blank", or WP-Admin link
+    exoticKey: () => { //not a real click, or target = "_blank", or WP-Admin link
         var href = $.rq("h"), e = $.rq("e"); //Shorthands for href and event
         return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
             || href.iO("wp-login") || href.iO("wp-admin"));
     },
-    hashChange: function() { // only hash has changed
+    hashChange: () => { // only hash has changed
         var e = $.rq("e");
 		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
     }
