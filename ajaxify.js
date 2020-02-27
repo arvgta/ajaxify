@@ -349,7 +349,7 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inli
     
     if (o instanceof jQuery) return _onetxt(o); //process one inline script only
 	
-    $.scripts("d"); //fetch all scripts
+    if ($.scripts("d")) return; //fetch all scripts
     _addScripts($s, settings); //delta-loading
 }, {
     allstyle: $s => { //Style tag handling
@@ -396,6 +396,7 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inli
 // Fetches all inline scripts on the page
 pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     head = pass ? fn("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+    if (!head) return true;
     lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
     j = pass ? fn("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
     $s.c = _rel(lk, "stylesheet"); //Extract stylesheets
@@ -840,7 +841,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         $.frms("a"); // Ajaxify forms - in content divs only
             
         $.hApi($.rq("p") ? "+" : "=", href); // Push new state to the stack on new url
-        $("title").html(fn("title").html()); // Update title
+        if (fn("title")) $("title").html(fn("title").html()); // Update title
 
         // Stop animations + finishing off
         $.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
