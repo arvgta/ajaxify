@@ -595,7 +595,7 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
     if(o === "d") divs = p; //set divs variable
     if(o === "a") divs.find(forms).filter(function() { //Ajaxify all forms in divs
         return(_internal($(this).attr("action"))); //ensure "action"
-    }).submit(function(q) { //override submit handler
+    }).submit( q => { //override submit handler
         fm = $(q.target); // fetch target
         if (!fm.is("form")) { //is form? -> found
             fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields 
@@ -766,7 +766,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         if (!$.rq("?", true)) return; //semaphore check for prefetch requests
         var href = $.rq("v", e); // validate internal URL
         if ($.rq("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
-        fn("+", href, function() { //prefetch page
+        fn("+", href, () => { //prefetch page
                 if (previewoff === true) return(false);
                 if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
         });
