@@ -481,10 +481,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
     },
     findScript: url => { //Find URL in old array
         if(!url) return false;
-        for(var i = 0; i < $scriptsO.length; i++)  //Iterate through old array
-            if(url == $scriptsO[i]) return true; //Match found -> common!
-		
-		return false;
+		return $scriptsO.some(e => e == url); // iterate through items, on first positive match return true
     },
     removeScript: $S => { //Remove single script from DOM
         $((PK == "href" ? linkr : scrr).replace("!", $S)).remove(); //Remove script (stylesheet or external JS)
@@ -750,7 +747,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
         $.hApi("=", window.location.href); // Set initial state
         $(window).on("popstate", _onPop); // Set handler for popState
         if (prefetchoff !== true) {
-            $(document).hoverIntent(_prefetch, function(){}, selector); //this type of call also handles dynamically inserted links
+            $(document).hoverIntent(_prefetch, () => {}, selector); //this type of call also handles dynamically inserted links
             $(document).on("touchstart", selector, _prefetch); // for touchscreens - same thing
         }
         
