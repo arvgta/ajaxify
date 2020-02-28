@@ -108,10 +108,7 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
 }
 
 function Hints(hints) {  var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
-    this.find = t => { //find hints within passed text (t)
-        if (!t || !myHints) return; //validate both text to search for and hints are given - otherwise quick return
-        return myHints.some(h => t.iO(h)); // iterate through items, on first positive match return true
-    };
+    this.find = t => (!t || !myHints) ? false : myHints.some(h => t.iO(h)) //iterate through hints within passed text (t)
 }
 
 // The stateful Cache plugin
