@@ -694,7 +694,7 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
     //default -> do nothing
 
 }, {
-    scrll: o => { $(window).scrollTop(o); } 
+    scrll: o => $(window).scrollTop(o)
 });
 
 // The hApi plugin - manages operatios on the History API centrally
