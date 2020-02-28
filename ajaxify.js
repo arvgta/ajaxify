@@ -174,7 +174,7 @@ pO("pages", { d: [], i: -1 }, 0, function (h) {
 // x - returns XHR
 // otherwise - returns selection of current page to client
 
-pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) { 
+pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) { 
     if (!o) return $.cache1(); //nothing passed -> return currently cached page
 	
     if (o.iO("/")) { //URL
@@ -272,18 +272,9 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "" }, 0, function (o, p, p2) {
         });
     },
 	
-    isHtml: x => { //restrict interesting MIME types - only (X)HTML / FORM-family
-        var d;
-        return (d = x.getResponseHeader("Content-Type")), d && (d.iO("html") || d.iO("form-"));
-    },
-	
-    parseHTML: h => { //process fetched HTML
-        return $.parseHTML($.trim(_replD(h)), null, true); //trim escaped HTML of entire page
-    },
-	
-    replD: h => { //pre-process HTML so it can be loaded by jQuery
-        return String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>");
-    }
+    isHtml: x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")), //restrict interesting MIME types - only (X)HTML / FORM-family
+    parseHTML: h => $.parseHTML($.trim(_replD(h)), null, true), //process fetched HTML, trim escaped HTML of entire page
+    replD: h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>") //pre-process HTML so it can be loaded by jQuery
 });
 
 // The main plugin - Ajaxify
