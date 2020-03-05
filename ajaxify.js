@@ -313,7 +313,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 // c - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
-pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
+pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
     if (o === "i") { //Initalise
         if(!$s) $s = $(); //Start off with empty internal jQuery object
         if(!inlhints) inlhints = new Hints(inlinehints); //create Hints object during initialisation
@@ -340,41 +340,35 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0 }, { canonical: false, inli
     if ($.scripts("d")) return; //fetch all scripts
     _addScripts($s, settings); //delta-loading
 }, {
-    allstyle: $s => { //Style tag handling
-        if (!style || !$s) return; //Style shut off or selection empty -> return
-        $("head").find("style").remove(); //Remove all style tags in the DOM first
+    allstyle: $s =>  //Style tag handling
+        !style || !$s || ( //Style shut off or selection empty -> return
+        $("head").find("style").remove(), //Remove all style tags in the DOM first
         $s.each(function() { //Iterate through selection
             var d = $(this).text(); //Grab text
             _addstyle(d); //Add single style tag
-        });
-    },
+        })
+		)
+    ,
     onetxt: $s => { //Add one inline JS script - pre-processing / validation
-        var txt = $s.text(), t = $s.prop("type"); //Extract text and type
+        txt = $s.text(); //Extract text and type
         if (!txt.iO(").ajaxify(") && 
             ((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || 
             inlhints.find(txt))
-        ) _addtext(txt, t, $s); //Check constraints
+        ) _addtxt($s); //Check constraints
     },
-    addtext: (t, type, $s) => { //Add one inline JS script - main function
-        if(!t || !t.length) return; //Ensure input
-        if(inlineappend || (type && !type.iO("text/javascript"))) try { return _apptext($s); } catch (e) { }
+    addtxt: $s => { //Add one inline JS script - main function
+        if(!txt || !txt.length) return; //Ensure input
+        if(inlineappend || ($s.prop("type") && !$s.prop("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
         
-        try { $.globalEval(t); } catch (e1) { //instead of appending, try an eval
-            try { eval(t); } catch (e2) {
-                $.log("Error in inline script : " + t + "\nError code : " + e2);
+        try { $.globalEval(txt); } catch (e1) { //instead of appending, try an eval
+            try { eval(txt); } catch (e2) {
+                $.log("Error in inline script : " + txt + "\nError code : " + e2);
             }
         }
     },
-    apptext: $s => { //Add one inline JS script - commit
-        $s.clone().addClass(inlineclass).appendTo("body"); //label with inlineclass to make dynamic removal later on easy
-    },
-    addstyle: t => { //add a single style tag
-        $("head").append('<style>' + t + '</style>');
-    },
-    addScripts: ($s, st) => { //Delta-loading of sylesheets and external JS files
-        $s.c.addAll("href", st); //Stylesheets
-        $s.j.addAll("src", st); //External JS files
-    }
+    apptxt: $s => $s.clone().addClass(inlineclass).appendTo("body"), //Add one inline script - label with inlineclass to make dynamic removal later on easy
+    addstyle: t => $("head").append('<style>' + t + '</style>'), //add a single style tag
+    addScripts: ($s, st) => ( $s.c.addAll("href", st), $s.j.addAll("src", st) )//Delta-loading of sylesheets("href") and external JS files("src")
 });
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" jQuery object that is passed in and fills it
