@@ -200,14 +200,14 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
     return $.cache1().find(o === "title" ?  "title:first" : ".ajy-" + o); //default -> return element requested from cached page
 
 }, {
-    lSel: $t => { //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
-        pass++; //central increment of "pass" variable
-        _lEls($t); //load selection specified in "$t" into DOM
-        $("body > script").remove("." + inlineclass); //remove all previously dynamically added inline scripts
-        $.scripts(true); //invoke delta-loading of JS
-        $.scripts("s"); //invoke delta-loading of CSS
-        return $.scripts("c"); //return canonical URL
-    },
+    lSel: $t => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
+        pass++, //central increment of "pass" variable
+        _lEls($t), //load selection specified in "$t" into DOM
+        $("body > script").remove("." + inlineclass), //remove all previously dynamically added inline scripts
+        $.scripts(true), //invoke delta-loading of JS
+        $.scripts("s"), //invoke delta-loading of CSS
+        $.scripts("c") //return canonical URL
+    ),
 	
     lPage: (h, pre) => { //fire Ajax load, check for hash first, "pre" indicates a prefetch
         if (h.iO("#")) h = h.split("#")[0]; //get first part before hash
