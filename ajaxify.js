@@ -328,13 +328,8 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: fal
         return _addScripts($s, settings); //Load scripts from DOM into addScripts and initialise it
     }
             
-    if (o === "c") { //Canonical URL handling
-        if (canonical && $s.can) return $s.can.attr("href"); //Return "href" only
-        else return false; //No canonical found
-    }
-	
-    if (o==="d") return $.detScripts($s); //fetch all scripts
-    
+    if (o === "c") return canonical && $s.can ? $s.can.attr("href") : false; //Canonical URL handling - return href
+    if (o === "d") return $.detScripts($s); //fetch all scripts
     if (o instanceof jQuery) return _onetxt(o); //process one inline script only
 	
     if ($.scripts("d")) return; //fetch all scripts
@@ -349,13 +344,12 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: fal
         })
 		)
     ,
-    onetxt: $s => { //Add one inline JS script - pre-processing / validation
-        txt = $s.text(); //Extract text and type
-        if (!txt.iO(").ajaxify(") && 
-            ((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || 
+    onetxt: $s => //Add one inline JS script - pre-processing / validation  
+        (!(txt = $s.text()).iO(").ajaxify(") && //Extract text and type, avoid unwanted recursion
+            ((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || //Check hints, class "ajaxy"
             inlhints.find(txt))
-        ) _addtxt($s); //Check constraints
-    },
+        ) && _addtxt($s) //Check constraints
+    ,
     addtxt: $s => { //Add one inline JS script - main function
         if(!txt || !txt.length) return; //Ensure input
         if(inlineappend || ($s.prop("type") && !$s.prop("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
