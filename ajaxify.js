@@ -427,19 +427,17 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
         }
     });
 }, {
-    allScripts: $t => {
-        $t.each(function() { //Iterate through selection
+    allScripts: $t => 
+        $t.each(function() { //Iterate through scripts
             _iScript($(this)); //Write out single script
-        });
-        
-        return true;
-    },
-    newArray: $t => { //Fill new array on initial load
+        }) && true //Always return true
+    ,
+    newArray: $t =>  //Fill new array on initial load
         $t.each(function() { //Iterate through selection
             if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only	 
-        });
-    },
-    classAlways: ($t, url) => { return $t.attr("data-class") == "always" || hints.find(url); }, //Check for data-class = "always" and alwayshints
+        })
+    ,
+    classAlways: ($t, url) => $t.attr("data-class") == "always" || hints.find(url), //Check for data-class = "always" and alwayshints
     iScript: $S => { //insert single script - pre-processing
         var url = $S.attr(PK);
 
@@ -453,13 +451,8 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
         _copyAttributes(script, $S); //copy all attributes of script element generically
         document.head.appendChild(script); //it doesn't matter much, if we append to head or content element
     },
-    findScript: url => { //Find URL in old array
-        if(!url) return false;
-		return $scriptsO.some(e => e == url); // iterate through items, on first positive match return true
-    },
-    removeScript: $S => { //Remove single script from DOM
-        $((PK == "href" ? linkr : scrr).replace("!", $S)).remove(); //Remove script (stylesheet or external JS)
-    }
+    findScript: url => !url ? false : $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
+    removeScript: $S => $((PK == "href" ? linkr : scrr).replace("!", $S)).remove() //Remove script (stylesheet or external JS) from DOM
 });
 
 
