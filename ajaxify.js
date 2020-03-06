@@ -379,10 +379,8 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
     $s.y = head.find("style"); //Extract style tags
     $s.can = _rel(lk, "canonical"); //Extract canonical tag
 	$s.j = j; //Assign JSs to internal selection
-    }, {
-    rel: (lk, v) => { //Extract files that have specific "rel" attribute only
-        return $(lk).filter(function(){return($(this).attr("rel").iO(v));});
-    }
+    }, { //rel - Extract files that have specific "rel" attribute only
+    rel: (lk, v) => $(lk).filter(function(){return($(this).attr("rel").iO(v));})
 });
 
 
