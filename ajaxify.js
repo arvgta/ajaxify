@@ -399,7 +399,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
     if(deltas === false) return _allScripts($this); //process all scripts
     //deltas presumed to be "true" -> proceed with normal delta-loading
 	
-	$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  If PK is "href" - stylesheets, otherwise JS
+    $scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  If PK is "href" - stylesheets, otherwise JS
 
     if(!pass) _newArray($this); //Fill new array on initial load, nothing more
     else $this.each(function() { //Iterate through selection
@@ -418,9 +418,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
             return;
         }
         
-        if(PK != "href") {  
-            $.scripts($t); //Inline JS script? -> inject into DOM
-        }
+        if(PK != "href") $.scripts($t); //Inline JS script? -> inject into DOM
     });
 }, {
     allScripts: $t => 
@@ -538,10 +536,8 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 	
     if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
 }, {
-    setE: p => { //Set event and href in one go
-        e = p;
-        h = typeof e !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e; //extract href (link/form submit/history pop)
-   }
+    setE: p =>  //Set event and href in one go
+        h = typeof (e = p) !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e //extract href (link/form submit/history pop)
 });
 
 // The Frms plugin - stands for forms
@@ -618,11 +614,7 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
     if(i === -1) d.push(os); //doesn't exist -> push to array
     else d[i] = os; //exists -> overwrite
 }, {
-  iOffset: h => { //get index of page, -1 if not found
-        for (var i = 0; i < d.length; i++)
-            if (d[i][0] == h) return i;
-        return -1;
-    }
+  iOffset: h => d.findIndex(e => e[0] == h) //find index of page within array
 }
 );
 
