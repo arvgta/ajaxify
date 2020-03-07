@@ -731,11 +731,11 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
             
         return is;
     },
-    stopBubbling: e => { // Stop "bubbling-up"
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-    },
+    stopBubbling: e => ( // Stop "bubbling-up"
+        e.preventDefault(),
+        e.stopPropagation(),
+        e.stopImmediatePropagation()
+    ),
     click: (e, notPush) => { //...handler for normal clicks
         if(!$.rq("?")) return; //semaphore check for click requests
         var href = $.rq("v", e);  // validate internal URL
@@ -814,7 +814,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
     },
     hashChange: () => { // only hash has changed
         var e = $.rq("e");
-		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
+        return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
     }
 });
 
