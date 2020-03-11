@@ -195,7 +195,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 }, {
 	lSel: $t => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
 		pass++, //central increment of "pass" variable
-		_lEls($t), //load selection specified in "$t" into DOM
+		_ldBody(), //load body of target into main DOM
 		$("body > script").remove("." + inlineclass), //remove all previously dynamically added inline scripts
 		$.scripts(true), //invoke delta-loading of JS
 		$.scripts("s"), //invoke delta-loading of CSS
@@ -210,28 +210,14 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 		if (cb) return cb(); //fire callback, if given
 	},
 
-	ld: ($t, $h) => { //load HTML of target selection into DOM
-		if(typeof $h[0] == "undefined") { //target element absent or corrupted
-			$.log("Inserting placeholder for ID: " + $t.attr("id"));
-			var tagN = $t.prop("tagName").toLowerCase();
-			$t = $t.replaceWith("<" + tagN + " id='" + $t.attr("id") + "'></" + tagN + ">"); //insert empty hidden element with id as a placeholder
-			return; //Skip this element and continue - skip the rest of the _ld() function
-		}
-
+	ld: ($t, $h) => { //load HTML of target selection into main DOM
 		var $c = $h.clone(); //we want to preserve the original target element
 		$c.find("script").remove(); //prevent double firing of scripts
 		_copyAttributes($t[0], $c, true); //copy tag attributes of element, flushing the first parameter initially
 		$t.html($c.html()); //inject element into primary DOM
 	},
 
-	lEls: $t => //load target selection into DOM
-		$.cache1() && !_isBody($t) && $t.each(function() { //iterate through elements
-			_ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
-		})
-	,
-
-	isBody: $t => $t.prop("tagName").toLowerCase() == "body" && $.cache1().find("#ajy-body").attr("tagName", "body")
-		&& (_ld($("body"), $.cache1().find("#ajy-body")), 1),
+	ldBody: () => $.cache1().find("#ajy-body").attr("tagName", "body") && _ld($("body"), $.cache1().find("#ajy-body")),
 
 	lAjax: (hin, pre) => { //execute Ajax load
 		var ispost = $.rq("is"); //POST?
@@ -672,7 +658,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 
 	if(h === "i") { //request to initialise
 		var s = settings; //abbreviation
-		if(!$this.length) $.log("Warning - empty content selector passed!");
+		if($this.length) $.log("Warning - main selector contents no longer needed from version 8.0.0!");
 		$gthis = $this; //copy selection to global selector
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
