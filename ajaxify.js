@@ -100,7 +100,7 @@ function _copyAttributes(el, $S, flush) { //copy all attributes of element gener
 	[...$S[0].attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 }
 
-function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
+function Hints(hints) {	var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
 	this.find = t => (!t || !myHints) ? false : myHints.some(h => t.iO(h)) //iterate through hints within passed text (t)
 }
 
@@ -225,10 +225,13 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 	},
 
 	lEls: $t => //load target selection into DOM
-		$.cache1() && $t.each(function() { //iterate through elements
+		$.cache1() && !_isBody($t) && $t.each(function() { //iterate through elements
 			_ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
 		})
 	,
+
+	isBody: $t => $t.prop("tagName").toLowerCase() == "body" && $.cache1().find("#ajy-body").attr("tagName", "body")
+		&& (_ld($("body"), $.cache1().find("#ajy-body")), 1),
 
 	lAjax: (hin, pre) => { //execute Ajax load
 		var ispost = $.rq("is"); //POST?
