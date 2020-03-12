@@ -658,8 +658,8 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 
 	if(h === "i") { //request to initialise
 		var s = settings; //abbreviation
-		if($this.length) $.log("Warning - main selector contents no longer needed from version 8.0.0!");
-		$gthis = $this; //copy selection to global selector
+		if($this.length) $.log("Main selector contents no longer needed from version 8.0.0!");
+		$gthis = $("body"); //copy selection to global selector
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
 		$.frms(0, 0, s); //initialise forms sub-plugin
