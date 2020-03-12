@@ -78,7 +78,7 @@ linki = '<link rel="stylesheet" type="text/css" href="*" />',
 scri = '<script src="*"></script>',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]';
-inlineclass = "ajy-inline";
+//inlineclass = "ajy-inline";
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1,mbp="(function ($) { var Name = function(options){ \npVars \npSettings \n this.a = funStr; \npFns }; \n$.fnn = function(arg0) {var $this = $(this); \nif(!$.fnn.o) $.fnn.o = new Name(options); \nreturn $.fnn.o.a(args);}; \n})(jQuery);";function getParamNames(){return funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"))}function JSON2Str(n,r){var t="var ",e=0;for(var o in n)if(n.hasOwnProperty(o)){var s=n[o];t+=e?",\n":"",t+="function"==typeof s?"_"+o+" = "+iLog(s.toString(),o):o+" = "+(r?'settings["':"")+(r?o+'"]':JSON.stringify(s)),e++}return t+";"}function pO(n,r,t,e,o,s){var i,a,l,f="",g="",u="",p="",c="",S=mbp;if(n&&e){if(funStr=iLog(funStr=e.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),a=(p=getParamNames(e)).iO("$this"),l=p.iO("options"),c=p.replace("$this, ",""),c="$this"==p?"":c,t&&!l&&(c+=""===c?"options":", options"),r&&(f=JSON2Str(r)),t&&(g="var settings = $.extend("+JSON.stringify(t)+", options);\n",g+=JSON2Str(t,1)),o&&(u=JSON2Str(o)),t||(S=S.replace(/\(options/g,"(")),a||(S=S.replace("var $this = $(this);","")),S=S.replace(/fnn/g,a?"fn."+n:n).replace(/Name/g,i).replace("funStr",funStr).replace("pVars",f).replace("pSettings",g).replace("pFns",u).replace("args",p).replace("arg0",c),codedump&&console.log(S),!s)try{jQuery.globalEval(S)}catch(n){alert("Error : "+n+" | "+S)}}else alert("Error in pO(): Missing parameter")}function showArgs(n){s="";for(var r=0;r<n.length;r++)null==n[r]?s+="null | ":s+=(null!=n[r]&&"function"!=typeof n[r]&&"object"!=typeof n[r]&&("string"!=typeof n[r]||n[r].length<=100)?n[r]:"string"==typeof n[r]?n[r].substr(0,100):typeof n[r])+" | ";return s}function iLog(n,r){var t=n.indexOf("{");return logging&&"log"!==r?(n=n.substr(0,t)+'{ $.log(lvl++ + " | '+r+" | "+n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1)+' | " + showArgs(arguments));\n'+n.substr(t+1,n.length-t-2)+"\n lvl--;}").replace(/return /g,"return lvl--, ").replace(/return;/g,"return lvl--, undefined;"):n}pO("log",0,{verbosity:0},function(n,r){r&&(verbosity=r),verbosity&&n&&lvl<verbosity&&console&&console.log(n)});
@@ -196,7 +196,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 	lSel: () => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
 		pass++, //central increment of "pass" variable
 		_ldBody(), //load body of target into main DOM
-		$("body > script").remove("." + inlineclass), //remove all previously dynamically added inline scripts
+		//$("body > script").remove("." + inlineclass), //remove all previously dynamically added inline scripts
 		$.scripts(true), //invoke delta-loading of JS
 		$.scripts("s"), //invoke delta-loading of CSS
 		$.scripts("c") //return canonical URL
@@ -342,7 +342,7 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: fal
 			}
 		}
 	},
-	apptxt: $s => $s.clone().addClass(inlineclass).appendTo("body"), //Add one inline script - label with inlineclass to make dynamic removal later on easy
+	apptxt: $s => $s.clone()./*addClass(inlineclass).*/appendTo("body"), //Add one inline script
 	addstyle: t => $("head").append('<style>' + t + '</style>'), //add a single style tag
 	addScripts: ($s, st) => ( $s.c.addAll("href", st), $s.j.addAll("src", st) )//Delta-loading of sylesheets("href") and external JS files("src")
 });
@@ -653,15 +653,13 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $body: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
+pO("pronto", { $body: 0, requestTimer: 0, pfohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
 	if(!h) return; //ensure data
 
 	if(h === "i") { //request to initialise
 		var s = settings; //abbreviation
 		if($this.length) $.log("Main selector contents no longer needed from version 8.0.0!");
-		//$body = $("body"); //copy selection to global selector
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
-		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
 		$.frms(0, 0, s); //initialise forms sub-plugin
 		if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
 		$.scrolly(0, s); //initialise scroll effects sub-plugin
