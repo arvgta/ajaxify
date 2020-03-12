@@ -183,7 +183,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 
 	if (o === "a") { if (xhr && xhr.readyState !== 4) xhr.abort(); return; }
 	if (o === "s") return ((xhr) ? xhr.readyState : 4) + rt; //return xhr ready state together with request type(rt)
-	if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
+	if (o === "-") return _lSel(); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
 	if (o === "x") return xhr; //return xhr object dynamically
 
 	if (!$.cache1()) return;
@@ -193,7 +193,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 	return $.cache1().find(o === "title" ?	"title:first" : ".ajy-" + o); //default -> return element requested from cached page
 
 }, {
-	lSel: $t => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
+	lSel: () => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
 		pass++, //central increment of "pass" variable
 		_ldBody(), //load body of target into main DOM
 		$("body > script").remove("." + inlineclass), //remove all previously dynamically added inline scripts
@@ -653,13 +653,13 @@ pO("hApi", 0, 0, function (o, p) {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of $.rq hard and continue with _request()
-pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
+pO("pronto", { $body: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
 	if(!h) return; //ensure data
 
 	if(h === "i") { //request to initialise
 		var s = settings; //abbreviation
 		if($this.length) $.log("Main selector contents no longer needed from version 8.0.0!");
-		$gthis = $("body"); //copy selection to global selector
+		//$body = $("body"); //copy selection to global selector
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
 		$.frms(0, 0, s); //initialise forms sub-plugin
@@ -688,11 +688,11 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 			$(document).on("touchstart", selector, _prefetch); // for touchscreens - same thing
 		}
 
-		var $body = $("body"); //abbreviation
+		$body = $("body"); //abbreviation
 		$body.on("click.pronto", selector, _click); // Real click handler -> _click()
 		$.frms("d", $body); // Select forms in whole body
 		$.frms("a"); // Ajaxify forms
-		$.frms("d", $gthis); // Every further pass - select forms in content div(s) only
+		//$.frms("d", $gthis); // Every further pass - select forms in content div(s) only
 		if($.slides) $.slides("i"); // Init slideshow
 	}, 
 	prefetch: e => { //...target page on hoverIntent
@@ -700,18 +700,10 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		if (!$.rq("?", true)) return; //semaphore check for prefetch requests
 		var href = $.rq("v", e); // validate internal URL
 		if ($.rq("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
-		fn("+", href, () => { //prefetch page
+		fn("+", href, () => {} /*//prefetch page
 				if (previewoff === true) return(false);
 				if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
-		});
-	},
-	isInDivs: () => {
-		var is = false;
-		$gthis.each(function() {
-			if ($($.rq("e")).parents("#" + $(this).attr("id")).length > 0) is = true;
-		});	
-
-		return is;
+		}*/);
 	},
 	stopBubbling: e => ( // Stop "bubbling-up"
 		e.preventDefault(),
@@ -768,7 +760,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 	doRender: () => { // Render HTML
 		_trigger("load");  // Fire load event
 		if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
-		$.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
+		$.rq("C", fn("-")); // Update DOM and fetch canonical URL
 
 		var href = $.rq("h"), // Retrieve href 
 		href = $.rq("c", href); // Fetch canonical if no hash or parameters in URL
