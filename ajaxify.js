@@ -700,10 +700,7 @@ pO("pronto", { $body: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector
 		if (!$.rq("?", true)) return; //semaphore check for prefetch requests
 		var href = $.rq("v", e); // validate internal URL
 		if ($.rq("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
-		fn("+", href, () => {} /*//prefetch page
-				if (previewoff === true) return(false);
-				if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
-		}*/);
+		fn("+", href, () => {});
 	},
 	stopBubbling: e => ( // Stop "bubbling-up"
 		e.preventDefault(),
@@ -764,7 +761,7 @@ pO("pronto", { $body: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector
 
 		var href = $.rq("h"), // Retrieve href 
 		href = $.rq("c", href); // Fetch canonical if no hash or parameters in URL
-		$.frms("a"); // Ajaxify forms - in content divs only
+		$.frms("a"); // Ajaxify forms
 
 		$.hApi($.rq("p") ? "+" : "=", href); // Push new state to the stack on new url
 		if (fn("title")) $("title").html(fn("title").html()); // Update title
