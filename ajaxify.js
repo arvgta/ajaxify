@@ -217,7 +217,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 		$t.html($c.html()); //inject element into primary DOM
 	},
 
-	ldBody: () => $.cache1().find("#ajy-body").attr("tagName", "body") && _ld($("body"), $.cache1().find("#ajy-body")),
+	ldBody: () => $.cache1() && $.cache1().find("#ajy-body").attr("tagName", "body") && _ld($("body"), $.cache1().find("#ajy-body")),
 
 	lAjax: (hin, pre) => { //execute Ajax load
 		var ispost = $.rq("is"); //POST?
