@@ -658,7 +658,7 @@ pO("pronto", { $body: 0, requestTimer: 0, pfohints: 0 }, { selector: "a:not(.no-
 
 	if(h === "i") { //request to initialise
 		var s = settings; //abbreviation
-		if($this.length) $.log("Main selector contents no longer needed from version 8.0.0!");
+		if($this.length) $.log("Main selector no longer needed");
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		$.frms(0, 0, s); //initialise forms sub-plugin
 		if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
