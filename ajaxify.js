@@ -96,15 +96,8 @@ function _internal(url) {
 }
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
-	if (flush) //delete all old attributes
-		while(el.attributes.length > 0)
-			el.removeAttribute(el.attributes[0].name);
-
-	var attr, attributes = Array.prototype.slice.call($S[0].attributes); //slice performs a copy, too;
-	
-	while (attr = attributes.pop()) { //fetch one of all the attributes at a time
-		el.setAttribute(attr.nodeName, attr.nodeValue); //low-level insertion
-	}
+	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
+	[...$S[0].attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 }
 
 function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string
