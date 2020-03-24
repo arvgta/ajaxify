@@ -21,7 +21,7 @@ The plugin can take an arbitrary amount of IDs
 
 Options default values
 {
-// basic config parameters
+//	basic config parameters
 	selector : "a:not(.no-ajaxy)", //Selector for elements to trigger swapping - not those to be swapped - e.g. a selection of links
 	forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
 	canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
