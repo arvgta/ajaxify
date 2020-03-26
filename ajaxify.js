@@ -225,10 +225,13 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 	},
 
 	lEls: $t => //load target selection into DOM
-		$.cache1() && $t.each(function() { //iterate through elements
+		$.cache1() && !_isBody($t) && $t.each(function() { //iterate through elements
 			_ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
 		})
 	,
+
+	isBody: $t => $t.prop("tagName").toLowerCase() == "body" && $.cache1().find("#ajy-body").attr("tagName", "body")
+		&& (_ld($("body"), $.cache1().find("#ajy-body")), 1),
 
 	lAjax: (hin, pre) => { //execute Ajax load
 		var ispost = $.rq("is"); //POST?
@@ -669,7 +672,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 
 	if(h === "i") { //request to initialise
 		var s = settings; //abbreviation
-		if(!$this.length) $.log("Warning - empty content selector passed!");
+		if(!$this.length) $this = $("body");
 		$gthis = $this; //copy selection to global selector
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
