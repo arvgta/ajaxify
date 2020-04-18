@@ -399,7 +399,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
 
 	if(!pass) _newArray($this); //Fill new array on initial load, nothing more
 	else $this.each(function() { //Iterate through selection
-		var $t = $(this), url = $t.attr(PK), async = $t.attr("async"), defer = $t.attr("defer");
+		var $t = $(this), url = $t.attr(PK);
 		if(_classAlways($t, url)) { //Class always handling
 			_removeScript(url); //remove from DOM
 			_iScript($t); //insert back single external script in the head
