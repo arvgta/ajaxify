@@ -104,6 +104,8 @@ function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.lengt
 	this.find = t => (!t || !myHints) ? false : myHints.some(h => t.iO(h)) //iterate through hints within passed text (t)
 }
 
+function _esc(url) { return url.replace(/(\/|\\)/g,"\\$1"); } 
+
 // The stateful Cache plugin
 // Usage - parameter "o" values: 
 // none - returns currently cached page
@@ -431,7 +433,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
 	iScript: $S => { //insert single script - pre-processing
 		var url = $S.attr(PK);
 
-		if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
+		if(PK == "href") return $(linki.replace("*", _esc(url))).appendTo("head"); //insert single stylesheet
 		if(!url) return $.scripts($S); //insert single inline script
 
 		//Insert single external JS script - we have to go low level to avoid a warning coming from jQuery append()
@@ -439,10 +441,10 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
 		var script = document.createElement("script");
 		script.async = asyncdef; //initialise with asyncdef - may be overwritten in _copyAttributes
 		_copyAttributes(script, $S); //copy all attributes of script element generically
-		document.head.appendChild(script); //it doesn't matter much, if we append to head or content element
+		document.head.appendChild(script); //append to head because some come from the head
 	},
 	findScript: url => !url ? false : $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
-	removeScript: $S => $((PK == "href" ? linkr : scrr).replace("!", $S)).remove() //Remove script (stylesheet or external JS) from DOM
+	removeScript: $S => $((PK == "href" ? linkr : scrr).replace("!", _esc($S))).remove() //Remove script (stylesheet or external JS) from DOM
 });
 
 
