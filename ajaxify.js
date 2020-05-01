@@ -385,7 +385,7 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
+pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
 	if(!hints) hints = new Hints(alwayshints); //create Hints object during first pass
 	if(!$this.length) return; //ensure input
 	if(deltas === "n") return true; //If delta-loading disabled, return quickly
@@ -399,14 +399,16 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
 
 	if(!pass) _newArray($this); //Fill new array on initial load, nothing more
 	else $this.each(function() { //Iterate through selection
-		var $t = $(this), url = $t.attr(PK);
-		if(_classAlways($t, url)) { //Class always handling
-			_removeScript(url); //remove from DOM
+		var $t = $(this);
+		url = $t.attr(PK);
+
+		if(_classAlways($t)) { //Class always handling
+			_removeScript(); //remove from DOM
 			_iScript($t); //insert back single external script in the head
 			return;
 		}
 		if(url) { //URL?
-			if(!_findScript(url)) { // Test, whether new
+			if(!_findScript()) { // Test, whether new
 				$scriptsO.push(url); //If yes: Push to old array
 				_iScript($t);
 			}
@@ -424,12 +426,12 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
 	,
 	newArray: $t =>	 //Fill new array on initial load
 		$t.each(function() { //Iterate through selection
-			if($(this).attr(PK)) $scriptsO.push($(this).attr(PK)); //Copy over external sheet URLs only
+			if(url = $(this).attr(PK)) $scriptsO.push(url); //Copy over external sheet URLs only
 		})
 	,
-	classAlways: ($t, url) => $t.attr("data-class") == "always" || hints.find(url), //Check for data-class = "always" and alwayshints
+	classAlways: $t => $t.attr("data-class") == "always" || hints.find(url), //Check for data-class = "always" and alwayshints
 	iScript: $S => { //insert single script - pre-processing
-		var url = $S.attr(PK);
+		url = $S.attr(PK);
 
 		if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
 		if(!url) return $.scripts($S); //insert single inline script
@@ -439,10 +441,10 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, hints: 0 }, { deltas: 
 		var script = document.createElement("script");
 		script.async = asyncdef; //initialise with asyncdef - may be overwritten in _copyAttributes
 		_copyAttributes(script, $S); //copy all attributes of script element generically
-		document.head.appendChild(script); //it doesn't matter much, if we append to head or content element
+		document.head.appendChild(script); //append to head because some come from the head
 	},
-	findScript: url => !url ? false : $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
-	removeScript: $S => $((PK == "href" ? linkr : scrr).replace("!", $S)).remove() //Remove script (stylesheet or external JS) from DOM
+	findScript: () => !url ? false : $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
+	removeScript: () => $((PK == "href" ? linkr : scrr).replace("!", url)).remove() //Remove script (stylesheet or external JS) from DOM
 });
 
 
