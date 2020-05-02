@@ -422,7 +422,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 	allScripts: $t => 
 		$t.each(function() { //Iterate through scripts
 			_iScript($(this)); //Write out single script
-		}) && true //Always return true
+		})
 	,
 	newArray: $t =>	 //Fill new array on initial load
 		$t.each(function() { //Iterate through selection
@@ -443,7 +443,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 		_copyAttributes(script, $S); //copy all attributes of script element generically
 		document.head.appendChild(script); //append to head because some come from the head
 	},
-	findScript: () => !url ? false : $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
+	findScript: () => url && $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
 	removeScript: () => $((PK == "href" ? linkr : scrr).replace("!", url)).remove() //Remove script (stylesheet or external JS) from DOM
 });
 
