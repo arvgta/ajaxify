@@ -408,7 +408,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 			return;
 		}
 		if(url) { //URL?
-			if(!_findScript()) { // Test, whether new
+			if(!$scriptsO.some(e => e == url)) { // Test, whether new
 				$scriptsO.push(url); //If yes: Push to old array
 				_iScript($t);
 			}
@@ -443,7 +443,6 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 		_copyAttributes(script, $S); //copy all attributes of script element generically
 		document.head.appendChild(script); //append to head because some come from the head
 	},
-	findScript: () => url && $scriptsO.some(e => e == url), //Find URL in old array, on first positive match return true
 	removeScript: () => $((PK == "href" ? linkr : scrr).replace("!", url)).remove() //Remove script (stylesheet or external JS) from DOM
 });
 
