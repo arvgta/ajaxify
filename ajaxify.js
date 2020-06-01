@@ -230,7 +230,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 		})
 	,
 
-	isBody: $t => $t.prop("tagName").toLowerCase() == "body" && $.cache1().find("#ajy-body").prop("tagName", "body")
+	isBody: $t => $t.prop("tagName").toLowerCase() == "body" /*&& $.cache1().find("#ajy-body").prop("tagName", "body")*/
 		&& (_ld($("body"), $.cache1().find("#ajy-body")), 1),
 
 	lAjax: (hin, pre) => { //execute Ajax load
