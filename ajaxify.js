@@ -619,7 +619,7 @@ pO("offsets", { d: [], i: -1 }, 0, function (h) {
 // scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
 // Switch (o) values:
 // + - add current page to offsets
-// - - scroll to current page offset
+// ! - scroll to current page offset
 pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 	if(!o) return; //ensure operator
 
