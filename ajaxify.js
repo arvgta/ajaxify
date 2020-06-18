@@ -783,14 +783,14 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 	doRender: () => { // Render HTML
 		_trigger("load");  // Fire load event
 		if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
-		$.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
 
 		var href = $.rq("h"), // Retrieve href 
 		href = $.rq("c", href); // Fetch canonical if no hash or parameters in URL
-		$.frms("a"); // Ajaxify forms - in content divs only
 
 		$.hApi($.rq("p") ? "+" : "=", href); // Push new state to the stack on new url
 		if (fn("title")) $("title").html(fn("title").html()); // Update title
+		$.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
+		$.frms("a"); // Ajaxify forms - in content divs only
 
 		// Stop animations + finishing off
 		$.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
