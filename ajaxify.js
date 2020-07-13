@@ -386,11 +386,11 @@ pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
 pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
 	if(!hints) hints = new Hints(alwayshints); //create Hints object during first pass
 	if(!$this.length) return; //ensure input
-	if(deltas === "n") return true; //If delta-loading disabled, return quickly
+	if(deltas === "n") return true; //Delta-loading completely disabled
 
 	PK = pk; //Copy "primary key" into internal variable
 
-	if(deltas === false) return _allScripts($this); //process all scripts
+	if(!deltas) return _allScripts($this); //process all scripts
 	//deltas presumed to be "true" -> proceed with normal delta-loading
 
 	$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  If PK is "href" - stylesheets, otherwise JS
