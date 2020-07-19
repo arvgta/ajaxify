@@ -393,7 +393,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 	if(!deltas) return _allScripts($this); //process all scripts
 	//deltas presumed to be "true" -> proceed with normal delta-loading
 
-	$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  If PK is "href" - stylesheets, otherwise JS
+	$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
 
 	if(!pass) _newArray($this); //Fill new array on initial load, nothing more
 	else $this.each(function() { //Iterate through selection
