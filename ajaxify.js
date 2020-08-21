@@ -19,7 +19,10 @@ jQuery('#content, #nav').ajaxify();
 The plugin can take an arbitrary amount of IDs
 
 
-Options default values
+//Options default values
+*/
+var gsettings, dsettings = 
+
 {
 //	basic config parameters
 	selector : "a:not(.no-ajaxy)", //Selector for elements to trigger swapping - not those to be swapped - e.g. a selection of links
@@ -36,7 +39,7 @@ Options default values
 // script and style handling settings, prefetch
 	deltas : true, // true = deltas loaded, false = all scripts loaded
 	asyncdef : false, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
-	alwayshints: false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
+	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
 	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
@@ -49,10 +52,10 @@ Options default values
 	memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
 	cb : null, // callback handler on completion of each Ajax request - default null
 	pluginon : true // Plugin set "on" or "off" (==false) manually
-}
+};
 
 
-*/
+
 
 
  //Intuitively better understandable shorthand for String.indexOf() - String.iO()
@@ -81,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
-var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { let ${i} = function(${$=e?"options":""}){\n        ${p}\n        ${d}\n        this.a = ${funStr};\n        ${O}\n    };\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,!0!==codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
+var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
 
 
 //Global helpers
@@ -280,6 +283,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 	var o = options;
 	if (!o || typeof(o) !== "string") {
 		$(function () { //on DOMReady
+			gsettings = Object.assign(dsettings, settings);
 			if (_init(settings)) { //sub-plugins initialisation
 				$this.pronto("i", settings); //Pronto initialisation
 				if (deltas) $.scripts("1"); //delta-loading initialisation
