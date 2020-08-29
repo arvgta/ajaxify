@@ -105,6 +105,8 @@ function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.lengt
 	this.find = t => (!t || !myHints) ? false : myHints.some(h => t.iO(h)) //iterate through hints within passed text (t)
 }
 
+function lg(m){ gsettings.verbosity && console && console.log(m); }
+
 // The stateful Cache plugin
 // Usage - parameter "o" values: 
 // none - returns currently cached page
@@ -117,7 +119,7 @@ pO("cache1", { d: false }, 0, function (o) {
 	if (typeof o === "string") { //URL or "f" passed
 		if(o === "f") { //"f" passed -> flush
 			$.pages("f"); //delegate flush to $.pages
-			$.log("Cache flushed");
+			lg("Cache flushed");
 		} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
 
 		return d; //return cached page
@@ -213,7 +215,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 
 	ld: ($t, $h) => { //load HTML of target selection into DOM
 		if(typeof $h[0] == "undefined") { //target element absent or corrupted
-			$.log("Inserting placeholder for ID: " + $t.attr("id"));
+			lg("Inserting placeholder for ID: " + $t.attr("id"));
 			var tagN = $t.prop("tagName").toLowerCase();
 			$t = $t.replaceWith("<" + tagN + " id='" + $t.attr("id") + "'></" + tagN + ">"); //insert empty hidden element with id as a placeholder
 			return; //Skip this element and continue - skip the rest of the _ld() function
@@ -259,7 +261,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 			try {
 				xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
 				_trigger("error", error); //raise general pronto.error event
-				$.log("Response text : " + xhr.responseText); //log out debugging information
+				lg("Response text : " + xhr.responseText); //log out debugging information
 				$.cache1($(_parseHTML(xhr.responseText))); //attempt to gracefully fill $.cache1
 				$.pages([hin, $.cache1()]); //commit to $.pages
 				if(cb) return cb(error);  //finally, call user's bespoke callback function
@@ -294,9 +296,10 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 }, {
 	init: s => { //main intialisation of Pronto and its sub-plugins
 		if (!api || !pluginon) { //History API not defined or Ajaxify turned off manually -> exit / gracefully degrade
-			$.log("Gracefully exiting...");
+			lg("Gracefully exiting...");
 			return false;
 		}
+		lg("Test");
 		$.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
 		$.scripts("i", s); //Initialse sub-plugins...
 		$.cache1(0, s);
@@ -354,7 +357,7 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: fal
 
 		try { $.globalEval(txt); } catch (e1) { //instead of appending, try an eval
 			try { eval(txt); } catch (e2) {
-				$.log("Error in inline script : " + txt + "\nError code : " + e2);
+				lg("Error in inline script : " + txt + "\nError code : " + e2);
 			}
 		}
 	},
@@ -757,7 +760,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		_trigger("request"); // Fire request event
 		fn($.rq("h"), err => { // Call "fn" - handler of parent
 			if (err) { 
-				$.log("Error in _request : " + err); 
+				lg("Error in _request : " + err); 
 				_trigger("error", err); 
 			}
 
