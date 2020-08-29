@@ -83,6 +83,9 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
+//Module global classes
+let pages;
+
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
 
@@ -118,9 +121,9 @@ pO("cache1", { d: false }, 0, function (o) {
 	
 	if (typeof o === "string") { //URL or "f" passed
 		if(o === "f") { //"f" passed -> flush
-			$.pages("f"); //delegate flush to $.pages
+			pages.a("f"); //delegate flush to $.pages
 			lg("Cache flushed");
-		} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
+		} else d = pages.a($.memory(o)); //URL passed -> look up page in memory
 
 		return d; //return cached page
 	}
@@ -145,21 +148,25 @@ pO("memory", 0, { memoryoff: false, hints: 0 }, function (h) {
 // <URL> - returns page with specified URL from internal array
 // <jQuery object> - saves the passed page in internal array
 // false - returns false
-pO("pages", { d: [], i: -1 }, 0, function (h) {
-	if (typeof h === "string") { //URL or "f" passed
-		if(h === "f") d = []; //"f" ? -> flush internal array
-		else if((i=_iPage(h)) !== -1) return d[i][1]; //get page index - return entire page / not found - do nothing
-	}
+class classPages { constructor() {
+	let d = [], i = -1;
+            
+    this.a = function (h) {
+		if (typeof h === "string") { 
+			if(h === "f") d = []; 
+			else if((i=_iPage(h)) !== -1) return d[i][1]; 
+		}
 
-	if (typeof h === "object") { //jQuery object passed [href, <page>]
-		if((i=_iPage(h)) === -1) d.push(h); //check whether href in array already? / no -> add to array
-		else d[i] = h; //yes -> update complete object
-	}
+		if (typeof h === "object") { 
+			if((i=_iPage(h)) === -1) d.push(h); 
+			else d[i] = h; 
+		}
 
-	if (typeof h === "boolean") return false; //false in - false out
-}, 
-{	 iPage: h => d.findIndex(e => e[0] == h) //find index of page within array
-});
+		if (typeof h === "boolean") return false; 
+	};
+		
+	let _iPage = h => d.findIndex(e => e[0] == h)
+}}
 
 // The GetPage plugin
 // First parameter (o) is a switch: 
@@ -250,7 +257,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 			}
 
 			$.cache1($(_parseHTML(h))); //Clean HTML and load it into cache
-			$.pages([hin, $.cache1()]); //Load object into $.pages, too
+			pages.a([hin, $.cache1()]); //Load object into $.pages, too
 			plus = 0; //Reset "plus" variable, indicating no pre-fetch has happened
 
 			if (cb) return(cb()); //Call callback if given
@@ -263,7 +270,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 				_trigger("error", error); //raise general pronto.error event
 				lg("Response text : " + xhr.responseText); //log out debugging information
 				$.cache1($(_parseHTML(xhr.responseText))); //attempt to gracefully fill $.cache1
-				$.pages([hin, $.cache1()]); //commit to $.pages
+				pages.a([hin, $.cache1()]); //commit to $.pages
 				if(cb) return cb(error);  //finally, call user's bespoke callback function
 			} catch (e) {}
 		},
@@ -286,6 +293,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 	if (!o || typeof(o) !== "string") {
 		$(function () { //on DOMReady
 			gsettings = Object.assign(dsettings, settings);
+			pages = new classPages();
 			if (_init(settings)) { //sub-plugins initialisation
 				$this.pronto("i", settings); //Pronto initialisation
 				if (deltas) $.scripts("1"); //delta-loading initialisation
