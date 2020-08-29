@@ -299,8 +299,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 			lg("Gracefully exiting...");
 			return false;
 		}
-		lg("Test");
-		$.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
+		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
+		//$.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
 		$.scripts("i", s); //Initialse sub-plugins...
 		$.cache1(0, s);
 		$.memory(0, s);
