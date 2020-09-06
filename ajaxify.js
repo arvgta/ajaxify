@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1;
+let pages, memory, cache1, getPage, fn;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -110,7 +110,7 @@ function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.lengt
 
 function lg(m){ gsettings.verbosity && console && console.log(m); }
 
-// The stateful Cache plugin
+// The stateful Cache class
 // Usage - parameter "o" values: 
 // none - returns currently cached page
 // <URL> - returns page with specified URL
@@ -138,7 +138,7 @@ class classCache1 { constructor() {
 	};          
  }}
 
-// The stateful Memory plugin
+// The stateful Memory class
 // Usage: memory.a(<URL>) - returns the same URL if not turned off internally
 class classMemory { constructor(options) {
 	let hints = 0, memoryoff = gsettings.memoryoff;
@@ -151,7 +151,7 @@ class classMemory { constructor(options) {
 	};           
 }}
 
-// The stateful Pages plugin
+// The stateful Pages class
 // Usage - parameter "h" values:
 // <URL> - returns page with specified URL from internal array
 // <jQuery object> - saves the passed page in internal array
@@ -185,111 +185,106 @@ class classPages { constructor() {
 // x - returns XHR
 // otherwise - returns selection of current page to client
 
-pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) { 
-	if (!o) return cache1.a(); //nothing passed -> return currently cached page
+class classGetPage { constructor() {
+	let xhr = 0, cb = 0, plus = 0, rt = "", ct = 0;
+            
+	this.a = function (o, p, p2) { 
+		if (!o) return cache1.a(); 
 
-	if (o.iO("/")) { //URL
-		cb = p; //second parameter "p" must be callback
-		if(plus == o) return; //same URL as in "plus" variable? -> return
-		return _lPage(o); //load page with the URL and return it
-	}
-	if (o === "+")	{ //pre-fetch page
-		plus = p; //store second parameter "p" in "plus" variable
-		cb = p2; //third parameter "p2" must be callback
-		return _lPage(p, true); //load page with the URL, indicating a pre-fetch in second parameter (true)
-	}
-
-	if (o === "a") { if (xhr && xhr.readyState !== 4) xhr.abort(); return; }
-	if (o === "s") return ((xhr) ? xhr.readyState : 4) + rt; //return xhr ready state together with request type(rt)
-	if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
-	if (o === "x") return xhr; //return xhr object dynamically
-
-	if (!cache1.a()) return;
-	if (o === "body") return cache1.a().find("#ajy-" + o);
-	if (o === "script") return cache1.a().find(o); //scripts are not escaped
-
-	return cache1.a().find(o === "title" ?	"title:first" : ".ajy-" + o); //default -> return element requested from cached page
-
-}, {
-	lSel: $t => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
-		pass++, //central increment of "pass" variable
-		_lEls($t), //load selection specified in "$t" into DOM
-		$("body > script").remove("." + inlineclass), //remove all previously dynamically added inline scripts
-		$.scripts(true), //invoke delta-loading of JS
-		$.scripts("s"), //invoke delta-loading of CSS
-		$.scripts("c") //return canonical URL
-	),
-
-	lPage: (h, pre) => { //fire Ajax load, check for hash first, "pre" indicates a prefetch
-		if (h.iO("#")) h = h.split("#")[0]; //get first part before hash
-		if ($.rq("is") || !cache1.a(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
-
-		plus = 0; //otherwise reset "plus" variable
-		if (cb) return cb(); //fire callback, if given
-	},
-
-	ld: ($t, $h) => { //load HTML of target selection into DOM
-		if(typeof $h[0] == "undefined") { //target element absent or corrupted
-			lg("Inserting placeholder for ID: " + $t.attr("id"));
-			var tagN = $t.prop("tagName").toLowerCase();
-			$t = $t.replaceWith("<" + tagN + " id='" + $t.attr("id") + "'></" + tagN + ">"); //insert empty hidden element with id as a placeholder
-			return; //Skip this element and continue - skip the rest of the _ld() function
+		if (o.iO("/")) { 
+			cb = p; 
+			if(plus == o) return; 
+			return _lPage(o); 
 		}
 
-		var $c = $h.clone(); //we want to preserve the original target element
-		$c.find("script").remove(); //prevent double firing of scripts
-		_copyAttributes($t[0], $c, true); //copy tag attributes of element, flushing the first parameter initially
-		$t.html($c.html()); //inject element into primary DOM
+		if (o === "+")	{ 
+			plus = p; 
+			cb = p2; 
+			return _lPage(p, true); 
+		}
+
+		if (o === "a") { if (xhr && xhr.readyState !== 4) xhr.abort(); return; }
+		if (o === "s") return ((xhr) ? xhr.readyState : 4) + rt; 
+		if (o === "-") return _lSel(p); 
+		if (o === "x") return xhr; 
+
+		if (!cache1.a()) return;
+		if (o === "body") return cache1.a().find("#ajy-" + o);
+		if (o === "script") return cache1.a().find(o); 
+
+		return cache1.a().find(o === "title" ?	"title:first" : ".ajy-" + o); 
+};
+let _lSel = $t => (
+	pass++, 
+	_lEls($t), 
+	jQuery("body > script").remove("." + inlineclass), 
+	jQuery.scripts(true), 
+	jQuery.scripts("s"), 
+	jQuery.scripts("c") 
+),
+	_lPage = (h, pre) => { 
+		if (h.iO("#")) h = h.split("#")[0]; 
+		if (jQuery.rq("is") || !cache1.a(h)) return _lAjax(h, pre); 
+
+		plus = 0; 
+		if (cb) return cb(); 
 	},
+	_ld = ($t, $h) => { 
+		if(typeof $h[0] == "undefined") { 
+			lg("Inserting placeholder for ID: " + $t.attr("id"));
+			var tagN = $t.prop("tagName").toLowerCase();
+			$t = $t.replaceWith("<" + tagN + " id='" + $t.attr("id") + "'></" + tagN + ">"); 
+			return; 
+		}
 
-	lEls: $t => //load target selection into DOM
-		cache1.a() && !_isBody($t) && $t.each(function() { //iterate through elements
-			_ld($(this), cache1.a().find("#" + $(this).attr("id"))); //load target element into DOM
-		})
-	,
+		var $c = $h.clone(); 
+		$c.find("script").remove(); 
+		_copyAttributes($t[0], $c, true); 
+		$t.html($c.html()); 
+	},
+	_lEls = $t => 
+		cache1.a() && !_isBody($t) && $t.each(function() { 
+			_ld(jQuery(this), cache1.a().find("#" + jQuery(this).attr("id"))); 
+		}),
+	_isBody = $t => $t.prop("tagName").toLowerCase() == "body" 
+		&& (_ld(jQuery("body"), cache1.a().find("#ajy-body")), 1),
+	_lAjax = (hin, pre) => { 
+		var ispost = jQuery.rq("is"); 
+		if (pre) rt="p"; else rt="c"; 
 
-	isBody: $t => $t.prop("tagName").toLowerCase() == "body" /*&& cache1.a().find("#ajy-body").prop("tagName", "body")*/
-		&& (_ld($("body"), cache1.a().find("#ajy-body")), 1),
-
-	lAjax: (hin, pre) => { //execute Ajax load
-		var ispost = $.rq("is"); //POST?
-		if (pre) rt="p"; else rt="c"; //store request type (p-prefetch, c-click)
-
-		xhr = $.ajax({ //central AJAX load, for both POSTs and GETs
-		url: hin, //URL
-		type: ispost ? "POST" : "GET", //POST or GET?
-		data: ispost ? $.rq("d") : null, //fetch data from $.rq
-		success: h => { //success -> "h" holds HTML
-			if (!h || !_isHtml(xhr)) { //HTML empty or not HTML or XML?
-				if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
+		xhr = jQuery.ajax({ 
+		url: hin, 
+		type: ispost ? "POST" : "GET", 
+		data: ispost ? jQuery.rq("d") : null, 
+		success: h => { 
+			if (!h || !_isHtml(xhr)) { 
+				if (!pre) location.href = hin; 
 			}
 
-			cache1.a($(_parseHTML(h))); //Clean HTML and load it into cache
-			pages.a([hin, cache1.a()]); //Load object into $.pages, too
-			plus = 0; //Reset "plus" variable, indicating no pre-fetch has happened
+			cache1.a(jQuery(_parseHTML(h))); 
+			pages.a([hin, cache1.a()]); 
+			plus = 0; 
 
-			if (cb) return(cb()); //Call callback if given
+			if (cb) return(cb()); 
 		},
-		error: (jqXHR, status, error) => {
-		// Try to parse response text
-			if (status === 'abort') {plus=0; return;} // handler for fn("a") aborted requests, to avoid error
+		error: (jqXHR, status, error) => {	
+			if (status === 'abort') {plus=0; return;} 
 			try {
-				xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
-				_trigger("error", error); //raise general pronto.error event
-				lg("Response text : " + xhr.responseText); //log out debugging information
-				cache1.a($(_parseHTML(xhr.responseText))); //attempt to gracefully fill cache1
-				pages.a([hin, cache1.a()]); //commit to $.pages
-				if(cb) return cb(error);  //finally, call user's bespoke callback function
+				xhr = jqXHR; 
+				_trigger("error", error); 
+				lg("Response text : " + xhr.responseText); 
+				cache1.a(jQuery(_parseHTML(xhr.responseText))); 
+				pages.a([hin, cache1.a()]); 
+				if(cb) return cb(error);  
 			} catch (e) {}
 		},
-		async: true //Explicitly not synchronous!
+		async: true 
 		});
 	},
-
-	isHtml: x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")), //restrict interesting MIME types - only (X)HTML / FORM-family
-	parseHTML: h => $.parseHTML($.trim(_replD(h)), null, true), //process fetched HTML, trim escaped HTML of entire page
-	replD: h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>") //pre-process HTML so it can be loaded by jQuery
-});
+	_isHtml = x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")),
+	_parseHTML = h => jQuery.parseHTML(jQuery.trim(_replD(h)), null, true),
+	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
+}}
 
 // The main plugin - Ajaxify
 // Is passed the global options 
@@ -319,6 +314,7 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 		$.scripts("i", s); //Initialse sub-plugins...
 		cache1 = new classCache1();
 		memory = new classMemory();
+		fn = getPage = new classGetPage();
 		return true; //Return success
 	}
 });
@@ -387,10 +383,10 @@ pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: fal
 // Fetches all external scripts on the page
 // Fetches all inline scripts on the page
 pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
-	head = pass ? fn("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+	head = pass ? fn.a("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
 	if (!head) return true;
 	lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-	j = pass ? fn("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+	j = pass ? fn.a("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
 	$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
 	$s.y = head.find("style"); //Extract style tags
 	$s.can = _rel(lk, "canonical"); //Extract canonical tag
@@ -494,11 +490,11 @@ pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, 
 	if(o === "!") return l = h; //store href in "l" (last request)
 
 	if(o === "?") { //Edin previously called this "isOK" - powerful intelligent plausibility check
-		let xs=fn("s");
-		if (!xs.iO("4") && !p) fn("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
+		let xs=fn.a("s");
+		if (!xs.iO("4") && !p) fn.a("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
 		if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
 		if (xs==="1p" && p) return true; //if xhr is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
-		//([semaphore options for requests] fn("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
+		//([semaphore options for requests] fn.a("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
 		return true;
 	}
 
@@ -736,7 +732,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		if (!$.rq("?", true)) return; //semaphore check for prefetch requests
 		var href = $.rq("v", e); // validate internal URL
 		if ($.rq("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
-		fn("+", href, () => { //prefetch page
+		fn.a("+", href, () => { //prefetch page
 				if (previewoff === true) return(false);
 				if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
 		});
@@ -773,7 +769,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		$.rq("!"); //we're serious about this request - disable further fetches on same URL
 		if(notPush) $.rq("p", false); // mode for hApi - replaceState / pushState
 		_trigger("request"); // Fire request event
-		fn($.rq("h"), err => { // Call "fn" - handler of parent
+		fn.a($.rq("h"), err => { // Call "fn" - handler of parent
 			if (err) { 
 				lg("Error in _request : " + err); 
 				_trigger("error", err); 
@@ -799,18 +795,18 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 
 		if (!url || url === currentURL) return; // Check if data exists
 		_trigger("request"); // Fire request event
-		fn(url, _render); // Call "fn" - handler of parent, continue with _render()
+		fn.a(url, _render); // Call "fn" - handler of parent, continue with _render()
 	},
 	doRender: () => { // Render HTML
 		_trigger("load");  // Fire load event
-		if(bodyClasses) { var classes = fn("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
+		if(bodyClasses) { var classes = fn.a("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
 
 		var href = $.rq("h"), // Retrieve href 
 		href = $.rq("c", href); // Fetch canonical if no hash or parameters in URL
 
 		$.hApi($.rq("p") ? "+" : "=", href); // Push new state to the stack on new url
-		if (fn("title")) $("title").html(fn("title").html()); // Update title
-		$.rq("C", fn("-", $gthis)); // Update DOM and fetch canonical URL
+		if (fn.a("title")) $("title").html(fn.a("title").html()); // Update title
+		$.rq("C", fn.a("-", $gthis)); // Update DOM and fetch canonical URL
 		$.frms("a"); // Ajaxify forms - in content divs only
 
 		// Stop animations + finishing off
@@ -836,4 +832,4 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 	}
 });
 
-var fn = jQuery.getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
+//var fn = getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
