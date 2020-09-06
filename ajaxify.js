@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory;
+let pages, memory, cache1;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -116,23 +116,27 @@ function lg(m){ gsettings.verbosity && console && console.log(m); }
 // <URL> - returns page with specified URL
 // <jQuery object> - saves the page in cache
 // f - flushes the cache
-pO("cache1", { d: false }, 0, function (o) {
-	if (!o) return d; //nothing passed -> return currently cached page
+class classCache1 { constructor() {
+	let d = false;
+            
+	this.a = function (o) {
+		if (!o) return d; 
 	
-	if (typeof o === "string") { //URL or "f" passed
-		if(o === "f") { //"f" passed -> flush
-			pages.a("f"); //delegate flush to $.pages
-			lg("Cache flushed");
-		} else d = pages.a(memory.a(o)); //URL passed -> look up page in memory
+		if (typeof o === "string") { //URL or "f" passed
+			if(o === "f") { //"f" passed -> flush
+				pages.a("f"); //delegate flush to $.pages
+				lg("Cache flushed");
+			} else d = pages.a(memory.a(o)); //URL passed -> look up page in memory
 
-		return d; //return cached page
-	}
+			return d; //return cached page
+		}
 
-	if (typeof o === "object") { //jQuery object passed (whole page)
-		d = o; //store object internally
-		return d; //return it
-	}
-});
+		if (typeof o === "object") { 
+			d = o; 
+			return d; 
+		}
+	};          
+ }}
 
 // The stateful Memory plugin
 // Usage: memory.a(<URL>) - returns the same URL if not turned off internally
@@ -182,7 +186,7 @@ class classPages { constructor() {
 // otherwise - returns selection of current page to client
 
 pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) { 
-	if (!o) return $.cache1(); //nothing passed -> return currently cached page
+	if (!o) return cache1.a(); //nothing passed -> return currently cached page
 
 	if (o.iO("/")) { //URL
 		cb = p; //second parameter "p" must be callback
@@ -200,11 +204,11 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 	if (o === "-") return _lSel(p); //load page into DOM, handle scripts and fetch canonical URL. "p" must hold selection to load
 	if (o === "x") return xhr; //return xhr object dynamically
 
-	if (!$.cache1()) return;
-	if (o === "body") return $.cache1().find("#ajy-" + o);
-	if (o === "script") return $.cache1().find(o); //scripts are not escaped
+	if (!cache1.a()) return;
+	if (o === "body") return cache1.a().find("#ajy-" + o);
+	if (o === "script") return cache1.a().find(o); //scripts are not escaped
 
-	return $.cache1().find(o === "title" ?	"title:first" : ".ajy-" + o); //default -> return element requested from cached page
+	return cache1.a().find(o === "title" ?	"title:first" : ".ajy-" + o); //default -> return element requested from cached page
 
 }, {
 	lSel: $t => ( //load selection specified in "$t" into DOM, handle scripts and fetch canonical URL
@@ -218,7 +222,7 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 
 	lPage: (h, pre) => { //fire Ajax load, check for hash first, "pre" indicates a prefetch
 		if (h.iO("#")) h = h.split("#")[0]; //get first part before hash
-		if ($.rq("is") || !$.cache1(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
+		if ($.rq("is") || !cache1.a(h)) return _lAjax(h, pre); //if request is a POST or page not in cache, really fire the Ajax request
 
 		plus = 0; //otherwise reset "plus" variable
 		if (cb) return cb(); //fire callback, if given
@@ -239,13 +243,13 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 	},
 
 	lEls: $t => //load target selection into DOM
-		$.cache1() && !_isBody($t) && $t.each(function() { //iterate through elements
-			_ld($(this), $.cache1().find("#" + $(this).attr("id"))); //load target element into DOM
+		cache1.a() && !_isBody($t) && $t.each(function() { //iterate through elements
+			_ld($(this), cache1.a().find("#" + $(this).attr("id"))); //load target element into DOM
 		})
 	,
 
-	isBody: $t => $t.prop("tagName").toLowerCase() == "body" /*&& $.cache1().find("#ajy-body").prop("tagName", "body")*/
-		&& (_ld($("body"), $.cache1().find("#ajy-body")), 1),
+	isBody: $t => $t.prop("tagName").toLowerCase() == "body" /*&& cache1.a().find("#ajy-body").prop("tagName", "body")*/
+		&& (_ld($("body"), cache1.a().find("#ajy-body")), 1),
 
 	lAjax: (hin, pre) => { //execute Ajax load
 		var ispost = $.rq("is"); //POST?
@@ -260,8 +264,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 				if (!pre) location.href = hin; //If not a pre-fetch -> jump to URL as an escape
 			}
 
-			$.cache1($(_parseHTML(h))); //Clean HTML and load it into cache
-			pages.a([hin, $.cache1()]); //Load object into $.pages, too
+			cache1.a($(_parseHTML(h))); //Clean HTML and load it into cache
+			pages.a([hin, cache1.a()]); //Load object into $.pages, too
 			plus = 0; //Reset "plus" variable, indicating no pre-fetch has happened
 
 			if (cb) return(cb()); //Call callback if given
@@ -273,8 +277,8 @@ pO("getPage", { xhr: 0, cb: 0, plus: 0, rt: "", ct: 0 }, 0, function (o, p, p2) 
 				xhr = jqXHR; //make xhr accessible asap for user in pronto.error handler
 				_trigger("error", error); //raise general pronto.error event
 				lg("Response text : " + xhr.responseText); //log out debugging information
-				$.cache1($(_parseHTML(xhr.responseText))); //attempt to gracefully fill $.cache1
-				pages.a([hin, $.cache1()]); //commit to $.pages
+				cache1.a($(_parseHTML(xhr.responseText))); //attempt to gracefully fill cache1
+				pages.a([hin, cache1.a()]); //commit to $.pages
 				if(cb) return cb(error);  //finally, call user's bespoke callback function
 			} catch (e) {}
 		},
@@ -312,9 +316,8 @@ pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this
 			return false;
 		}
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
-		//$.log("Ajaxify loaded...", verbosity, s); //verbosity steers, whether this initialisation message is output and initial verbosity
 		$.scripts("i", s); //Initialse sub-plugins...
-		$.cache1(0, s);
+		cache1 = new classCache1();
 		memory = new classMemory();
 		return true; //Return success
 	}
