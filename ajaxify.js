@@ -176,7 +176,7 @@ class classPages { constructor() {
 	let _iPage = h => d.findIndex(e => e[0] == h)
 }}
 
-// The GetPage plugin
+// The GetPage class
 // First parameter (o) is a switch: 
 // empty - returns cache
 // <URL> - loads HTML via Ajax, second parameter "p" must be callback
@@ -291,33 +291,46 @@ let _lSel = $t => (
 // Checks for necessary pre-conditions - otherwise gracefully degrades
 // Initialises sub-plugins
 // Calls Pronto
-pO("ajaxify", 0, { pluginon: true, deltas: true, verbosity: 0 }, function ($this, options) {
-	var o = options;
-	if (!o || typeof(o) !== "string") {
-		$(function () { //on DOMReady
-			gsettings = Object.assign(dsettings, settings);
-			pages = new classPages();
-			if (_init(settings)) { //sub-plugins initialisation
-				$this.pronto("i", settings); //Pronto initialisation
-				if (deltas) $.scripts("1"); //delta-loading initialisation
-			}
-		});
-	}
-	else return $().pronto(o);
-}, {
-	init: s => { //main intialisation of Pronto and its sub-plugins
-		if (!api || !pluginon) { //History API not defined or Ajaxify turned off manually -> exit / gracefully degrade
-			lg("Gracefully exiting...");
-			return false;
+(function ($) { class Ajaxify { constructor(options) {          
+	let settings = $.extend({"pluginon":true,"deltas":true,"verbosity":0}, options);
+	let pluginon = settings["pluginon"],
+	deltas = settings["deltas"],
+	verbosity = settings["verbosity"];
+	
+	this.a = function ($this, options) {
+		var o = options;
+		if (!o || typeof(o) !== "string") {
+			$(function () { 
+				gsettings = Object.assign(dsettings, settings);
+				pages = new classPages();
+				if (_init(settings)) { 
+					$this.pronto("i", settings); 
+					if (deltas) $.scripts("1"); 
+				}
+			});
 		}
-		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
-		$.scripts("i", s); //Initialse sub-plugins...
-		cache1 = new classCache1();
-		memory = new classMemory();
-		fn = getPage = new classGetPage();
-		return true; //Return success
-	}
-});
+		else return $().pronto(o);
+	};
+		let _init = s => { 
+			if (!api || !pluginon) { 
+				lg("Gracefully exiting...");
+				return false;
+			}
+			
+			lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
+			$.scripts("i", s); 
+			cache1 = new classCache1();
+			memory = new classMemory();
+			fn = getPage = new classGetPage();
+			return true; 
+		}
+}}
+
+    $.fn.ajaxify = function(options) {let $this = $(this);
+        if(!$.fn.ajaxify.o) $.fn.ajaxify.o = new Ajaxify(options);
+        return $.fn.ajaxify.o.a($this, options);
+    };
+})(jQuery);
 
 // The stateful Scripts plugin
 // First parameter "o" is switch:
