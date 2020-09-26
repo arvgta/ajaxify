@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn;
+let pages, memory, cache1, getPage, fn, scripts;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -218,9 +218,9 @@ let _lSel = $t => (
 	pass++, 
 	_lEls($t), 
 	jQuery("body > script").remove("." + inlineclass), 
-	jQuery.scripts(true), 
-	jQuery.scripts("s"), 
-	jQuery.scripts("c") 
+	scripts.a(true), 
+	scripts.a("s"), 
+	scripts.a("c") 
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
@@ -305,7 +305,7 @@ let _lSel = $t => (
 				pages = new classPages();
 				if (_init(settings)) { 
 					$this.pronto("i", settings); 
-					if (deltas) $.scripts("1"); 
+					if (deltas) scripts.a("1"); 
 				}
 			});
 		}
@@ -318,7 +318,9 @@ let _lSel = $t => (
 			}
 			
 			lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
-			$.scripts("i", s); 
+			
+			scripts = new classScripts();
+			scripts.a("i"); 
 			cache1 = new classCache1();
 			memory = new classMemory();
 			fn = getPage = new classGetPage();
@@ -338,57 +340,64 @@ let _lSel = $t => (
 // c - fetch canonical URL
 // jQuery object - handle one inline script
 // otherwise - delta loading
-pO("scripts", { $s : false, inlhints: 0, skphints: 0, txt: 0 }, { canonical: false, inline: true, inlinehints: false, inlineskip: "adsbygoogle", inlineappend: true, style: true }, function (o) {
-	if (o === "i") { //Initalise
-		if(!$s) $s = $(); //Start off with empty internal jQuery object
-		if(!inlhints) inlhints = new Hints(inlinehints); //create Hints object during initialisation
-		if(!skphints) skphints = new Hints(inlineskip); //create Hints object during initialisation
-		return true;
-	}
+class classScripts { constructor() {
+	let $s = false, inlhints = 0, skphints = 0, txt = 0,
+	canonical = gsettings.canonical,
+	inline = gsettings.inline,
+	inlinehints = gsettings.inlinehints,
+	inlineskip = gsettings.inlineskip,
+	inlineappend = gsettings.inlineappend,
+	style = gsettings.style;
+	
+    this.a = function (o) {
+		if (o === "i") { 
+			if(!$s) $s = jQuery(); 
+			if(!inlhints) inlhints = new Hints(inlinehints); 
+			if(!skphints) skphints = new Hints(inlineskip); 
+			return true;
+		}
 
-	if (o === "s") return _allstyle($s.y); //Handle style tags
+		if (o === "s") return _allstyle($s.y); 
 
-	if (o === "1") { //Initial load initialisation
-		$.detScripts($s); //Fetch scripts from DOM, "pass" variable will be 0
-		return _addScripts($s, settings); //Load scripts from DOM into addScripts and initialise it
-	}
+		if (o === "1") { 
+			jQuery.detScripts($s); 
+			return _addScripts($s, gsettings); 
+		}
 
-	if (o === "c") return canonical && $s.can ? $s.can.attr("href") : false; //Canonical URL handling - return href
-	if (o === "d") return $.detScripts($s); //fetch all scripts
-	if (o instanceof jQuery) return _onetxt(o); //process one inline script only
+		if (o === "c") return canonical && $s.can ? $s.can.attr("href") : false;
+		if (o === "d") return jQuery.detScripts($s);
+		if (o instanceof jQuery) return _onetxt(o);
 
-	if ($.scripts("d")) return; //fetch all scripts
-	_addScripts($s, settings); //delta-loading
-}, {
-	allstyle: $s =>	 //Style tag handling
-		!style || !$s || ( //Style shut off or selection empty -> return
-		$("head").find("style").remove(), //Remove all style tags in the DOM first
-		$s.each(function() { //Iterate through selection
-			var d = $(this).text(); //Grab text
-			_addstyle(d); //Add single style tag
-		})
-		)
-	,
-	onetxt: $s => //Add one inline JS script - pre-processing / validation
-		(!(txt = $s.text()).iO(").ajaxify(") && //Extract text and type, avoid unwanted recursion
-			((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || //Check hints, class "ajaxy"
+		if (scripts.a("d")) return;
+		_addScripts($s, gsettings);
+};
+let _allstyle = $s =>	 
+	!style || !$s || ( 
+	jQuery("head").find("style").remove(), 
+	$s.each(function() { 
+	var d = jQuery(this).text(); 
+	_addstyle(d); 
+	})
+	),
+	_onetxt = $s => 
+		(!(txt = $s.text()).iO(").ajaxify(") && 
+			((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || 
 			inlhints.find(txt))
-		) && _addtxt($s) //Check constraints
-	,
-	addtxt: $s => { //Add one inline JS script - main function
-		if(!txt || !txt.length) return; //Ensure input
+		) && _addtxt($s),
+	_addtxt = $s => { 
+		if(!txt || !txt.length) return; 
 		if(inlineappend || ($s.prop("type") && !$s.prop("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
 
-		try { $.globalEval(txt); } catch (e1) { //instead of appending, try an eval
+		try { jQuery.globalEval(txt); } catch (e1) { 
 			try { eval(txt); } catch (e2) {
 				lg("Error in inline script : " + txt + "\nError code : " + e2);
 			}
 		}
 	},
-	apptxt: $s => $s.clone().addClass(inlineclass).appendTo("body"), //Add one inline script - label with inlineclass to make dynamic removal later on easy
-	addstyle: t => $("head").append('<style>' + t + '</style>'), //add a single style tag
-	addScripts: ($s, st) => ( $s.c.addAll("href", st), $s.j.addAll("src", st) )//Delta-loading of sylesheets("href") and external JS files("src")
-});
+	_apptxt = $s => $s.clone().addClass(inlineclass).appendTo("body"),
+	_addstyle = t => jQuery("head").append('<style>' + t + '</style>'),
+	_addScripts = ($s, st) => ( $s.c.addAll("href", st), $s.j.addAll("src", st) )
+}}
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" jQuery object that is passed in and fills it
 // Fetches all stylesheets in the head
@@ -445,7 +454,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 			return;
 		}
 
-		if(PK != "href") $.scripts($t); //Inline JS script? -> inject into DOM
+		if(PK != "href") scripts.a($t); //Inline JS script? -> inject into DOM
 	});
 }, {
 	allScripts: $t => 
@@ -463,7 +472,7 @@ pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { 
 		url = $S.attr(PK);
 
 		if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
-		if(!url) return $.scripts($S); //insert single inline script
+		if(!url) return scripts.a($S); //insert single inline script
 
 		//Insert single external JS script - we have to go low level to avoid a warning coming from jQuery append()
 		//But we'll do our best to support all salient attributes
