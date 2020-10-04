@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts;
+let pages, memory, cache1, getPage, fn, scripts, detScripts;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -324,6 +324,7 @@ let _lSel = $t => (
 			cache1 = new classCache1();
 			memory = new classMemory();
 			fn = getPage = new classGetPage();
+			detScripts = new classDetScripts();
 			return true; 
 		}
 }}
@@ -360,12 +361,12 @@ class classScripts { constructor() {
 		if (o === "s") return _allstyle($s.y); 
 
 		if (o === "1") { 
-			jQuery.detScripts($s); 
+			detScripts.a($s); 
 			return _addScripts($s, gsettings); 
 		}
 
 		if (o === "c") return canonical && $s.can ? $s.can.attr("href") : false;
-		if (o === "d") return jQuery.detScripts($s);
+		if (o === "d") return detScripts.a($s);
 		if (o instanceof jQuery) return _onetxt(o);
 
 		if (scripts.a("d")) return;
@@ -404,18 +405,21 @@ let _allstyle = $s =>
 // Fetches the canonical URL
 // Fetches all external scripts on the page
 // Fetches all inline scripts on the page
-pO("detScripts", { head: 0, lk: 0, j: 0 }, 0, function ($s) {
-	head = pass ? fn.a("head") : $("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
-	if (!head) return true;
-	lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-	j = pass ? fn.a("script") : $("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
-	$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
-	$s.y = head.find("style"); //Extract style tags
-	$s.can = _rel(lk, "canonical"); //Extract canonical tag
-	$s.j = j; //Assign JSs to internal selection
-	}, { //rel - Extract files that have specific "rel" attribute only
-	rel: (lk, v) => $(lk).filter(function(){return($(this).attr("rel").iO(v));})
-});
+class classDetScripts { constructor() {
+	let head = 0, lk = 0, j = 0;
+            
+	this.a = function ($s) {
+		head = pass ? fn.a("head") : jQuery("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+		if (!head) return true;
+		lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
+		j = pass ? fn.a("script") : jQuery("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+		$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
+		$s.y = head.find("style"); //Extract style tags
+		$s.can = _rel(lk, "canonical"); //Extract canonical tag
+		$s.j = j; //Assign JSs to internal selection
+	};
+let _rel = (lk, v) => jQuery(lk).filter(function(){return(jQuery(this).attr("rel").iO(v));})
+}}
 
 
 // The AddAll plugin
@@ -853,5 +857,3 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
 	}
 });
-
-//var fn = getPage; //fn is passed to Pronto as a jQuery sub-plugin, that is a callback
