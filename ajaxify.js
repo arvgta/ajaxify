@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -325,6 +325,7 @@ let _lSel = $t => (
 			memory = new classMemory();
 			fn = getPage = new classGetPage();
 			detScripts = new classDetScripts();
+			addAll = new classAddAll();
 			return true; 
 		}
 }}
@@ -362,7 +363,7 @@ class classScripts { constructor() {
 
 		if (o === "1") { 
 			detScripts.a($s); 
-			return _addScripts($s, gsettings); 
+			return _addScripts($s); 
 		}
 
 		if (o === "c") return canonical && $s.can ? $s.can.attr("href") : false;
@@ -370,7 +371,7 @@ class classScripts { constructor() {
 		if (o instanceof jQuery) return _onetxt(o);
 
 		if (scripts.a("d")) return;
-		_addScripts($s, gsettings);
+		_addScripts($s);
 };
 let _allstyle = $s =>	 
 	!style || !$s || ( 
@@ -397,7 +398,7 @@ let _allstyle = $s =>
 	},
 	_apptxt = $s => $s.clone().addClass(inlineclass).appendTo("body"),
 	_addstyle = t => jQuery("head").append('<style>' + t + '</style>'),
-	_addScripts = ($s, st) => ( $s.c.addAll("href", st), $s.j.addAll("src", st) )
+	_addScripts = $s => ( addAll.a($s.c, "href"), addAll.a($s.j, "src") )
 }}
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" jQuery object that is passed in and fills it
@@ -427,66 +428,68 @@ let _rel = (lk, v) => jQuery(lk).filter(function(){return(jQuery(this).attr("rel
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-pO("addAll", { $scriptsO: [], $sCssO: [], $sO: [], PK: 0, url: 0, hints: 0 }, { deltas: true, asyncdef: false, alwayshints: false }, function ($this, pk) {
-	if(!hints) hints = new Hints(alwayshints); //create Hints object during first pass
-	if(!$this.length) return; //ensure input
-	if(deltas === "n") return true; //Delta-loading completely disabled
+class classAddAll { constructor() {
+	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, hints = 0,
+	deltas = gsettings.deltas,
+	asyncdef = gsettings.asyncdef,
+	alwayshints = gsettings.alwayshints;
 
-	PK = pk; //Copy "primary key" into internal variable
+	this.a = function ($this, pk) {
+		if(!hints) hints = new Hints(alwayshints); //create Hints object during first pass
+		if(!$this.length) return; //ensure input
+		if(deltas === "n") return true; //Delta-loading completely disabled
 
-	if(!deltas) return _allScripts($this); //process all scripts
-	//deltas presumed to be "true" -> proceed with normal delta-loading
+		PK = pk; //Copy "primary key" into internal variable
 
-	$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
+		if(!deltas) return _allScripts($this); //process all scripts
+		//deltas presumed to be "true" -> proceed with normal delta-loading
 
-	if(!pass) _newArray($this); //Fill new array on initial load, nothing more
-	else $this.each(function() { //Iterate through selection
-		var $t = $(this);
-		url = $t.attr(PK);
+		$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
 
-		if(_classAlways($t)) { //Class always handling
-			_removeScript(); //remove from DOM
-			_iScript($t); //insert back single external script in the head
-			return;
-		}
-		if(url) { //URL?
-			if(!$scriptsO.some(e => e == url)) { // Test, whether new
-				$scriptsO.push(url); //If yes: Push to old array
-				_iScript($t);
+		if(!pass) _newArray($this); //Fill new array on initial load, nothing more
+		else $this.each(function() { //Iterate through selection
+			var $t = jQuery(this);
+			url = $t.attr(PK);
+
+			if(_classAlways($t)) { //Class always handling
+				_removeScript(); //remove from DOM
+				_iScript($t); //insert back single external script in the head
+				return;
 			}
-			//Otherwise nothing to do
-			return;
-		}
+			if(url) { //URL?
+				if(!$scriptsO.some(e => e == url)) { // Test, whether new
+					$scriptsO.push(url); //If yes: Push to old array
+					_iScript($t);
+				}
+				//Otherwise nothing to do
+				return;
+			}
 
-		if(PK != "href") scripts.a($t); //Inline JS script? -> inject into DOM
-	});
-}, {
-	allScripts: $t => 
-		$t.each(function() { //Iterate through scripts
-			_iScript($(this)); //Write out single script
-		})
-	,
-	newArray: $t =>	 //Fill new array on initial load
-		$t.each(function() { //Iterate through selection
-			if(url = $(this).attr(PK)) $scriptsO.push(url); //Copy over external sheet URLs only
-		})
-	,
-	classAlways: $t => $t.attr("data-class") == "always" || hints.find(url), //Check for data-class = "always" and alwayshints
-	iScript: $S => { //insert single script - pre-processing
+			if(PK != "href") scripts.a($t); //Inline JS script? -> inject into DOM
+		});
+};
+let _allScripts = $t => 
+	$t.each(function() { 
+		_iScript(jQuery(this)); 
+	}),
+	_newArray = $t =>	 
+		$t.each(function() { 
+			if(url = jQuery(this).attr(PK)) $scriptsO.push(url); 
+		}),
+	_classAlways = $t => $t.attr("data-class") == "always" || hints.find(url),
+	_iScript = $S => { 
 		url = $S.attr(PK);
 
-		if(PK == "href") return $(linki.replace("*", url)).appendTo("head"); //insert single stylesheet
-		if(!url) return scripts.a($S); //insert single inline script
-
-		//Insert single external JS script - we have to go low level to avoid a warning coming from jQuery append()
-		//But we'll do our best to support all salient attributes
+		if(PK == "href") return jQuery(linki.replace("*", url)).appendTo("head"); 
+		if(!url) return scripts.a($S); 
+		
 		var script = document.createElement("script");
-		script.async = asyncdef; //initialise with asyncdef - may be overwritten in _copyAttributes
-		_copyAttributes(script, $S); //copy all attributes of script element generically
-		document.head.appendChild(script); //append to head because some come from the head
+		script.async = asyncdef; 
+		_copyAttributes(script, $S); 
+		document.head.appendChild(script); 
 	},
-	removeScript: () => $((PK == "href" ? linkr : scrr).replace("!", url)).remove() //Remove script (stylesheet or external JS) from DOM
-});
+	_removeScript = () => jQuery((PK == "href" ? linkr : scrr).replace("!", url)).remove()
+}}
 
 
 // The Rq plugin - stands for request
