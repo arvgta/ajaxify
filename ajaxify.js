@@ -84,14 +84,14 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
 
 
 //Global helpers
-function _trigger(t, e){ e = e ? e : jQuery.rq("e"); jQuery(window).trigger("pronto." + t, e); }
+function _trigger(t, e){ e = e ? e : Rq.a("e"); jQuery(window).trigger("pronto." + t, e); }
 function _internal(url) {
 	if (!url) return false;
 	if (typeof(url) === "object") url = url.href;
@@ -224,7 +224,7 @@ let _lSel = $t => (
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
-		if (jQuery.rq("is") || !cache1.a(h)) return _lAjax(h, pre); 
+		if (Rq.a("is") || !cache1.a(h)) return _lAjax(h, pre); 
 
 		plus = 0; 
 		if (cb) return cb(); 
@@ -249,13 +249,13 @@ let _lSel = $t => (
 	_isBody = $t => $t.prop("tagName").toLowerCase() == "body" 
 		&& (_ld(jQuery("body"), cache1.a().find("#ajy-body")), 1),
 	_lAjax = (hin, pre) => { 
-		var ispost = jQuery.rq("is"); 
+		var ispost = Rq.a("is"); 
 		if (pre) rt="p"; else rt="c"; 
 
 		xhr = jQuery.ajax({ 
 		url: hin, 
 		type: ispost ? "POST" : "GET", 
-		data: ispost ? jQuery.rq("d") : null, 
+		data: ispost ? Rq.a("d") : null, 
 		success: h => { 
 			if (!h || !_isHtml(xhr)) { 
 				if (!pre) location.href = hin; 
@@ -326,6 +326,7 @@ let _lSel = $t => (
 			fn = getPage = new classGetPage();
 			detScripts = new classDetScripts();
 			addAll = new classAddAll();
+			Rq = new classRq();
 			return true; 
 		}
 }}
@@ -509,78 +510,80 @@ let _allScripts = $t =>
 // d - set / get internal "d" (data for central $.ajax())
 // C - set / get internal "can" ("href" of canonical URL)
 // c - check whether simple canonical URL is given and return, otherwise return value passed in "p"
-pO("rq", { ispost: 0, data: 0, push: 0, can: 0, e: 0, c: 0, h: 0, l: false}, 0, function (o, p) {
-	if(o === "=") { 
-		if(p) return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
-		|| h === l; //or href of last request ("l")
-		return h === currentURL; //for click requests
-	}
-
-	if(o === "!") return l = h; //store href in "l" (last request)
-
-	if(o === "?") { //Edin previously called this "isOK" - powerful intelligent plausibility check
-		let xs=fn.a("s");
-		if (!xs.iO("4") && !p) fn.a("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
-		if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
-		if (xs==="1p" && p) return true; //if xhr is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
-		//([semaphore options for requests] fn.a("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
-		return true;
-	}
-
-	if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
-		if(!p) return false; //ensure data
-		_setE(p); //Set event and href in one go
-		if(!_internal(h)) return false; //if not internal -> report failure
-		o = "i"; //continue with "i"
-	}
-
-	if(o === "i") { //initialise request defaults and return "c" (currentTarget)
-		ispost = false; //GET assumed
-		data = null; //reset data
-		push = true; //assume we want to push URL to the History API
-		can = false; //reset can (canonical URL)
-		return h; //return "h" (href)
-	}
-
-	if(o === "h") { // Access href hard
-		if(p) {
-			if (typeof p === "string") e = 0; // Reset e -> default handler
-			h = (p.href) ? p.href : p;	// Poke in href hard
+class classRq { constructor() {
+	let ispost = 0, data = 0, push = 0, can = 0, e = 0, c = 0, h = 0, l = false;
+            
+	this.a = function (o, p) {
+		if(o === "=") { 
+			if(p) return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
+			|| h === l; //or href of last request ("l")
+			return h === currentURL; //for click requests
 		}
 
-		return h; //href
-	}
+		if(o === "!") return l = h; //store href in "l" (last request)
 
-	if(o === "e") { //set / get internal "e" (event)
-		if(p) _setE(p);	//Set event and href in one go
-		return e ? e : h; // Return "e" or if not given "h"
-	}
+		if(o === "?") { //Edin previously called this "isOK" - powerful intelligent plausibility check
+			let xs=fn.a("s");
+			if (!xs.iO("4") && !p) fn.a("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
+			if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
+			if (xs==="1p" && p) return true; //if xhr is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
+			//([semaphore options for requests] fn.a("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
+			return true;
+		}
 
-	if(o === "p") { //set / get internal "p" (push flag)
-		if(p !== undefined) push = p;
-		return push;
-	}
+		if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
+			if(!p) return false; //ensure data
+			_setE(p); //Set event and href in one go
+			if(!_internal(h)) return false; //if not internal -> report failure
+			o = "i"; //continue with "i"
+		}
 
-	if(o === "is") { //set / get internal "ispost" (flag whether request is a POST)
-		if(p !== undefined) ispost = p;
-		return ispost;
-	}
+		if(o === "i") { //initialise request defaults and return "c" (currentTarget)
+			ispost = false; //GET assumed
+			data = null; //reset data
+			push = true; //assume we want to push URL to the History API
+			can = false; //reset can (canonical URL)
+			return h; //return "h" (href)
+		}
 
-	if(o === "d") { //set / get internal "d" (data for central $.ajax())
-		if(p) data = p;
-		return data;
-	}
+		if(o === "h") { // Access href hard
+			if(p) {
+				if (typeof p === "string") e = 0; // Reset e -> default handler
+				h = (p.href) ? p.href : p;	// Poke in href hard
+			}
 
-	if(o === "C") { //set internal "can" ("href" of canonical URL)
-		if(p !== undefined) can = p;
-		return can;
-	}
+			return h; //href
+		}
 
-	if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
-}, {
-	setE: p =>	//Set event and href in one go
-		h = typeof (e = p) !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e //extract href (link/form submit/history pop)
-});
+		if(o === "e") { //set / get internal "e" (event)
+			if(p) _setE(p);	//Set event and href in one go
+			return e ? e : h; // Return "e" or if not given "h"
+		}
+
+		if(o === "p") { //set / get internal "p" (push flag)
+			if(p !== undefined) push = p;
+			return push;
+		}
+
+		if(o === "is") { //set / get internal "ispost" (flag whether request is a POST)
+			if(p !== undefined) ispost = p;
+			return ispost;
+		}
+
+		if(o === "d") { //set / get internal "d" (data for central $.ajax())
+			if(p) data = p;
+			return data;
+		}
+
+		if(o === "C") { //set internal "can" ("href" of canonical URL)
+			if(p !== undefined) can = p;
+			return can;
+		}
+
+		if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
+};
+let _setE = p => h = typeof (e = p) !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e
+}}
 
 // The Frms plugin - stands for forms
 // Ajaxify all forms in the specified divs
@@ -612,12 +615,12 @@ pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) 
 		if (a && a.length > 0) h = a; //found -> store
 		else h = currentURL; //not found -> select current URL
 
-		$.rq("v", q); //validate request
+		Rq.a("v", q); //validate request
 
 		if (g == "get") h = _b(h, p); //GET -> copy URL parameters
 		else {
-			$.rq("is", true); //set is POST in request data
-			$.rq("d", p); //save data in request data
+			Rq.a("is", true); //set is POST in request data
+			Rq.a("d", p); //save data in request data
 		}
 
 		_trigger("submit", h); //raise pronto.submit event
@@ -713,7 +716,7 @@ pO("hApi", 0, 0, function (o, p) {
 // Switch (h) values:
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
-// <URL> - set "h" variable of $.rq hard and continue with _request()
+// <URL> - set "h" variable of Rq hard and continue with _request()
 pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
 	if(!h) return; //ensure data
 
@@ -731,13 +734,13 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 	}
 
 	if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
-		$.rq("h", h);
+		Rq.a("h", h);
 		_request();
 		return;
 	}
 
 	if(h.iO("/")) { //jump to internal page programmatically -> default handler
-		$.rq("h", h);				 
+		Rq.a("h", h);				 
 		_request(true);
 	}
 }, { 
@@ -758,9 +761,9 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 	}, 
 	prefetch: e => { //...target page on hoverIntent
 		if(prefetchoff === true) return;
-		if (!$.rq("?", true)) return; //semaphore check for prefetch requests
-		var href = $.rq("v", e); // validate internal URL
-		if ($.rq("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
+		if (!Rq.a("?", true)) return; //semaphore check for prefetch requests
+		var href = Rq.a("v", e); // validate internal URL
+		if (Rq.a("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
 		fn.a("+", href, () => { //prefetch page
 				if (previewoff === true) return(false);
 				if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
@@ -769,7 +772,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 	isInDivs: () => {
 		var is = false;
 		$gthis.each(function() {
-			if ($($.rq("e")).parents("#" + $(this).attr("id")).length > 0) is = true;
+			if ($(Rq.a("e")).parents("#" + $(this).attr("id")).length > 0) is = true;
 		});	
 
 		return is;
@@ -780,8 +783,8 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		e.stopImmediatePropagation()
 	),
 	click: (e, notPush) => { //...handler for normal clicks
-		if(!$.rq("?")) return; //semaphore check for click requests
-		var href = $.rq("v", e);  // validate internal URL
+		if(!Rq.a("?")) return; //semaphore check for click requests
+		var href = Rq.a("v", e);  // validate internal URL
 		if(!href || _exoticKey()) return; // Ignore everything but normal click
 		if(href.substr(-1) ==="#") return true;
 		if(_hashChange()) { // only hash part has changed
@@ -791,14 +794,14 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 
 		$.scrolly("+"); // Capture old vertical position of scroll bar
 		_stopBubbling(e); // preventDefault and stop bubbling-up from here on, no matter what comes next
-		if($.rq("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
-		if(refresh || !$.rq("=")) _request(notPush); // Continue with _request() when not the same URL or "refresh" parameter set hard
+		if(Rq.a("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
+		if(refresh || !Rq.a("=")) _request(notPush); // Continue with _request() when not the same URL or "refresh" parameter set hard
 	}, 
 	request: notPush => { // ... new url
-		$.rq("!"); //we're serious about this request - disable further fetches on same URL
-		if(notPush) $.rq("p", false); // mode for hApi - replaceState / pushState
+		Rq.a("!"); //we're serious about this request - disable further fetches on same URL
+		if(notPush) Rq.a("p", false); // mode for hApi - replaceState / pushState
 		_trigger("request"); // Fire request event
-		fn.a($.rq("h"), err => { // Call "fn" - handler of parent
+		fn.a(Rq.a("h"), err => { // Call "fn" - handler of parent
 			if (err) { 
 				lg("Error in _request : " + err); 
 				_trigger("error", err); 
@@ -815,9 +818,9 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		} else _doRender(); //requestDelay is 0 -> continue
 	},
 	onPop: e => { // Handle back/forward navigation
-		$.rq("i"); //Initialise request in general
-		$.rq("e", e); //Initialise request event
-		$.rq("p", false); //We don't want to re-push
+		Rq.a("i"); //Initialise request in general
+		Rq.a("e", e); //Initialise request event
+		Rq.a("p", false); //We don't want to re-push
 		$.scrolly("+");
 
 		var data = e.originalEvent.state, url = data ? data.url : 0;
@@ -830,12 +833,12 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		_trigger("load");  // Fire load event
 		if(bodyClasses) { var classes = fn.a("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
 
-		var href = $.rq("h"), // Retrieve href 
-		href = $.rq("c", href); // Fetch canonical if no hash or parameters in URL
+		var href = Rq.a("h"), // Retrieve href 
+		href = Rq.a("c", href); // Fetch canonical if no hash or parameters in URL
 
-		$.hApi($.rq("p") ? "+" : "=", href); // Push new state to the stack on new url
+		$.hApi(Rq.a("p") ? "+" : "=", href); // Push new state to the stack on new url
 		if (fn.a("title")) $("title").html(fn.a("title").html()); // Update title
-		$.rq("C", fn.a("-", $gthis)); // Update DOM and fetch canonical URL
+		Rq.a("C", fn.a("-", $gthis)); // Update DOM and fetch canonical URL
 		$.frms("a"); // Ajaxify forms - in content divs only
 
 		// Stop animations + finishing off
@@ -851,12 +854,12 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);  // the old API					
 	},
 	exoticKey: () => { //not a real click, or target = "_blank", or WP-Admin link
-		var href = $.rq("h"), e = $.rq("e"); //Shorthands for href and event
+		var href = Rq.a("h"), e = Rq.a("e"); //Shorthands for href and event
 		return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
 			|| href.iO("wp-login") || href.iO("wp-admin"));
 	},
 	hashChange: () => { // only hash has changed
-		var e = $.rq("e");
+		var e = Rq.a("e");
 		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
 	}
 });
