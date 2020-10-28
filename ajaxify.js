@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -590,57 +590,60 @@ let _setE = p => h = typeof (e = p) !== "string" ? e.currentTarget.href || e.cur
 // Switch (o) values:
 // d - set divs variable
 // a - Ajaxify all forms in divs
-pO("frms", { fm: 0, divs: 0}, { forms: "form:not(.no-ajaxy)" }, function (o, p) {
-	if (!forms || !o) return; //ensure data
+class classFrms { constructor() {
+	let fm = 0, divs = 0,
+	forms = gsettings.forms;
 
-	if(o === "d") divs = p; //set divs variable
-	if(o === "a") divs.find(forms).filter(function() { //Ajaxify all forms in divs
-		let c = $(this).attr("action");
-		return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
-	}).submit( q => { //override submit handler
-		fm = $(q.target); // fetch target
-		if (!fm.is("form")) { //is form? -> found
-			fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields 
-			if (fm.length === 0) { //failed?
-				return(true); //degrade to default handler
+	this.a = function (o, p) {
+		if (!forms || !o) return; //ensure data
+
+		if(o === "d") divs = p; //set divs variable
+		if(o === "a") divs.find(forms).filter(function() { //Ajaxify all forms in divs
+			let c = jQuery(this).attr("action");
+			return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
+		}).submit( q => { //override submit handler
+			fm = jQuery(q.target); // fetch target
+			if (!fm.is("form")) { //is form? -> found
+				fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields 
+				if (fm.length === 0) { //failed?
+					return(true); //degrade to default handler
+				}
 			}
-		}
 
-		p = _k(); //Serialise data
-		var g = "get", //assume GET
-		m = fm.attr("method"); //fetch method attribute
-		if (m.length > 0 && m.toLowerCase() == "post") g = "post"; //Override with "post"
+			p = _k(); //Serialise data
+			var g = "get", //assume GET
+			m = fm.attr("method"); //fetch method attribute
+			if (m.length > 0 && m.toLowerCase() == "post") g = "post"; //Override with "post"
 
-		var h, a = fm.attr("action"); //fetch action attribute
-		if (a && a.length > 0) h = a; //found -> store
-		else h = currentURL; //not found -> select current URL
+			var h, a = fm.attr("action"); //fetch action attribute
+			if (a && a.length > 0) h = a; //found -> store
+			else h = currentURL; //not found -> select current URL
 
-		Rq.a("v", q); //validate request
+			Rq.a("v", q); //validate request
 
-		if (g == "get") h = _b(h, p); //GET -> copy URL parameters
-		else {
-			Rq.a("is", true); //set is POST in request data
-			Rq.a("d", p); //save data in request data
-		}
+			if (g == "get") h = _b(h, p); //GET -> copy URL parameters
+			else {
+				Rq.a("is", true); //set is POST in request data
+				Rq.a("d", p); //save data in request data
+			}
 
-		_trigger("submit", h); //raise pronto.submit event
-		$().pronto({ href: h }); //programmatically change page
+			_trigger("submit", h); //raise pronto.submit event
+			jQuery().pronto({ href: h }); //programmatically change page
 
-		return(false); //success -> disable default behaviour
-	});
-}, {
-	k: () => { //Serialise data
-		let o = fm.serialize(), 
-			n = $("input[name][type=submit]", fm);
+			return(false); //success -> disable default behaviour
+		});
+	};
+let _k = () => { 
+	let o = fm.serialize(), n = jQuery("input[name][type=submit]", fm);
 
-		if (!n.length) return o; else n = `${n.attr("name")}=${n.val()}`;
+	if (!n.length) return o; else n = `${n.attr("name")}=${n.val()}`;
 		return (o.length) ? `${o}&${n}` : n;
 	},
-	b: (m, n) => { //copy URL parameters
+	_b = (m, n) => { 
 		if (m.iO("?")) m = m.substring(0, m.iO("?"));
 		return `${m}?${n}`;
 	}
-});
+}}
 
 // The stateful Offsets plugin
 // Usage:
@@ -726,7 +729,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		$gthis = $this; //copy selection to global selector
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
-		$.frms(0, 0, s); //initialise forms sub-plugin
+		frms = new classFrms(); //initialise forms sub-plugin
 		if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
 		$.scrolly(0, s); //initialise scroll effects sub-plugin
 		_init_p(); //initialise Pronto sub-plugin
@@ -754,9 +757,9 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 
 		var $body = $("body"); //abbreviation
 		$body.on("click.pronto", selector, _click); // Real click handler -> _click()
-		$.frms("d", $body); // Select forms in whole body
-		$.frms("a"); // Ajaxify forms
-		$.frms("d", $gthis); // Every further pass - select forms in content div(s) only
+		frms.a("d", $body); // Select forms in whole body
+		frms.a("a"); // Ajaxify forms
+		frms.a("d", $gthis); // Every further pass - select forms in content div(s) only
 		if($.slides) $.slides("i"); // Init slideshow
 	}, 
 	prefetch: e => { //...target page on hoverIntent
@@ -839,7 +842,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		$.hApi(Rq.a("p") ? "+" : "=", href); // Push new state to the stack on new url
 		if (fn.a("title")) $("title").html(fn.a("title").html()); // Update title
 		Rq.a("C", fn.a("-", $gthis)); // Update DOM and fetch canonical URL
-		$.frms("a"); // Ajaxify forms - in content divs only
+		frms.a("a"); // Ajaxify forms - in content divs only
 
 		// Stop animations + finishing off
 		$.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
