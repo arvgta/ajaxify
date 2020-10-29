@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -649,23 +649,25 @@ let _k = () => {
 // Usage:
 // 1) $.offsets(<URL>) - returns offset of specified URL from internal array
 // 2) $.offsets() - saves the current URL + offset in internal array
-pO("offsets", { d: [], i: -1 }, 0, function (h) {
-	if (typeof h === "string") { //Lookup page offset
-		h = h.iO("?") ? h.split("?")[0] : h; //Handle root URL only from dynamic pages
-		i = _iOffset(h); //Fetch offset
-		if(i === -1) return 0; // scrollTop if not found
-		return d[i][1]; //Return offset that was found
-	}
+class classOffsets { constructor() {
+	let d = [], i = -1;
+            
+	this.a = function (h) {
+		if (typeof h === "string") { //Lookup page offset
+			h = h.iO("?") ? h.split("?")[0] : h; //Handle root URL only from dynamic pages
+			i = _iOffset(h); //Fetch offset
+			if(i === -1) return 0; // scrollTop if not found
+			return d[i][1]; //Return offset that was found
+		}
 
-	//Add page offset
-	var u = currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, $(window).scrollTop()];
-	i = _iOffset(us); //get page index
-	if(i === -1) d.push(os); //doesn't exist -> push to array
-	else d[i] = os; //exists -> overwrite
-}, {
-  iOffset: h => d.findIndex(e => e[0] == h) //find index of page within array
-}
-);
+		//Add page offset
+		var u = currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, jQuery(window).scrollTop()];
+		i = _iOffset(us); //get page index
+		if(i === -1) d.push(os); //doesn't exist -> push to array
+		else d[i] = os; //exists -> overwrite
+	};
+let _iOffset = h => d.findIndex(e => e[0] == h)
+}}
 
 // The Scrolly plugin - manages scroll effects centrally
 // scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
@@ -687,8 +689,8 @@ pO("scrolly", 0, { scrolltop: "s" }, function (o) {
 	}
 
 	if(scrolltop === "s") { //smart scroll enabled
-		if(op === "+") $.offsets(); //add page offset
-		if(op === "!") _scrll($.offsets(o)); //scroll to stored position of page
+		if(op === "+") offsets.a(); //add page offset
+		if(op === "!") _scrll(offsets.a(o)); //scroll to stored position of page
 
 		return;
 	}
@@ -732,6 +734,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		frms = new classFrms(); //initialise forms sub-plugin
 		if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
 		$.scrolly(0, s); //initialise scroll effects sub-plugin
+		offsets = new classOffsets();
 		_init_p(); //initialise Pronto sub-plugin
 		return $this; //return jQuery selector for chaining
 	}
