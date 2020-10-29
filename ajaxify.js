@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -674,34 +674,37 @@ let _iOffset = h => d.findIndex(e => e[0] == h)
 // Switch (o) values:
 // + - add current page to offsets
 // ! - scroll to current page offset
-pO("scrolly", 0, { scrolltop: "s" }, function (o) {
-	if(!o) return; //ensure operator
+class classScrolly { constructor() {
+            
+	let scrolltop = gsettings.scrolltop;
 
-	var op = o; //cache operator
+	this.a = function (o) {
+		if(!o) return; //ensure operator
 
-	if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
+		var op = o; //cache operator
 
-	if(op !== "+" && o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
-		var $el = $("#" + o.split("#")[1]); //fetch the element
-		if (!$el.length) return; //nothing found -> return quickly
-		_scrll($el.offset().top); // ...animate to ID
-		return;
-	}
+		if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
 
-	if(scrolltop === "s") { //smart scroll enabled
-		if(op === "+") offsets.a(); //add page offset
-		if(op === "!") _scrll(offsets.a(o)); //scroll to stored position of page
+		if(op !== "+" && o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
+			var $el = jQuery("#" + o.split("#")[1]); //fetch the element
+			if (!$el.length) return; //nothing found -> return quickly
+			_scrll($el.offset().top); // ...animate to ID
+			return;
+		}
 
-		return;
-	}
+		if(scrolltop === "s") { //smart scroll enabled
+			if(op === "+") offsets.a(); //add page offset
+			if(op === "!") _scrll(offsets.a(o)); //scroll to stored position of page
 
-	if(op !== "+" && scrolltop) _scrll(0); //otherwise scroll to top of page
+			return;
+		}
 
-	//default -> do nothing
+		if(op !== "+" && scrolltop) _scrll(0); //otherwise scroll to top of page
 
-}, {
-	scrll: o => $(window).scrollTop(o)
-});
+		//default -> do nothing
+	};
+let _scrll = o => jQuery(window).scrollTop(o)
+}}
 
 // The hApi plugin - manages operatios on the History API centrally
 // Second parameter (p) - set global currentURL
@@ -733,7 +736,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
 		frms = new classFrms(); //initialise forms sub-plugin
 		if($.slides) $.slides(0, s); //initialise optional slideshow sub-plugin
-		$.scrolly(0, s); //initialise scroll effects sub-plugin
+		scrolly = new classScrolly(); //initialise scroll effects sub-plugin
 		offsets = new classOffsets();
 		_init_p(); //initialise Pronto sub-plugin
 		return $this; //return jQuery selector for chaining
@@ -798,7 +801,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 			return true; // Enable default behaviour and return - does not invoke a full page load!
 		}
 
-		$.scrolly("+"); // Capture old vertical position of scroll bar
+		scrolly.a("+"); // Capture old vertical position of scroll bar
 		_stopBubbling(e); // preventDefault and stop bubbling-up from here on, no matter what comes next
 		if(Rq.a("=")) $.hApi("="); // if new URL is same as old URL, commit to History API
 		if(refresh || !Rq.a("=")) _request(notPush); // Continue with _request() when not the same URL or "refresh" parameter set hard
@@ -827,7 +830,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		Rq.a("i"); //Initialise request in general
 		Rq.a("e", e); //Initialise request event
 		Rq.a("p", false); //We don't want to re-push
-		$.scrolly("+");
+		scrolly.a("+");
 
 		var data = e.originalEvent.state, url = data ? data.url : 0;
 
@@ -848,7 +851,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		frms.a("a"); // Ajaxify forms - in content divs only
 
 		// Stop animations + finishing off
-		$.scrolly("!"); // Scroll to respective ID if hash in URL, or previous position on page
+		scrolly.a("!"); // Scroll to respective ID if hash in URL, or previous position on page
 		_gaCaptureView(href); // Trigger analytics page view
 		_trigger("render"); // Fire render event
 		if(passCount) $("#" + passCount).html("Pass: " + pass);
