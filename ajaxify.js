@@ -50,7 +50,7 @@ var gsettings, dsettings =
 // debugging & advanced settings
 	verbosity : 0, //Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
 	memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
-	cb : 0, // callback handler on completion of each Ajax request - default null
+	cb : 0, // callback handler on completion of each Ajax request - default 0
 	pluginon : true, // Plugin set "on" or "off" (==false) manually
 	passCount: false // Show number of pass for debugging
 };
@@ -85,7 +85,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly, hApi, slides;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly, hApi, pronto, slides;
 
 //Minified pO() function - for documentation of pO() please refer to https://4nf.org/po/
 var funStr,logging=!1,codedump=!1;let getParamNames=()=>funStr.slice(funStr.indexOf("(")+1,funStr.indexOf(")"));function JSON2Str(n,t){let e="";return Object.entries(n).forEach(([n,o],r)=>{e+=`${r?",\n":""}`+("function"==typeof o?`_${n} = ${iLog(o.toString(),n)}`:`${n} = ${t?'settings["':""}${t?n+'"]':JSON.stringify(o)}`)}),e?`let ${e}${0!=t?";":""}`:""}function pO(n,t,e,o,r,s){let i,l,u,g,f,$,c,a,p="",d="",O="";if(!n||!o)return console.log("Error in pO(): Missing parameter");if(funStr=iLog(funStr=o.toString(),n),i=n.substr(0,1).toUpperCase()+n.substr(1,n.length-1),g=(l=getParamNames(o)).indexOf("$this")+1,f=l.indexOf("options")+1,u=l.replace("$this, ",""),u="$this"==l?"":u,e&&!f&&(u+=""===u?"options":", options"),t&&(p=JSON2Str(t)),e&&(d=`let settings = $.extend(${JSON.stringify(e)}, options);\n${JSON2Str(e,1)}`),r&&(O=JSON2Str(r,0)),a=`\n(function ($) { class ${i} {\n        constructor(${$=e?"options":""}) {\n            ${p}\n            ${d}\n            this.a = ${funStr};\n            ${O}\n        }\n    }\n\n    $.${c=g?"fn."+n:n} = function(${u}) {${g?"let $this = $(this);":""}\n        if(!$.${c}.o) $.${c}.o = new ${i}(${$});\n        return $.${c}.o.a(${l});\n    };\n})(jQuery);`,1!=codedump&&codedump!==i.toLowerCase()||console.log(a),!s)try{jQuery.globalEval(a)}catch(n){console.log(`Error: ${n} | ${a}`)}}function showArgs(n){s="";for(var t=0;t<n.length;t++)null==n[t]?s+="null | ":s+=(null!=n[t]&&"function"!=typeof n[t]&&"object"!=typeof n[t]&&("string"!=typeof n[t]||n[t].length<=100)?n[t]:"string"==typeof n[t]?n[t].substr(0,100):typeof n[t])+" | ";return s}function iLog(n,t){if(n=n.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g,""),!logging||"log"===t)return n;let e=n.indexOf("=>")<30?n.indexOf("=>")+1:0,o=n.indexOf("{")+1;e&&(n=n.replace(/(	|\r\n|\n|\r)/gm,""),(!o||o>e+5)&&(n=`${n.substr(0,e+2)}{ return ${n.substr(e+1)}}`),n="function ("+n.substr(0,n.indexOf("{")-3).trim().replace(/\(/g,"").replace(/\)/g,"")+")"+n.substr(n.indexOf("{")).trim()),o=n.indexOf("{");let r=n.substr(n.indexOf("("),n.indexOf(")")-n.indexOf("(")+1).replace(/"/g,'\\"').replace(/'/g,"\\'");return`${n.substr(0,o)}{$.log(lvl + " | ${t} | ${r} | " + showArgs(arguments)${2==logging?", -1, true, arguments":""}); try { lvl++; ${n.substr(o+1,n.length-o-2)}} finally {lvl--;}}`}pO("log",0,{verbosity:0},function(n,t,e,o){if(t>=0&&(verbosity=t),verbosity&&n&&lvl<=verbosity&&console&&1==e)return console.groupCollapsed(n),console.table(o),console.groupCollapsed("Trace"),console.trace(),console.groupEnd(),void console.groupEnd();verbosity&&n&&lvl<=verbosity&&console&&console.log(n)});
@@ -304,13 +304,14 @@ let _lSel = $t => (
 			$(function () { 
 				gsettings = Object.assign(dsettings, settings);
 				pages = new classPages();
+				pronto = new classPronto();
 				if (_init(settings)) { 
-					$this.pronto("i", settings); 
+					pronto.a($this, "i"); 
 					if (deltas) scripts.a("1"); 
 				}
 			});
 		}
-		else return $().pronto(o);
+		else return pronto.a($(), o);
 	};
 		let _init = s => { 
 			if (!api || !pluginon) { 
@@ -629,7 +630,7 @@ class classFrms { constructor() {
 			}
 
 			_trigger("submit", h); //raise pronto.submit event
-			jQuery().pronto({ href: h }); //programmatically change page
+			pronto.a(jQuery(), { href: h }); //programmatically change page
 
 			return(false); //success -> disable default behaviour
 		});
@@ -729,151 +730,162 @@ class classHApi { constructor() {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
-pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selector: "a:not(.no-ajaxy)", prefetchoff: false, refresh: false, previewoff: true, cb: 0, bodyClasses: false, requestDelay: 0, passCount: false }, function ($this, h) {
-	if(!h) return; //ensure data
+class classPronto { constructor() {
+	let $gthis = 0, requestTimer = 0, pfohints = 0, pvohints = 0,
+	selector = gsettings.selector,
+	prefetchoff = gsettings.prefetchoff,
+	refresh = gsettings.refresh,
+	previewoff = gsettings.previewoff,
+	cb = gsettings.cb,
+	bodyClasses = gsettings.bodyClasses,
+	requestDelay = gsettings.requestDelay,
+	passCount = gsettings.passCount;
 
-	if(h === "i") { //request to initialise
-		var s = settings; //abbreviation
-		if(!$this.length) $this = $("body");
-		$gthis = $this; //copy selection to global selector
-		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
-		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
-		frms = new classFrms(); //initialise forms sub-plugin
-		if(gsettings.idleTime) slides = new classSlides(); //initialise optional slideshow sub-plugin
-		scrolly = new classScrolly(); //initialise scroll effects sub-plugin
-		offsets = new classOffsets();
-		hApi = new classHApi();
-		_init_p(); //initialise Pronto sub-plugin
-		return $this; //return jQuery selector for chaining
-	}
+	this.a = function ($this, h) {
+		if(!h) return; //ensure data
 
-	if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
-		Rq.a("h", h);
-		_request();
-		return;
-	}
-
-	if(h.iO("/")) { //jump to internal page programmatically -> default handler
-		Rq.a("h", h);				 
-		_request(true);
-	}
-}, { 
-	init_p: () => {
-		hApi.a("=", window.location.href); // Set initial state
-		$(window).on("popstate", _onPop); // Set handler for popState
-		if (prefetchoff !== true) {
-			$(document).hoverIntent(_prefetch, () => {}, selector); //this type of call also handles dynamically inserted links
-			$(document).on("touchstart", selector, _prefetch); // for touchscreens - same thing
+		if(h === "i") { //request to initialise
+			//var s = settings; //abbreviation
+			if(!$this.length) $this = jQuery("body");
+			$gthis = $this; //copy selection to global selector
+			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
+			if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
+			frms = new classFrms(); //initialise forms sub-plugin
+			if(gsettings.idleTime) slides = new classSlides(); //initialise optional slideshow sub-plugin
+			scrolly = new classScrolly(); //initialise scroll effects sub-plugin
+			offsets = new classOffsets();
+			hApi = new classHApi();
+			_init_p(); //initialise Pronto sub-plugin
+			return $this; //return jQuery selector for chaining
 		}
 
-		var $body = $("body"); //abbreviation
-		$body.on("click.pronto", selector, _click); // Real click handler -> _click()
-		frms.a("d", $body); // Select forms in whole body
-		frms.a("a"); // Ajaxify forms
-		frms.a("d", $gthis); // Every further pass - select forms in content div(s) only
-		if(gsettings.idleTime) slides.a("i"); // Init slideshow
-	}, 
-	prefetch: e => { //...target page on hoverIntent
+		if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
+			Rq.a("h", h);
+			_request();
+			return;
+		}
+
+		if(h.iO("/")) { //jump to internal page programmatically -> default handler
+			Rq.a("h", h);				 
+			_request(true);
+		}
+	};
+let _init_p = () => {
+	hApi.a("=", window.location.href); 
+	jQuery(window).on("popstate", _onPop); 
+	if (prefetchoff !== true) {
+		jQuery(document).hoverIntent(_prefetch, () => {}, selector); 
+		jQuery(document).on("touchstart", selector, _prefetch); 
+	}
+
+	var $body = jQuery("body"); 
+	$body.on("click.pronto", selector, _click); 
+	frms.a("d", $body); 
+	frms.a("a"); 
+	frms.a("d", $gthis); 
+	if(gsettings.idleTime) slides.a("i"); 
+},
+	_prefetch = e => { 
 		if(prefetchoff === true) return;
-		if (!Rq.a("?", true)) return; //semaphore check for prefetch requests
-		var href = Rq.a("v", e); // validate internal URL
-		if (Rq.a("=", true) || !href || pfohints.find(href)) return; //same page, no data or selected out
-		fn.a("+", href, () => { //prefetch page
-				if (previewoff === true) return(false);
-				if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
+		if (!Rq.a("?", true)) return; 
+		var href = Rq.a("v", e); 
+		if (Rq.a("=", true) || !href || pfohints.find(href)) return; 
+		fn.a("+", href, () => { 
+			if (previewoff === true) return(false);
+			if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
 		});
 	},
-	isInDivs: () => {
+	_isInDivs = () => {
 		var is = false;
 		$gthis.each(function() {
-			if ($(Rq.a("e")).parents("#" + $(this).attr("id")).length > 0) is = true;
+			if (jQuery(Rq.a("e")).parents("#" + jQuery(this).attr("id")).length > 0) is = true;
 		});	
 
 		return is;
 	},
-	stopBubbling: e => ( // Stop "bubbling-up"
+	_stopBubbling = e => ( 
 		e.preventDefault(),
 		e.stopPropagation(),
 		e.stopImmediatePropagation()
 	),
-	click: (e, notPush) => { //...handler for normal clicks
-		if(!Rq.a("?")) return; //semaphore check for click requests
-		var href = Rq.a("v", e);  // validate internal URL
-		if(!href || _exoticKey()) return; // Ignore everything but normal click
+	_click = (e, notPush) => {
+		if(!Rq.a("?")) return; 
+		var href = Rq.a("v", e);  
+		if(!href || _exoticKey()) return; 
 		if(href.substr(-1) ==="#") return true;
-		if(_hashChange()) { // only hash part has changed
-			hApi.a("=", href); // commit new URL to History API
-			return true; // Enable default behaviour and return - does not invoke a full page load!
+		if(_hashChange()) { 
+			hApi.a("=", href); 
+			return true; 
 		}
 
-		scrolly.a("+"); // Capture old vertical position of scroll bar
-		_stopBubbling(e); // preventDefault and stop bubbling-up from here on, no matter what comes next
-		if(Rq.a("=")) hApi.a("="); // if new URL is same as old URL, commit to History API
-		if(refresh || !Rq.a("=")) _request(notPush); // Continue with _request() when not the same URL or "refresh" parameter set hard
-	}, 
-	request: notPush => { // ... new url
-		Rq.a("!"); //we're serious about this request - disable further fetches on same URL
-		if(notPush) Rq.a("p", false); // mode for hApi - replaceState / pushState
-		_trigger("request"); // Fire request event
-		fn.a(Rq.a("h"), err => { // Call "fn" - handler of parent
+		scrolly.a("+"); 
+		_stopBubbling(e); 
+		if(Rq.a("=")) hApi.a("="); 
+		if(refresh || !Rq.a("=")) _request(notPush); 
+	},
+	_request = notPush => {
+		Rq.a("!"); 
+		if(notPush) Rq.a("p", false); 
+		_trigger("request"); 
+		fn.a(Rq.a("h"), err => { 
 			if (err) { 
 				lg("Error in _request : " + err); 
 				_trigger("error", err); 
 			}
 
-			_render(); // continue with _render()
+			_render(); 
 		});
 	},
-	render: () => { // Clear and set timer for requestDelay
+	_render = () => {
 		_trigger("beforeload");
-		if(requestDelay) { //only needs handling if requestDelay set (not 0)
-			if(requestTimer) clearTimeout(requestTimer); // Clear
-			requestTimer = setTimeout(_doRender, requestDelay); // Set - unconditionally
-		} else _doRender(); //requestDelay is 0 -> continue
+		if(requestDelay) { 
+			if(requestTimer) clearTimeout(requestTimer); 
+			requestTimer = setTimeout(_doRender, requestDelay); 
+		} else _doRender(); 
 	},
-	onPop: e => { // Handle back/forward navigation
-		Rq.a("i"); //Initialise request in general
-		Rq.a("e", e); //Initialise request event
-		Rq.a("p", false); //We don't want to re-push
+	_onPop = e => {
+		Rq.a("i"); 
+		Rq.a("e", e); 
+		Rq.a("p", false); 
 		scrolly.a("+");
 
 		var data = e.originalEvent.state, url = data ? data.url : 0;
 
-		if (!url || url === currentURL) return; // Check if data exists
-		_trigger("request"); // Fire request event
-		fn.a(url, _render); // Call "fn" - handler of parent, continue with _render()
+		if (!url || url === currentURL) return; 
+		_trigger("request"); 
+		fn.a(url, _render); 
 	},
-	doRender: () => { // Render HTML
-		_trigger("load");  // Fire load event
-		if(bodyClasses) { var classes = fn.a("body").attr("class"); $("body").attr("class", classes ? classes : null); } //Replace body classes from target page
+	_doRender = () => {
+		_trigger("load");  
+		if(bodyClasses) { var classes = fn.a("body").attr("class"); jQuery("body").attr("class", classes ? classes : null); } 
 
-		var href = Rq.a("h"), // Retrieve href 
-		href = Rq.a("c", href); // Fetch canonical if no hash or parameters in URL
+		var href = Rq.a("h"), 
+		href = Rq.a("c", href); 
 
-		hApi.a(Rq.a("p") ? "+" : "=", href); // Push new state to the stack on new url
-		if (fn.a("title")) $("title").html(fn.a("title").html()); // Update title
-		Rq.a("C", fn.a("-", $gthis)); // Update DOM and fetch canonical URL
-		frms.a("a"); // Ajaxify forms - in content divs only
+		hApi.a(Rq.a("p") ? "+" : "=", href); 
+		if (fn.a("title")) jQuery("title").html(fn.a("title").html()); 
+		Rq.a("C", fn.a("-", $gthis)); 
+		frms.a("a"); 
 
-		// Stop animations + finishing off
-		scrolly.a("!"); // Scroll to respective ID if hash in URL, or previous position on page
-		_gaCaptureView(href); // Trigger analytics page view
-		_trigger("render"); // Fire render event
-		if(passCount) $("#" + passCount).html("Pass: " + pass);
-		if(cb) cb(); // Callback users handler, if specified
+		
+		scrolly.a("!"); 
+		_gaCaptureView(href); 
+		_trigger("render"); 
+		if(passCount) jQuery("#" + passCount).html("Pass: " + pass);
+		if(cb) cb(); 
 	},
-	gaCaptureView: href => { // Google Analytics support
+	_gaCaptureView = href => {
 		href = "/" + href.replace(rootUrl,"");
-		if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); // the new analytics API
-		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);  // the old API					
+		if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); 
+		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);  
 	},
-	exoticKey: () => { //not a real click, or target = "_blank", or WP-Admin link
-		var href = Rq.a("h"), e = Rq.a("e"); //Shorthands for href and event
+	_exoticKey = () => {
+		var href = Rq.a("h"), e = Rq.a("e"); 
 		return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
 			|| href.iO("wp-login") || href.iO("wp-admin"));
 	},
-	hashChange: () => { // only hash has changed
+	_hashChange = () => {
 		var e = Rq.a("e");
 		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
 	}
-});
+}}
