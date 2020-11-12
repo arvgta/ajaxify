@@ -738,7 +738,7 @@ pO("pronto", { $gthis: 0, requestTimer: 0, pfohints: 0, pvohints: 0 }, { selecto
 		if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 		if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
 		frms = new classFrms(); //initialise forms sub-plugin
-		if(gsettings.idleTime) slides = new classSlides(gsettings); //initialise optional slideshow sub-plugin
+		if(gsettings.idleTime) slides = new classSlides(); //initialise optional slideshow sub-plugin
 		scrolly = new classScrolly(); //initialise scroll effects sub-plugin
 		offsets = new classOffsets();
 		hApi = new classHApi();
