@@ -50,8 +50,9 @@ var gsettings, dsettings =
 // debugging & advanced settings
 	verbosity : 0, //Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
 	memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
-	cb : null, // callback handler on completion of each Ajax request - default null
-	pluginon : true // Plugin set "on" or "off" (==false) manually
+	cb : 0, // callback handler on completion of each Ajax request - default null
+	pluginon : true, // Plugin set "on" or "off" (==false) manually
+	passCount: false // Show number of pass for debugging
 };
 
 
