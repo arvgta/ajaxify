@@ -62,8 +62,6 @@ var gsettings, dsettings =
  //Intuitively better understandable shorthand for String.indexOf() - String.iO()
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 
-//Minified hoverIntent plugin
-!function(e){"use strict";"function"==typeof define&&define.amd?define(["jquery"],e):jQuery&&!jQuery.fn.hoverIntent&&e(jQuery)}(function(e){"use strict";var t,n,i={interval:100,sensitivity:6,timeout:0},o=0,u=function(e){t=e.pageX,n=e.pageY},r=function(e,i,o,v){if(Math.sqrt((o.pX-t)*(o.pX-t)+(o.pY-n)*(o.pY-n))<v.sensitivity)return i.off(o.event,u),delete o.timeoutId,o.isActive=!0,e.pageX=t,e.pageY=n,delete o.pX,delete o.pY,v.over.apply(i[0],[e]);o.pX=t,o.pY=n,o.timeoutId=setTimeout(function(){r(e,i,o,v)},v.interval)};e.fn.hoverIntent=function(t,n,v){var a=o++,s=e.extend({},i);e.isPlainObject(t)?(s=e.extend(s,t),e.isFunction(s.out)||(s.out=s.over)):s=e.isFunction(n)?e.extend(s,{over:t,out:n,selector:v}):e.extend(s,{over:t,out:t,selector:n});var f=function(t){var n=e.extend({},t),i=e(this),o=i.data("hoverIntent");o||i.data("hoverIntent",o={});var v=o[a];v||(o[a]=v={id:a}),v.timeoutId&&(v.timeoutId=clearTimeout(v.timeoutId));var f=v.event="mousemove.hoverIntent.hoverIntent"+a;if("mouseenter"===t.type){if(v.isActive)return;v.pX=n.pageX,v.pY=n.pageY,i.off(f,u).on(f,u),v.timeoutId=setTimeout(function(){r(n,i,v,s)},s.interval)}else{if(!v.isActive)return;i.off(f,u),v.timeoutId=setTimeout(function(){!function(e,t,n,i){var o=t.data("hoverIntent");o&&delete o[n.id],i.apply(t[0],[e])}(n,i,v,s.out)},s.timeout)}};return this.on({"mouseenter.hoverIntent":f,"mouseleave.hoverIntent":f},s.selector)}});
 
 //Module global variables
 var lvl = 0, pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
@@ -101,6 +99,18 @@ function _internal(url) {
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
 	[...$S[0].attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
+}
+
+function _on(eventName, elementSelector, handler, el = document) { //e.currentTarget is document when the handler is called
+	el.addEventListener(eventName, function(e) {
+		// loop parent nodes from the target to the delegation node
+		for (var target = e.target; target && target != this; target = target.parentNode) {
+			if (target.matches(elementSelector)) {
+				handler(target, e);
+				break;
+			}
+		}
+	}, false);
 }
 
 function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.length) ? hints.split(", ") : false; //hints are passed as a comma separated string
@@ -513,7 +523,7 @@ let _allScripts = $t =>
 class classRq { constructor() {
 	let ispost = 0, data = 0, push = 0, can = 0, e = 0, c = 0, h = 0, l = false;
             
-	this.a = function (o, p) {
+	this.a = function (o, p, t) {
 		if(o === "=") { 
 			if(p) return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
 			|| h === l; //or href of last request ("l")
@@ -533,7 +543,7 @@ class classRq { constructor() {
 
 		if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
 			if(!p) return false; //ensure data
-			_setE(p); //Set event and href in one go
+			_setE(p, t); //Set event and href in one go
 			if(!_internal(h)) return false; //if not internal -> report failure
 			o = "i"; //continue with "i"
 		}
@@ -556,7 +566,7 @@ class classRq { constructor() {
 		}
 
 		if(o === "e") { //set / get internal "e" (event)
-			if(p) _setE(p);	//Set event and href in one go
+			if(p) _setE(p, t);	//Set event and href in one go
 			return e ? e : h; // Return "e" or if not given "h"
 		}
 
@@ -582,7 +592,7 @@ class classRq { constructor() {
 
 		if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
 };
-let _setE = p => h = typeof (e = p) !== "string" ? e.currentTarget.href || e.currentTarget.action || e.originalEvent.state.url : e
+let _setE = (p, t) => h = typeof (e = p) !== "string" ? e.currentTarget.href || (t && t.href) || e.currentTarget.action || e.originalEvent.state.url : e
 }}
 
 // The Frms plugin - stands for forms
@@ -769,28 +779,28 @@ class classPronto { constructor() {
 		}
 	};
 let _init_p = () => {
-	hApi.a("=", window.location.href); 
-	jQuery(window).on("popstate", _onPop); 
+	hApi.a("=", window.location.href);
+	window.addEventListener("popstate", _onPop);
 	if (prefetchoff !== true) {
-		jQuery(document).hoverIntent(_prefetch, () => {}, selector); 
-		jQuery(document).on("touchstart", selector, _prefetch); 
+		_on("mousedown", selector, _prefetch);
+		_on("touchstart", selector, _prefetch);
 	}
 
-	var $body = jQuery("body"); 
-	$body.on("click.pronto", selector, _click); 
+	var $body = jQuery("body");
+	_on("click", selector, _click, document.body);
 	frms.a("d", $body); 
 	frms.a("a"); 
 	frms.a("d", $gthis); 
 	if(gsettings.idleTime) slides.a("i"); 
 },
-	_prefetch = e => { 
+	_prefetch = (t, e) => {
 		if(prefetchoff === true) return;
 		if (!Rq.a("?", true)) return; 
-		var href = Rq.a("v", e); 
+		var href = Rq.a("v", e, t); 
 		if (Rq.a("=", true) || !href || pfohints.find(href)) return; 
 		fn.a("+", href, () => { 
 			if (previewoff === true) return(false);
-			if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(e, true);
+			if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(t, e, true);
 		});
 	},
 	_isInDivs = () => {
@@ -806,9 +816,9 @@ let _init_p = () => {
 		e.stopPropagation(),
 		e.stopImmediatePropagation()
 	),
-	_click = (e, notPush) => {
+	_click = (t, e, notPush) => {
 		if(!Rq.a("?")) return; 
-		var href = Rq.a("v", e);  
+		var href = Rq.a("v", e, t);  
 		if(!href || _exoticKey()) return; 
 		if(href.substr(-1) ==="#") return true;
 		if(_hashChange()) { 
@@ -842,12 +852,12 @@ let _init_p = () => {
 		} else _doRender(); 
 	},
 	_onPop = e => {
+		var url = window.location.href;
+
 		Rq.a("i"); 
-		Rq.a("e", e); 
+		Rq.a("h", url); 
 		Rq.a("p", false); 
 		scrolly.a("+");
-
-		var data = e.originalEvent.state, url = data ? data.url : 0;
 
 		if (!url || url === currentURL) return; 
 		_trigger("request"); 
