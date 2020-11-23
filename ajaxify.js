@@ -884,7 +884,7 @@ let _init_p = () => {
 		scrolly.a("!");
 		_gaCaptureView(href);
 		_trigger("render");
-		if(passCount) jQuery("#" + passCount).html("Pass: " + pass);
+		if(passCount) qs("#" + passCount).innerHTML = "Pass: " + pass;
 		if(cb) cb();
 	},
 	_gaCaptureView = href => {
