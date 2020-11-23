@@ -249,7 +249,8 @@ let _lSel = $t => (
 		var $c = $h.clone(); 
 		$c.find("script").remove(); 
 		_copyAttributes($t[0], $c, true); 
-		$t.html($c.html()); 
+		//$t.html($c.html());
+		$t[0].innerHTML = $c[0].innerHTML;
 	},
 	_lEls = $t => 
 		cache1.a() && !_isBody($t) && $t.each(function() { 
@@ -867,11 +868,11 @@ let _init_p = () => {
 		_trigger("load");  
 		if(bodyClasses) { var classes = fn.a("body").attr("class"); jQuery("body").attr("class", classes ? classes : null); } 
 
-		var href = Rq.a("h"), 
+		var href = Rq.a("h"), title;
 		href = Rq.a("c", href); 
 
-		hApi.a(Rq.a("p") ? "+" : "=", href); 
-		if (fn.a("title")) jQuery("title").html(fn.a("title").html()); 
+		hApi.a(Rq.a("p") ? "+" : "=", href);		
+		if(title = fn.a("title")) jQuery("title").html(title.html()); 
 		Rq.a("C", fn.a("-", $gthis)); 
 		frms.a("a"); 
 
