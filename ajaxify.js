@@ -88,6 +88,10 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 
 
 //Global helpers
+let doc=document,
+    qa=(s,o=doc)=>o.querySelectorAll(s),
+    qs=(s,o=doc)=>o.querySelector(s);
+
 function _trigger(t, e){ e = e ? e : Rq.a("e"); jQuery(window).trigger("pronto." + t, e); }
 function _internal(url) {
 	if (!url) return false;
@@ -865,31 +869,31 @@ let _init_p = () => {
 		fn.a(url, _render); 
 	},
 	_doRender = () => {
-		_trigger("load");  
-		if(bodyClasses) { var classes = fn.a("body").attr("class"); jQuery("body").attr("class", classes ? classes : null); } 
+		_trigger("load");
+		if(bodyClasses) { var classes = fn.a("body").attr("class"); jQuery("body").attr("class", classes ? classes : null); }
 
 		var href = Rq.a("h"), title;
-		href = Rq.a("c", href); 
+		href = Rq.a("c", href);
 
-		hApi.a(Rq.a("p") ? "+" : "=", href);		
-		if(title = fn.a("title")) jQuery("title").html(title.html()); 
-		Rq.a("C", fn.a("-", $gthis)); 
-		frms.a("a"); 
+		hApi.a(Rq.a("p") ? "+" : "=", href);
+		if(title = fn.a("title")) qs("title").innerHTML = title[0].innerHTML;
+		Rq.a("C", fn.a("-", $gthis));
+		frms.a("a");
 
 		
-		scrolly.a("!"); 
-		_gaCaptureView(href); 
-		_trigger("render"); 
+		scrolly.a("!");
+		_gaCaptureView(href);
+		_trigger("render");
 		if(passCount) jQuery("#" + passCount).html("Pass: " + pass);
-		if(cb) cb(); 
+		if(cb) cb();
 	},
 	_gaCaptureView = href => {
 		href = "/" + href.replace(rootUrl,"");
 		if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); 
-		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);  
+		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);
 	},
 	_exoticKey = () => {
-		var href = Rq.a("h"), e = Rq.a("e"); 
+		var href = Rq.a("h"), e = Rq.a("e");
 		return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
 			|| href.iO("wp-login") || href.iO("wp-admin"));
 	},
