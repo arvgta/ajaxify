@@ -824,7 +824,7 @@ let _init_p = () => {
 	_click = (t, e, notPush) => {
 		if(!Rq.a("?")) return; 
 		var href = Rq.a("v", e, t);  
-		if(!href || _exoticKey()) return; 
+		if(!href || _exoticKey(t)) return; 
 		if(href.substr(-1) ==="#") return true;
 		if(_hashChange()) { 
 			hApi.a("=", href); 
@@ -879,7 +879,6 @@ let _init_p = () => {
 		if(title = fn.a("title")) qs("title").innerHTML = title[0].innerHTML;
 		Rq.a("C", fn.a("-", $gthis));
 		frms.a("a");
-
 		
 		scrolly.a("!");
 		_gaCaptureView(href);
@@ -892,9 +891,9 @@ let _init_p = () => {
 		if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); 
 		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);
 	},
-	_exoticKey = () => {
-		var href = Rq.a("h"), e = Rq.a("e");
-		return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.currentTarget.target === "_blank"
+	_exoticKey = (t) => {
+		var href = Rq.a("h"), e = Rq.a("e"), tgt = e.currentTarget.target || t.target;
+		return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || tgt === "_blank"
 			|| href.iO("wp-login") || href.iO("wp-admin"));
 	},
 	_hashChange = () => {
