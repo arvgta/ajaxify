@@ -784,8 +784,8 @@ let _init_p = () => {
 	hApi.a("=", window.location.href);
 	window.addEventListener("popstate", _onPop);
 	if (prefetchoff !== true) {
-		_on("mousedown", selector, _prefetch); //triggered on touchstart as well!
-		//_on("touchstart", selector, _prefetch);
+		//_on("mousedown", selector, _prefetch); //triggered on touchstart as well!
+		_on("touchstart", selector, _prefetch);
 	}
 
 	var $body = jQuery("body");
