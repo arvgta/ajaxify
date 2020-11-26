@@ -32,7 +32,6 @@ var gsettings, dsettings =
  
 // visual effects settings
 	requestDelay : 0, //in msec - Delay of Pronto request
-	previewoff : true, // Plugin previews prefetched pages - set to "false" to enable or provide hints to selectively disable
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
 	bodyClasses : false, // Copy body classes from target page, set to "true" to enable
  
@@ -744,11 +743,10 @@ class classHApi { constructor() {
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
 class classPronto { constructor() {
-	let $gthis = 0, requestTimer = 0, pfohints = 0, pvohints = 0,
+	let $gthis = 0, requestTimer = 0, pfohints = 0,
 	selector = gsettings.selector,
 	prefetchoff = gsettings.prefetchoff,
 	refresh = gsettings.refresh,
-	previewoff = gsettings.previewoff,
 	cb = gsettings.cb,
 	bodyClasses = gsettings.bodyClasses,
 	requestDelay = gsettings.requestDelay,
@@ -762,7 +760,6 @@ class classPronto { constructor() {
 			if(!$this.length) $this = jQuery("body");
 			$gthis = $this; //copy selection to global selector
 			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
-			if(!pvohints) pvohints = new Hints(previewoff); //create Hints object during initialisation
 			frms = new classFrms(); //initialise forms sub-plugin
 			if(gsettings.idleTime) slides = new classSlides(); //initialise optional slideshow sub-plugin
 			scrolly = new classScrolly(); //initialise scroll effects sub-plugin
@@ -803,18 +800,7 @@ let _init_p = () => {
 		if (!Rq.a("?", true)) return; 
 		var href = Rq.a("v", e, t); 
 		if (Rq.a("=", true) || !href || pfohints.find(href)) return; 
-		fn.a("+", href, () => { 
-			if (previewoff === true) return(false);
-			if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(t, e, true);
-		});
-	},
-	_isInDivs = () => {
-		var is = false;
-		$gthis.each(function() {
-			if (jQuery(Rq.a("e")).parents("#" + jQuery(this).attr("id")).length > 0) is = true;
-		});	
-
-		return is;
+		fn.a("+", href, () => false);
 	},
 	_stopBubbling = e => ( 
 		e.preventDefault(),
