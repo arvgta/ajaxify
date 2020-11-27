@@ -113,7 +113,7 @@ function _on(eventName, elementSelector, handler, el = document) { //e.currentTa
 				break;
 			}
 		}
-	}, false);
+	}, !!eventName.iO('mo'));
 }
 
 function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.length) ? hints.split(", ") : false; //hints are passed as a comma separated string
@@ -596,7 +596,7 @@ class classRq { constructor() {
 
 		if(o === "c") return can && can !== p && !p.iO("#") && !p.iO("?") ? can : p; //get internal "can" ("href" of canonical URL)
 };
-let _setE = (p, t) => h = typeof (e = p) !== "string" ? e.currentTarget.href || (t && t.href) || e.currentTarget.action || e.originalEvent.state.url : e
+let _setE = (p, t) => h = typeof (e = p) !== "string" ? (e.currentTarget && e.currentTarget.href) || (t && t.href) || e.currentTarget.action || e.originalEvent.state.url : e
 }}
 
 // The Frms plugin - stands for forms
@@ -743,7 +743,7 @@ class classHApi { constructor() {
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
 class classPronto { constructor() {
-	let $gthis = 0, requestTimer = 0, pfohints = 0,
+	let $gthis = 0, requestTimer = 0, pfohints = 0, pd = 150, ptim = 0,
 	selector = gsettings.selector,
 	prefetchoff = gsettings.prefetchoff,
 	refresh = gsettings.refresh,
@@ -784,7 +784,8 @@ let _init_p = () => {
 	hApi.a("=", window.location.href);
 	window.addEventListener("popstate", _onPop);
 	if (prefetchoff !== true) {
-		//_on("mousedown", selector, _prefetch); //triggered on touchstart as well!
+		_on("mouseenter", selector, _preftime); // start prefetch timeout
+		_on("mouseleave", selector, _prefstop); // stop prefetch timeout
 		_on("touchstart", selector, _prefetch);
 	}
 
@@ -795,6 +796,8 @@ let _init_p = () => {
 	frms.a("d", $gthis); 
 	if(gsettings.idleTime) slides.a("i"); 
 },
+	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
+	_prefstop = () => clearTimeout(ptim),
 	_prefetch = (t, e) => {
 		if(prefetchoff === true) return;
 		if (!Rq.a("?", true)) return; 
