@@ -270,8 +270,9 @@ let _lSel = $t => (
 		type: ispost ? "POST" : "GET", 
 		data: ispost ? Rq.a("d") : null, 
 		success: h => { 
-			if (!h || !_isHtml(xhr)) { 
-				if (!pre) location.href = hin; 
+			if (!h || !_isHtml(xhr)) {
+				if (!pre) {location.href = hin; pronto.a(null, currentURL);}
+				plus = 0; return;
 			}
 
 			cache1.a(jQuery(_parseHTML(h))); 
