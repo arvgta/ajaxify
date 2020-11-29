@@ -271,7 +271,7 @@ let _lSel = $t => (
 		data: ispost ? Rq.a("d") : null, 
 		success: h => { 
 			if (!h || !_isHtml(xhr)) {
-				if (!pre) {location.href = hin; /*pronto.a(null, currentURL);*/}
+				if (!pre) {location.href = hin; pronto.a(null, currentURL);}
 				plus = 0; return;
 			}
 
