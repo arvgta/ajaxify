@@ -87,7 +87,7 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 
 
 //Global helpers
-let doc=document,
+let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
 
@@ -790,12 +790,12 @@ let _init_p = () => {
 		_on("touchstart", selector, _prefetch);
 	}
 
-	var $body = jQuery("body");
-	_on("click", selector, _click, document.body);
-	frms.a("d", $body); 
-	frms.a("a"); 
-	frms.a("d", $gthis); 
-	if(gsettings.idleTime) slides.a("i"); 
+	bdy = document.body;
+	_on("click", selector, _click, bdy);
+	frms.a("d", jQuery(bdy));
+	frms.a("a");
+	frms.a("d", $gthis);
+	if(gsettings.idleTime) slides.a("i");
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
 	_prefstop = () => clearTimeout(ptim),
