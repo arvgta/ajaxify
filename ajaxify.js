@@ -274,10 +274,8 @@ let _lSel = $t => (
 				plus = 0; return;
 			}
 
-			_cache(hin, h);
 			plus = 0; 
-
-			if (cb) return(cb()); 
+			return _cache(hin, h);
 		},
 		error: (jqXHR, status, error) => {	
 			if (status === 'abort') {plus=0; return;} 
@@ -285,13 +283,12 @@ let _lSel = $t => (
 				xhr = jqXHR; 
 				_trigger("error", error); 
 				lg("Response text : " + xhr.responseText); 
-				_cache(hin, xhr.responseText);
-				if(cb) return cb(error);  
+				return _cache(hin, xhr.responseText, error); 
 			} catch (e) {}
 		}
 		});
 	},
-	_cache = (href, h) => cache1.a(jQuery(_parseHTML(h))) && pages.a([href, cache1.a()]),
+	_cache = (href, h, err) => cache1.a(jQuery(_parseHTML(h))) && (pages.a([href, cache1.a()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
