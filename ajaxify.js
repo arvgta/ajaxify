@@ -252,7 +252,6 @@ let _lSel = $t => (
 		var $c = $h.clone(); 
 		$c.find("script").remove(); 
 		_copyAttributes($t[0], $c, true); 
-		//$t.html($c.html());
 		$t[0].innerHTML = $c[0].innerHTML;
 	},
 	_lEls = $t => 
@@ -275,8 +274,7 @@ let _lSel = $t => (
 				plus = 0; return;
 			}
 
-			cache1.a(jQuery(_parseHTML(h))); 
-			pages.a([hin, cache1.a()]); 
+			_cache(hin, h);
 			plus = 0; 
 
 			if (cb) return(cb()); 
@@ -287,14 +285,13 @@ let _lSel = $t => (
 				xhr = jqXHR; 
 				_trigger("error", error); 
 				lg("Response text : " + xhr.responseText); 
-				cache1.a(jQuery(_parseHTML(xhr.responseText))); 
-				pages.a([hin, cache1.a()]); 
+				_cache(hin, xhr.responseText);
 				if(cb) return cb(error);  
 			} catch (e) {}
-		},
-		async: true 
+		}
 		});
 	},
+	_cache = (href, h) => cache1.a(jQuery(_parseHTML(h))) && pages.a([href, cache1.a()]),
 	_isHtml = x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
