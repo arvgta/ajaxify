@@ -757,8 +757,8 @@ class classPronto { constructor() {
 		if(!h) return; //ensure data
 
 		if(h === "i") { //request to initialise
-			//var s = settings; //abbreviation
-			if(!$this.length) $this = jQuery("body");
+			bdy = document.body;
+			if(!$this.length) $this = jQuery(bdy);
 			$gthis = $this; //copy selection to global selector
 			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 			frms = new classFrms(); //initialise forms sub-plugin
@@ -790,7 +790,6 @@ let _init_p = () => {
 		_on("touchstart", selector, _prefetch);
 	}
 
-	bdy = document.body;
 	_on("click", selector, _click, bdy);
 	frms.a("d", jQuery(bdy));
 	frms.a("a");
@@ -860,7 +859,7 @@ let _init_p = () => {
 	},
 	_doRender = () => {
 		_trigger("load");
-		if(bodyClasses) { var classes = fn.a("body").attr("class"); jQuery("body").attr("class", classes ? classes : null); }
+		if(bodyClasses) { var classes = fn.a("body")[0].getAttribute("class"); bdy.setAttribute("class", classes ? classes : null); }
 
 		var href = Rq.a("h"), title;
 		href = Rq.a("c", href);
