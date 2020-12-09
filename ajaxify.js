@@ -296,7 +296,7 @@ let _lSel = $t => (
 		});
 	},
 	_isHtml = x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")),
-	_parseHTML = h => jQuery.parseHTML(jQuery.trim(_replD(h)), null, true),
+	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
 }}
 
