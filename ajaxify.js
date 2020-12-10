@@ -607,10 +607,13 @@ class classFrms { constructor() {
 		if (!forms || !o) return; //ensure data
 
 		if(o === "d") divs = p; //set divs variable
-		if(o === "a") divs.find(forms).filter(function() { //Ajaxify all forms in divs
-			let c = jQuery(this).attr("action");
+		if(o === "a") divs.forEach(div => { //iterate through divs
+		Array.prototype.filter.call(div.querySelectorAll(forms), function(e) { //filter forms
+			let c = e.getAttribute("action");
 			return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
-		}).submit( q => { //override submit handler
+		}).forEach(frm => { //iterate through forms
+		frm.addEventListener("submit", q => { //create event listener
+			q.preventDefault(); //prevent default form action
 			fm = jQuery(q.target); // fetch target
 			if (!fm.is("form")) { //is form? -> found
 				fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields 
@@ -640,7 +643,9 @@ class classFrms { constructor() {
 			pronto.a(jQuery(), { href: h }); //programmatically change page
 
 			return(false); //success -> disable default behaviour
+		})
 		});
+	});
 	};
 let _k = () => { 
 	let o = fm.serialize(), n = jQuery("input[name][type=submit]", fm);
@@ -783,12 +788,11 @@ let _init_p = () => {
 		_on("mouseleave", selector, _prefstop); // stop prefetch timeout
 		_on("touchstart", selector, _prefetch);
 	}
-
-	_on("click", selector, _click, bdy);
-	frms.a("d", jQuery(bdy));
-	frms.a("a");
-	frms.a("d", $gthis);
-	if(gsettings.idleTime) slides.a("i");
+	_on("click", selector, _click, document.body);
+	frms.a("d", qa("body")); 
+	frms.a("a"); 
+	frms.a("d", qa($gthis.selector)); 
+	if(gsettings.idleTime) slides.a("i"); 
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
 	_prefstop = () => clearTimeout(ptim),
@@ -853,7 +857,7 @@ let _init_p = () => {
 	},
 	_doRender = () => {
 		_trigger("load");
-		if(bodyClasses) { var classes = fn.a("body")[0].getAttribute("class"); bdy.setAttribute("class", classes ? classes : null); }
+		if(bodyClasses) { var classes = fn.a("body")[0].getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
 		var href = Rq.a("h"), title;
 		href = Rq.a("c", href);
