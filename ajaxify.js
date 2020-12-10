@@ -90,6 +90,7 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
+let _selector = q => (r = "", q.each(e => r+= q[e].tagName.replace(/DIV/g, "#") + ((q[e].tagName == "DIV") ? q[e].id : "") + ", "), r.slice(0, -2));
 
 function _trigger(t, e){ e = e ? e : Rq.a("e"); jQuery(window).trigger("pronto." + t, e); }
 function _internal(url) {
@@ -791,7 +792,7 @@ let _init_p = () => {
 	_on("click", selector, _click, document.body);
 	frms.a("d", qa("body"));
 	frms.a("a");
-	frms.a("d", qa($gthis.selector));
+	frms.a("d", qa(_selector($gthis)));
 	if(gsettings.idleTime) slides.a("i");
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
