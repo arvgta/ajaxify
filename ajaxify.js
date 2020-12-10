@@ -789,10 +789,10 @@ let _init_p = () => {
 		_on("touchstart", selector, _prefetch);
 	}
 	_on("click", selector, _click, document.body);
-	frms.a("d", qa("body")); 
-	frms.a("a"); 
-	frms.a("d", qa($gthis.selector)); 
-	if(gsettings.idleTime) slides.a("i"); 
+	frms.a("d", qa("body"));
+	frms.a("a");
+	frms.a("d", qa($gthis.selector));
+	if(gsettings.idleTime) slides.a("i");
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
 	_prefstop = () => clearTimeout(ptim),
