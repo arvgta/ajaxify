@@ -92,7 +92,7 @@ let doc=document, bdy,
     qs=(s,o=doc)=>o.querySelector(s);
 let _selector = q => (r = "", q.each(e => r+= q[e].tagName.replace(/DIV/g, "#") + ((q[e].tagName == "DIV") ? q[e].id : "") + ", "), r.slice(0, -2));
 
-function _trigger(t, e){ e = e ? e : Rq.a("e"); jQuery(window).trigger("pronto." + t, e); }
+function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e; window.dispatchEvent(ev); }
 function _internal(url) {
 	if (!url) return false;
 	if (typeof(url) === "object") url = url.href;
