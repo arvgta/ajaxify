@@ -260,7 +260,7 @@ let _lSel = $t => (
 			_ld(jQuery(this), cache1.a().find("#" + jQuery(this).attr("id"))); 
 		}),
 	_isBody = $t => $t.prop("tagName").toLowerCase() == "body" 
-		&& (_ld(jQuery("body"), cache1.a().find("#ajy-body")), 1),
+		&& (_ld(jQuery(bdy), cache1.a().find("#ajy-body")), 1),
 	_lAjax = (hin, pre) => { 
 		var ispost = Rq.a("is"); 
 		if (pre) rt="p"; else rt="c"; 
@@ -609,7 +609,7 @@ class classFrms { constructor() {
 
 		if(o === "d") divs = p; //set divs variable
 		if(o === "a") divs.forEach(div => { //iterate through divs
-		Array.prototype.filter.call(div.querySelectorAll(forms), function(e) { //filter forms
+		Array.prototype.filter.call(qa(forms, div), function(e) { //filter forms
 			let c = e.getAttribute("action");
 			return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
 		}).forEach(frm => { //iterate through forms
@@ -789,7 +789,7 @@ let _init_p = () => {
 		_on("mouseleave", selector, _prefstop); // stop prefetch timeout
 		_on("touchstart", selector, _prefetch);
 	}
-	_on("click", selector, _click, document.body);
+	_on("click", selector, _click, bdy);
 	frms.a("d", qa("body"));
 	frms.a("a");
 	frms.a("d", qa(_selector($gthis)));
