@@ -617,7 +617,7 @@ class classFrms { constructor() {
 			q.preventDefault(); //prevent default form action
 			fm = jQuery(q.target); // fetch target
 			if (!fm.is("form")) { //is form? -> found
-				fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields 
+				fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields
 				if (fm.length === 0) { //failed?
 					return(true); //degrade to default handler
 				}
@@ -777,7 +777,7 @@ class classPronto { constructor() {
 		}
 
 		if(h.iO("/")) { //jump to internal page programmatically -> default handler
-			Rq.a("h", h);				 
+			Rq.a("h", h);		 
 			_request(true);
 		}
 	};
@@ -799,62 +799,62 @@ let _init_p = () => {
 	_prefstop = () => clearTimeout(ptim),
 	_prefetch = (t, e) => {
 		if(prefetchoff === true) return;
-		if (!Rq.a("?", true)) return; 
-		var href = Rq.a("v", e, t); 
-		if (Rq.a("=", true) || !href || pfohints.find(href)) return; 
+		if (!Rq.a("?", true)) return;
+		var href = Rq.a("v", e, t);
+		if (Rq.a("=", true) || !href || pfohints.find(href)) return;
 		fn.a("+", href, () => false);
 	},
-	_stopBubbling = e => ( 
+	_stopBubbling = e => (
 		e.preventDefault(),
 		e.stopPropagation(),
 		e.stopImmediatePropagation()
 	),
 	_click = (t, e, notPush) => {
-		if(!Rq.a("?")) return; 
-		var href = Rq.a("v", e, t);  
-		if(!href || _exoticKey(t)) return; 
+		if(!Rq.a("?")) return;
+		var href = Rq.a("v", e, t);
+		if(!href || _exoticKey(t)) return;
 		if(href.substr(-1) ==="#") return true;
-		if(_hashChange()) { 
-			hApi.a("=", href); 
-			return true; 
+		if(_hashChange()) {
+			hApi.a("=", href);
+			return true;
 		}
 
-		scrolly.a("+"); 
-		_stopBubbling(e); 
-		if(Rq.a("=")) hApi.a("="); 
-		if(refresh || !Rq.a("=")) _request(notPush); 
+		scrolly.a("+");
+		_stopBubbling(e);
+		if(Rq.a("=")) hApi.a("=");
+		if(refresh || !Rq.a("=")) _request(notPush);
 	},
 	_request = notPush => {
-		Rq.a("!"); 
-		if(notPush) Rq.a("p", false); 
-		_trigger("request"); 
-		fn.a(Rq.a("h"), err => { 
-			if (err) { 
-				lg("Error in _request : " + err); 
-				_trigger("error", err); 
+		Rq.a("!");
+		if(notPush) Rq.a("p", false);
+		_trigger("request");
+		fn.a(Rq.a("h"), err => {
+			if (err) {
+				lg("Error in _request : " + err);
+				_trigger("error", err);
 			}
 
-			_render(); 
+			_render();
 		});
 	},
 	_render = () => {
 		_trigger("beforeload");
-		if(requestDelay) { 
-			if(requestTimer) clearTimeout(requestTimer); 
-			requestTimer = setTimeout(_doRender, requestDelay); 
-		} else _doRender(); 
+		if(requestDelay) {
+			if(requestTimer) clearTimeout(requestTimer);
+			requestTimer = setTimeout(_doRender, requestDelay);
+		} else _doRender();
 	},
 	_onPop = e => {
 		var url = window.location.href;
 
-		Rq.a("i"); 
-		Rq.a("h", url); 
-		Rq.a("p", false); 
+		Rq.a("i");
+		Rq.a("h", url);
+		Rq.a("p", false);
 		scrolly.a("+");
 
-		if (!url || url === currentURL) return; 
-		_trigger("request"); 
-		fn.a(url, _render); 
+		if (!url || url === currentURL) return;
+		_trigger("request");
+		fn.a(url, _render);
 	},
 	_doRender = () => {
 		_trigger("load");
@@ -867,7 +867,7 @@ let _init_p = () => {
 		if(title = fn.a("title")) qs("title").innerHTML = title[0].innerHTML;
 		Rq.a("C", fn.a("-", $gthis));
 		frms.a("a");
-		
+
 		scrolly.a("!");
 		_gaCaptureView(href);
 		_trigger("render");
@@ -876,7 +876,7 @@ let _init_p = () => {
 	},
 	_gaCaptureView = href => {
 		href = "/" + href.replace(rootUrl,"");
-		if (typeof window.ga !== "undefined") window.ga("send", "pageview", href); 
+		if (typeof window.ga !== "undefined") window.ga("send", "pageview", href);
 		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);
 	},
 	_exoticKey = (t) => {
