@@ -230,7 +230,7 @@ class classGetPage { constructor() {
 let _lSel = $t => (
 	pass++, 
 	_lEls($t), 
-	jQuery("body > script").remove("." + inlineclass), 
+	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? e.parentNode.removeChild(e) : false), 
 	scripts.a(true), 
 	scripts.a("s"), 
 	scripts.a("c") 
@@ -271,7 +271,7 @@ let _lSel = $t => (
 		data: ispost ? Rq.a("d") : null, 
 		success: h => { 
 			if (!h || !_isHtml(xhr)) {
-				if (!pre) {location.href = hin; pronto.a(null, currentURL);}
+				if (!pre) {location.href = hin; pronto.a(0, currentURL);}
 				plus = 0; return;
 			}
 
@@ -319,7 +319,7 @@ let _lSel = $t => (
 				}
 			});
 		}
-		else return pronto.a($(), o);
+		else return pronto.a(0, o);
 	};
 		let _init = s => { 
 			if (!api || !pluginon) { 
@@ -641,7 +641,7 @@ class classFrms { constructor() {
 			}
 
 			_trigger("submit", h); //raise pronto.submit event
-			pronto.a(jQuery(), { href: h }); //programmatically change page
+			pronto.a(0, { href: h }); //programmatically change page
 
 			return(false); //success -> disable default behaviour
 		})
@@ -777,7 +777,7 @@ class classPronto { constructor() {
 		}
 
 		if(h.iO("/")) { //jump to internal page programmatically -> default handler
-			Rq.a("h", h);		 
+			Rq.a("h", h);
 			_request(true);
 		}
 	};
