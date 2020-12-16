@@ -90,7 +90,7 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
-let _selector = q => (r = "", q.each(e => r+= q[e].tagName.replace(/DIV/g, "#") + ((q[e].tagName == "DIV") ? q[e].id : "") + ", "), r.slice(0, -2));
+let _selector = q => (r = "", q.each(e => r+= q[e].tagName + "#" + ((q[e].tagName != "BODY") ? q[e].id : "") + ", "), r.slice(0, -2));
 
 function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
 function _internal(url) {
@@ -256,11 +256,10 @@ let _lSel = $t => (
 		$t[0].innerHTML = $c[0].innerHTML;
 	},
 	_lEls = $t => 
-		cache1.a() && !_isBody($t) && $t.each(function() { 
-			_ld(jQuery(this), cache1.a().find("#" + jQuery(this).attr("id"))); 
+		cache1.a() && !_isBody($t) && $t.forEach(function($el) { 
+			_ld(jQuery($el), cache1.a().find("#" + $el.getAttribute("id")));
 		}),
-	_isBody = $t => $t.prop("tagName").toLowerCase() == "body" 
-		&& (_ld(jQuery(bdy), cache1.a().find("#ajy-body")), 1),
+	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(jQuery(bdy), cache1.a().find("#ajy-body")), 1),
 	_lAjax = (hin, pre) => { 
 		var ispost = Rq.a("is"); 
 		if (pre) rt="p"; else rt="c"; 
@@ -314,7 +313,7 @@ let _lSel = $t => (
 				pages = new classPages();
 				pronto = new classPronto();
 				if (_init(settings)) { 
-					pronto.a($this, "i"); 
+					pronto.a(_selector($this), "i"); 
 					if (deltas) scripts.a("1"); 
 				}
 			});
@@ -758,8 +757,8 @@ class classPronto { constructor() {
 
 		if(h === "i") { //request to initialise
 			bdy = document.body;
-			if(!$this.length) $this = jQuery(bdy);
-			$gthis = $this; //copy selection to global selector
+			if(!$this.length) $this = "body";
+			$gthis = qa($this); //copy selection to global selector
 			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 			frms = new classFrms(); //initialise forms sub-plugin
 			if(gsettings.idleTime) slides = new classSlides(); //initialise optional slideshow sub-plugin
@@ -767,7 +766,7 @@ class classPronto { constructor() {
 			offsets = new classOffsets();
 			hApi = new classHApi();
 			_init_p(); //initialise Pronto sub-plugin
-			return $this; //return jQuery selector for chaining
+			return $this; //return query selector for chaining
 		}
 
 		if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
@@ -792,7 +791,7 @@ let _init_p = () => {
 	_on("click", selector, _click, bdy);
 	frms.a("d", qa("body"));
 	frms.a("a");
-	frms.a("d", qa(_selector($gthis)));
+	frms.a("d", $gthis);
 	if(gsettings.idleTime) slides.a("i");
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
