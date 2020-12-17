@@ -675,7 +675,7 @@ class classOffsets { constructor() {
 		}
 
 		//Add page offset
-		var u = currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, jQuery(window).scrollTop()];
+		var u = currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
 		i = _iOffset(us); //get page index
 		if(i === -1) d.push(os); //doesn't exist -> push to array
 		else d[i] = os; //exists -> overwrite
@@ -700,9 +700,10 @@ class classScrolly { constructor() {
 		if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
 
 		if(op !== "+" && o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
-			var $el = jQuery("#" + o.split("#")[1]); //fetch the element
-			if (!$el.length) return; //nothing found -> return quickly
-			_scrll($el.offset().top); // ...animate to ID
+			let $el = qs("#" + o.split("#")[1]); //fetch the element
+			if (!$el) return; //nothing found -> return quickly
+			let box = $el.getBoundingClientRect();
+			_scrll(box.top + window.pageYOffset - document.documentElement.clientTop); // ...animate to ID
 			return;
 		}
 
@@ -717,7 +718,7 @@ class classScrolly { constructor() {
 
 		//default -> do nothing
 	};
-let _scrll = o => jQuery(window).scrollTop(o)
+let _scrll = o => window.scrollTo(0, o)
 }}
 
 // The hApi plugin - manages operatios on the History API centrally
