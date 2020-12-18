@@ -90,6 +90,7 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
+let _serialize= (e) => {for(var n=[],t=0;t<e.elements.length;t++){var o=e.elements[t];if(o.name&&!o.disabled&&"file"!==o.type&&"reset"!==o.type&&"submit"!==o.type&&"button"!==o.type)if("select-multiple"===o.type)for(var p=0;p<o.options.length;p++)o.options[p].selected&&n.push(encodeURIComponent(o.name)+"="+encodeURIComponent(o.options[p].value));else("checkbox"!==o.type&&"radio"!==o.type||o.checked)&&n.push(encodeURIComponent(o.name)+"="+encodeURIComponent(o.value))}return n.join("&")};
 let _selector = q => (r = "", q.each(e => r+= q[e].tagName + "#" + ((q[e].tagName != "BODY") ? q[e].id : "") + ", "), r.slice(0, -2));
 
 function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
@@ -613,21 +614,14 @@ class classFrms { constructor() {
 			return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
 		}).forEach(frm => { //iterate through forms
 		frm.addEventListener("submit", q => { //create event listener
-			q.preventDefault(); //prevent default form action
-			fm = jQuery(q.target); // fetch target
-			if (!fm.is("form")) { //is form? -> found
-				fm = fm.filter("input[type=submit]").parents("form:first"); //for multiple fields
-				if (fm.length === 0) { //failed?
-					return(true); //degrade to default handler
-				}
-			}
+			fm = q.target; // fetch target
 
 			p = _k(); //Serialise data
 			var g = "get", //assume GET
-			m = fm.attr("method"); //fetch method attribute
+			m = fm.getAttribute("method"); //fetch method attribute
 			if (m.length > 0 && m.toLowerCase() == "post") g = "post"; //Override with "post"
 
-			var h, a = fm.attr("action"); //fetch action attribute
+			var h, a = fm.getAttribute("action"); //fetch action attribute
 			if (a && a.length > 0) h = a; //found -> store
 			else h = currentURL; //not found -> select current URL
 
@@ -642,15 +636,16 @@ class classFrms { constructor() {
 			_trigger("submit", h); //raise pronto.submit event
 			pronto.a(0, { href: h }); //programmatically change page
 
+			q.preventDefault(); //prevent default form action
 			return(false); //success -> disable default behaviour
 		})
 		});
 	});
 	};
 let _k = () => { 
-	let o = fm.serialize(), n = jQuery("input[name][type=submit]", fm);
+	let o = _serialize(fm), n = qs("input[name][type=submit]", fm);
 
-	if (!n.length) return o; else n = `${n.attr("name")}=${n.val()}`;
+	if (!n) return o; else n = `${n.getAttribute("name")}=${n.value}`;
 		return (o.length) ? `${o}&${n}` : n;
 	},
 	_b = (m, n) => { 
