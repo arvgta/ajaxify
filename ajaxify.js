@@ -90,7 +90,6 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
-let _serialize= (e) => {for(var n=[],t=0;t<e.elements.length;t++){var o=e.elements[t];if(o.name&&!o.disabled&&"file"!==o.type&&"reset"!==o.type&&"submit"!==o.type&&"button"!==o.type)if("select-multiple"===o.type)for(var p=0;p<o.options.length;p++)o.options[p].selected&&n.push(encodeURIComponent(o.name)+"="+encodeURIComponent(o.options[p].value));else("checkbox"!==o.type&&"radio"!==o.type||o.checked)&&n.push(encodeURIComponent(o.name)+"="+encodeURIComponent(o.value))}return n.join("&")};
 let _selector = q => (r = "", q.each(e => r+= q[e].tagName + "#" + ((q[e].tagName != "BODY") ? q[e].id : "") + ", "), r.slice(0, -2));
 
 function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
@@ -196,11 +195,11 @@ class classPages { constructor() {
 // <URL> - loads HTML via Ajax, second parameter "p" must be callback
 // + - pre-fetches page, second parameter "p" must be URL, third parameter "p2" must be callback 
 // - - loads page into DOM and handle scripts, second parameter "p" must hold selection to load
-// x - returns XHR
+// x - returns response
 // otherwise - returns selection of current page to client
 
 class classGetPage { constructor() {
-	let xhr = 0, cb = 0, plus = 0, rt = "", ct = 0;
+	let rsp = 0, cb = 0, plus = 0, rt = "", ct = 0, rc = 0, ac = 0;
             
 	this.a = function (o, p, p2) { 
 		if (!o) return cache1.a(); 
@@ -217,10 +216,10 @@ class classGetPage { constructor() {
 			return _lPage(p, true); 
 		}
 
-		if (o === "a") { if (xhr && xhr.readyState !== 4) xhr.abort(); return; }
-		if (o === "s") return ((xhr) ? xhr.readyState : 4) + rt; 
+		if (o === "a") { if (rc > 0) {plus=0; ac.abort();} return; }
+		if (o === "s") return ((rc) ? 1 : 0) + rt; 
 		if (o === "-") return _lSel(p); 
-		if (o === "x") return xhr; 
+		if (o === "x") return rsp; 
 
 		if (!cache1.a()) return;
 		if (o === "body") return cache1.a().find("#ajy-" + o);
@@ -265,32 +264,38 @@ let _lSel = $t => (
 		var ispost = Rq.a("is"); 
 		if (pre) rt="p"; else rt="c"; 
 
-		xhr = jQuery.ajax({ 
-		url: hin, 
-		type: ispost ? "POST" : "GET", 
-		data: ispost ? Rq.a("d") : null, 
-		success: h => { 
-			if (!h || !_isHtml(xhr)) {
+		ac = new AbortController(); // set abort controller
+		rc++; // set active request counter
+		fetch(hin, {
+			method: ((ispost) ? "POST" : "GET"),
+			cache: "default",
+			mode: "same-origin",
+			headers: {"X-Requested-With": "XMLHttpRequest"},
+			body: (ispost) ? Rq.a("d") : null,
+			signal: ac.signal
+		}).then(r => {
+			if (!r.ok || !_isHtml(r)) {
 				if (!pre) {location.href = hin; pronto.a(0, currentURL);}
 				plus = 0; return;
 			}
-
+			rsp = r; // store response
+			return r.text();
+		}).then(r => {
 			plus = 0; 
-			return _cache(hin, h);
-		},
-		error: (jqXHR, status, error) => {	
-			if (status === 'abort') {plus=0; return;} 
+			rsp.responseText = r; // store response text
+			
+			return _cache(hin, r);
+		}).catch(err => {
+			if(err.name === "AbortError") return;
 			try {
-				xhr = jqXHR; 
-				_trigger("error", error); 
-				lg("Response text : " + xhr.responseText); 
-				return _cache(hin, xhr.responseText, error); 
+				_trigger("error", err); 
+				lg("Response text : " + err.message); 
+				return _cache(hin, err.message, err);
 			} catch (e) {}
-		}
-		});
+		}).finally(() => rc--); // reset active request counter
 	},
 	_cache = (href, h, err) => cache1.a(jQuery(_parseHTML(h))) && (pages.a([href, cache1.a()]), 1) && cb && cb(err),
-	_isHtml = x => (ct = x.getResponseHeader("Content-Type")) && (ct.iO("html") || ct.iO("form-")),
+	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
 }}
@@ -510,7 +515,7 @@ let _allScripts = $t =>
 // First parameter (o) values:
 // = - check whether internally stored "href" ("h") variable is the same as the global currentURL
 // ! - update last request ("l") variable with passed href
-// ? - Edin's intelligent plausibility check - can spawn an external XHR abort
+// ? - Edin's intelligent plausibility check - can spawn an external fetch abort
 // v - validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
 // i - initialise request defaults and return "c" (currentTarget)
 // h - access internal href hard
@@ -534,9 +539,9 @@ class classRq { constructor() {
 
 		if(o === "?") { //Edin previously called this "isOK" - powerful intelligent plausibility check
 			let xs=fn.a("s");
-			if (!xs.iO("4") && !p) fn.a("a"); //if xhr is not idle and new request is standard one, do xhr.abort() to set it free
-			if (xs==="1c" && p) return false; //if xhr is processing standard request and new request is prefetch, cancel prefetch until xhr is finished
-			if (xs==="1p" && p) return true; //if xhr is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
+			if (!xs.iO("0") && !p) fn.a("a"); //if fetch is not idle and new request is standard one, do ac.abort() to set it free
+			if (xs==="1c" && p) return false; //if fetch is processing standard request and new request is prefetch, cancel prefetch until fetch is finished
+			if (xs==="1p" && p) return true; //if fetch is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
 			//([semaphore options for requests] fn.a("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
 			return true;
 		}
@@ -642,15 +647,18 @@ class classFrms { constructor() {
 		});
 	});
 	};
-let _k = () => { 
-	let o = _serialize(fm), n = qs("input[name][type=submit]", fm);
+let _k = () => {
+		let o = new FormData(fm), n = qs("input[name][type=submit]", fm);
 
-	if (!n) return o; else n = `${n.getAttribute("name")}=${n.value}`;
-		return (o.length) ? `${o}&${n}` : n;
+		if (n) o.append(n.getAttribute("name"), n.value);
+		return o;
 	},
-	_b = (m, n) => { 
+	_b = (m, n) => {
+		let s = "";
 		if (m.iO("?")) m = m.substring(0, m.iO("?"));
-		return `${m}?${n}`;
+		
+		for (var [k, v] of n.entries()) s += `${k}=${encodeURIComponent(v)}&`;
+		return `${m}?${s.slice(0,-1)}`;
 	}
 }}
 
