@@ -216,7 +216,7 @@ class classGetPage { constructor() {
 			return _lPage(p, true); 
 		}
 
-		if (o === "a") { if (rc > 0) {plus=0; ac.abort();} return; }
+		if (o === "a") { if (rc > 0) {_cl(); ac.abort();} return; }
 		if (o === "s") return ((rc) ? 1 : 0) + rt; 
 		if (o === "-") return _lSel(p); 
 		if (o === "x") return rsp; 
@@ -275,13 +275,14 @@ let _lSel = $t => (
 			signal: ac.signal
 		}).then(r => {
 			if (!r.ok || !_isHtml(r)) {
-				if (!pre) {location.href = hin; pronto.a(0, currentURL);}
-				plus = 0; return;
+				if (!pre) {location.href = hin; _cl(); pronto.a(0, currentURL);}
+				return;
 			}
 			rsp = r; // store response
 			return r.text();
 		}).then(r => {
-			plus = 0; 
+			_cl(1); // clear only plus variable
+			if (!r) return; // ensure data
 			rsp.responseText = r; // store response text
 			
 			return _cache(hin, r);
@@ -294,6 +295,7 @@ let _lSel = $t => (
 			} catch (e) {}
 		}).finally(() => rc--); // reset active request counter
 	},
+	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
 	_cache = (href, h, err) => cache1.a(jQuery(_parseHTML(h))) && (pages.a([href, cache1.a()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
