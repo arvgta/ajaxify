@@ -26,7 +26,7 @@ var gsettings, dsettings =
 {
 //	basic config parameters
 	selector : "a:not(.no-ajaxy)", //Selector for elements to trigger swapping - not those to be swapped - e.g. a selection of links
-	forms : "form:not(.no-ajaxy)", // jQuery selection for ajaxifying forms - set to "false" to disable
+	forms : "form:not(.no-ajaxy)", // selector for ajaxifying forms - set to "false" to disable
 	canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
 	refresh : false, // Refresh the page even if link clicked is current page
  
@@ -92,6 +92,7 @@ let doc=document, bdy,
     qs=(s,o=doc)=>o.querySelector(s);
 let _selector = q => (r = "", q.each(e => r+= q[e].tagName + "#" + ((q[e].tagName != "BODY") ? q[e].id : "") + ", "), r.slice(0, -2));
 
+let _parse = s => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
 function _internal(url) {
 	if (!url) return false;
@@ -102,7 +103,8 @@ function _internal(url) {
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
-	[...$S[0].attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
+	if (!flush) $S = $S[0]; // temporary, until scripts plain js rework
+	[...$S.attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 }
 
 function _on(eventName, elementSelector, handler, el = document) { //e.currentTarget is document when the handler is called
@@ -127,7 +129,7 @@ function lg(m){ gsettings.verbosity && console && console.log(m); }
 // Usage - parameter "o" values: 
 // none - returns currently cached page
 // <URL> - returns page with specified URL
-// <jQuery object> - saves the page in cache
+// <object> - saves the page in cache
 // f - flushes the cache
 class classCache1 { constructor() {
 	let d = false;
@@ -167,7 +169,7 @@ class classMemory { constructor(options) {
 // The stateful Pages class
 // Usage - parameter "h" values:
 // <URL> - returns page with specified URL from internal array
-// <jQuery object> - saves the passed page in internal array
+// <object> - saves the passed page in internal array
 // false - returns false
 class classPages { constructor() {
 	let d = [], i = -1;
@@ -222,10 +224,10 @@ class classGetPage { constructor() {
 		if (o === "x") return rsp; 
 
 		if (!cache1.a()) return;
-		if (o === "body") return cache1.a().find("#ajy-" + o);
-		if (o === "script") return cache1.a().find(o); 
+		if (o === "body") return qs("#ajy-" + o, cache1.a());
+		if (o === "script") return qa(o, cache1.a()); 
 
-		return cache1.a().find(o === "title" ?	"title:first" : ".ajy-" + o); 
+		return qs((o === "title") ?	o : ".ajy-" + o, cache1.a()); 
 };
 let _lSel = $t => (
 	pass++, 
@@ -242,24 +244,24 @@ let _lSel = $t => (
 		plus = 0; 
 		if (cb) return cb(); 
 	},
-	_ld = ($t, $h) => { 
-		if(typeof $h[0] == "undefined") { 
-			lg("Inserting placeholder for ID: " + $t.attr("id"));
-			var tagN = $t.prop("tagName").toLowerCase();
-			$t = $t.replaceWith("<" + tagN + " id='" + $t.attr("id") + "'></" + tagN + ">"); 
+	_ld = ($t, $h) => {
+		if(!$h) { 
+			lg("Inserting placeholder for ID: " + $t.getAttribute("id"));
+			var tagN = $t.tagName.toLowerCase();
+			$t.parentNode.replaceChild(_parse("<" + tagN + " id='" + $t.getAttribute("id") + "'></" + tagN + ">"), $t);
 			return; 
 		}
 
-		var $c = $h.clone(); 
-		$c.find("script").remove(); 
-		_copyAttributes($t[0], $c, true); 
-		$t[0].innerHTML = $c[0].innerHTML;
+		var $c = $h.cloneNode(true); // clone element node (true = deep clone)
+		qa("script", $c).forEach(e => e.parentNode.removeChild(e));
+		_copyAttributes($t, $c, true); 
+		$t.innerHTML = $c.innerHTML;
 	},
 	_lEls = $t => 
 		cache1.a() && !_isBody($t) && $t.forEach(function($el) { 
-			_ld(jQuery($el), cache1.a().find("#" + $el.getAttribute("id")));
+			_ld($el, qs("#" + $el.getAttribute("id"), cache1.a()));
 		}),
-	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(jQuery(bdy), cache1.a().find("#ajy-body")), 1),
+	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", cache1.a())), 1),
 	_lAjax = (hin, pre) => { 
 		var ispost = Rq.a("is"); 
 		if (pre) rt="p"; else rt="c"; 
@@ -296,7 +298,7 @@ let _lSel = $t => (
 		}).finally(() => rc--); // reset active request counter
 	},
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
-	_cache = (href, h, err) => cache1.a(jQuery(_parseHTML(h))) && (pages.a([href, cache1.a()]), 1) && cb && cb(err),
+	_cache = (href, h, err) => cache1.a(_parse(_parseHTML(h))) && (pages.a([href, cache1.a()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
@@ -428,10 +430,10 @@ class classDetScripts { constructor() {
 	let head = 0, lk = 0, j = 0;
             
 	this.a = function ($s) {
-		head = pass ? fn.a("head") : jQuery("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+		head = pass ? jQuery(fn.a("head")) : jQuery("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
 		if (!head) return true;
 		lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-		j = pass ? fn.a("script") : jQuery("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+		j = pass ? jQuery(fn.a("script")) : jQuery("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
 		$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
 		$s.y = head.find("style"); //Extract style tags
 		$s.can = _rel(lk, "canonical"); //Extract canonical tag
@@ -863,13 +865,13 @@ let _init_p = () => {
 	},
 	_doRender = () => {
 		_trigger("load");
-		if(bodyClasses) { var classes = fn.a("body")[0].getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
+		if(bodyClasses) { var classes = fn.a("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
 		var href = Rq.a("h"), title;
 		href = Rq.a("c", href);
 
 		hApi.a(Rq.a("p") ? "+" : "=", href);
-		if(title = fn.a("title")) qs("title").innerHTML = title[0].innerHTML;
+		if(title = fn.a("title")) qs("title").innerHTML = title.innerHTML;
 		Rq.a("C", fn.a("-", $gthis));
 		frms.a("a");
 
