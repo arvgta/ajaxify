@@ -1,6 +1,6 @@
 /* 
  * ajaxify.js 
- * Ajaxify - A jQuery Ajax Plugin
+ * Ajaxify - The Ajax Plugin
  * https://4nf.org/ 
  * 
  * Copyright Arvind Gupta; MIT Licensed 
@@ -10,14 +10,10 @@
 
 Simplest plugin call:
 
-jQuery('#content').ajaxify();
-Ajaxifies the whole site, dynamically replacing the element with the ID '#content' across pages
+/// Vanilla javascript variant ///
 
-If several elements should be swapped, just specify their IDs like this:
-jQuery('#content, #nav').ajaxify();
-
-The plugin can take an arbitrary amount of IDs
-
+let ajaxify = new Ajaxify({options});
+Ajaxifies the whole site, dynamically replacing the elements specified in "elements" across pages
 
 //Options default values
 */
@@ -25,7 +21,8 @@ var gsettings, dsettings =
 
 {
 //	basic config parameters
-	selector : "a:not(.no-ajaxy)", //Selector for elements to trigger swapping - not those to be swapped - e.g. a selection of links
+	elements: "body", //selector for element IDs that are going to be swapped (e.g. "#el1, #el2, #el3")
+	selector : "a:not(.no-ajaxy)", //selector for links to trigger swapping - not elements to be swapped - i.e. a selection of links
 	forms : "form:not(.no-ajaxy)", // selector for ajaxifying forms - set to "false" to disable
 	canonical : false, // Fetch current URL from "canonical" link if given, updating the History API.  In case of a re-direct...
 	refresh : false, // Refresh the page even if link clicked is current page
@@ -90,9 +87,8 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
-let _selector = q => (r = "", q.each(e => r+= q[e].tagName + "#" + ((q[e].tagName != "BODY") ? q[e].id : "") + ", "), r.slice(0, -2));
 
-let _parse = s => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
+let _parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
 function _internal(url) {
 	if (!url) return false;
@@ -103,7 +99,6 @@ function _internal(url) {
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
-	if (!flush) $S = $S[0]; // temporary, until scripts plain js rework
 	[...$S.attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 }
 
@@ -309,28 +304,35 @@ let _lSel = $t => (
 // Checks for necessary pre-conditions - otherwise gracefully degrades
 // Initialises sub-plugins
 // Calls Pronto
-(function ($) { class Ajaxify { constructor(options) {          
-	let settings = $.extend({"pluginon":true,"deltas":true,"verbosity":0}, options);
-	let pluginon = settings["pluginon"],
-	deltas = settings["deltas"],
-	verbosity = settings["verbosity"];
+class Ajaxify { constructor(options) {
+	let $ = this, settings, elements, pluginon, deltas, verbosity;
 	
-	this.a = function ($this, options) {
+	$.init = () => {
+		settings = Object.assign({"pluginon":true,"deltas":true,"verbosity":0}, options);
+		elements = settings["elements"];
+		pluginon = settings["pluginon"];
+		deltas = settings["deltas"];
+		verbosity = settings["verbosity"];
+		
 		var o = options;
 		if (!o || typeof(o) !== "string") {
-			$(function () { 
-				gsettings = Object.assign(dsettings, settings);
-				pages = new classPages();
-				pronto = new classPronto();
-				if (_init(settings)) { 
-					pronto.a(_selector($this), "i"); 
-					if (deltas) scripts.a("1"); 
-				}
-			});
+			if (document.readyState === "complete") run(); // ensure ajaxify is run if plugin script is loaded asynchronously
+			else window.onload = () => run(); // run ajaxify on page load
+			return $;
 		}
 		else return pronto.a(0, o);
 	};
-		let _init = s => { 
+	
+	let run = () => {
+			gsettings = Object.assign(dsettings, settings);
+			pages = new classPages();
+			pronto = new classPronto();
+			if (load(settings)) { 
+				pronto.a(elements, "i"); 
+				if (deltas) scripts.a("1"); 
+			}
+		},
+		load = s => { 
 			if (!api || !pluginon) { 
 				lg("Gracefully exiting...");
 				return false;
@@ -348,19 +350,14 @@ let _lSel = $t => (
 			Rq = new classRq();
 			return true; 
 		}
+	$.init(); // initialize Ajaxify on definition
 }}
-
-    $.fn.ajaxify = function(options) {let $this = $(this);
-        if(!$.fn.ajaxify.o) $.fn.ajaxify.o = new Ajaxify(options);
-        return $.fn.ajaxify.o.a($this, options);
-    };
-})(jQuery);
 
 // The stateful Scripts plugin
 // First parameter "o" is switch:
 // i - initailise options
 // c - fetch canonical URL
-// jQuery object - handle one inline script
+// <object> - handle one inline script
 // otherwise - delta loading
 class classScripts { constructor() {
 	let $s = false, inlhints = 0, skphints = 0, txt = 0,
@@ -373,7 +370,7 @@ class classScripts { constructor() {
 	
     this.a = function (o) {
 		if (o === "i") { 
-			if(!$s) $s = jQuery(); 
+			if(!$s) $s = {}; 
 			if(!inlhints) inlhints = new Hints(inlinehints); 
 			if(!skphints) skphints = new Hints(inlineskip); 
 			return true;
@@ -386,42 +383,40 @@ class classScripts { constructor() {
 			return _addScripts($s); 
 		}
 
-		if (o === "c") return canonical && $s.can ? $s.can.attr("href") : false;
+		if (o === "c") return canonical && $s.can ? $s.can.getAttribute("href") : false;
 		if (o === "d") return detScripts.a($s);
-		if (o instanceof jQuery) return _onetxt(o);
+		if (o && typeof o == "object") return _onetxt(o);
 
 		if (scripts.a("d")) return;
 		_addScripts($s);
 };
 let _allstyle = $s =>	 
-	!style || !$s || ( 
-	jQuery("head").find("style").remove(), 
-	$s.each(function() { 
-	var d = jQuery(this).text(); 
-	_addstyle(d); 
-	})
+	!style || !$s || (
+	qa("style", qs("head")).forEach(e => e.parentNode.removeChild(e)),
+	$s.forEach(el => _addstyle(el.textContent))
 	),
 	_onetxt = $s => 
-		(!(txt = $s.text()).iO(").ajaxify(") && 
-			((inline && !skphints.find(txt)) || $s.hasClass("ajaxy") || 
+		(!(txt = $s.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
+			((inline && !skphints.find(txt)) || $s.classList.contains("ajaxy") || 
 			inlhints.find(txt))
 		) && _addtxt($s),
 	_addtxt = $s => { 
 		if(!txt || !txt.length) return; 
-		if(inlineappend || ($s.prop("type") && !$s.prop("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
+		if(inlineappend || ($s.getAttribute("type") && !$s.getAttribute("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
 
-		try { jQuery.globalEval(txt); } catch (e1) { 
-			try { eval(txt); } catch (e2) {
-				lg("Error in inline script : " + txt + "\nError code : " + e2);
-			}
+		try { eval(txt); } catch (e1) { 
+			lg("Error in inline script : " + txt + "\nError code : " + e1);
 		}
 	},
-	_apptxt = $s => $s.clone().addClass(inlineclass).appendTo("body"),
-	_addstyle = t => jQuery("head").append('<style>' + t + '</style>'),
+	_apptxt = $s => { let sc = document.createElement("script"); _copyAttributes(sc, $s); sc.classList.add(inlineclass);
+		try {sc.appendChild(document.createTextNode($s.textContent))} catch(e) {sc.text = $s.textContent};
+		return qs("body").appendChild(sc);
+	},
+	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
 	_addScripts = $s => ( addAll.a($s.c, "href"), addAll.a($s.j, "src") )
 }}
 // The DetScripts plugin - stands for "detach scripts"
-// Works on "$s" jQuery object that is passed in and fills it
+// Works on "$s" <object> that is passed in and fills it
 // Fetches all stylesheets in the head
 // Fetches the canonical URL
 // Fetches all external scripts on the page
@@ -430,16 +425,16 @@ class classDetScripts { constructor() {
 	let head = 0, lk = 0, j = 0;
             
 	this.a = function ($s) {
-		head = pass ? jQuery(fn.a("head")) : jQuery("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+		head = pass ? fn.a("head") : qs("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
 		if (!head) return true;
-		lk = head.find(pass ? ".ajy-link" : "link"); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-		j = pass ? jQuery(fn.a("script")) : jQuery("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+		lk = qa(pass ? ".ajy-link" : "link", head); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
+		j = pass ? fn.a("script") : qa("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
 		$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
-		$s.y = head.find("style"); //Extract style tags
+		$s.y = qa("style", head); //Extract style tags
 		$s.can = _rel(lk, "canonical"); //Extract canonical tag
 		$s.j = j; //Assign JSs to internal selection
 	};
-let _rel = (lk, v) => jQuery(lk).filter(function(){return(jQuery(this).attr("rel").iO(v));})
+let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel").iO(v));
 }}
 
 
@@ -467,10 +462,9 @@ class classAddAll { constructor() {
 		$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
 
 		if(!pass) _newArray($this); //Fill new array on initial load, nothing more
-		else $this.each(function() { //Iterate through selection
-			var $t = jQuery(this);
-			url = $t.attr(PK);
-
+		else $this.forEach(function(s) { //Iterate through selection
+			var $t = s;
+			url = $t.getAttribute(PK);
 			if(_classAlways($t)) { //Class always handling
 				_removeScript(); //remove from DOM
 				_iScript($t); //insert back single external script in the head
@@ -485,30 +479,24 @@ class classAddAll { constructor() {
 				return;
 			}
 
-			if(PK != "href") scripts.a($t); //Inline JS script? -> inject into DOM
+			if(PK != "href" && !$t.classList.contains("no-ajaxy")) scripts.a($t); //Inline JS script? -> inject into DOM
 		});
 };
-let _allScripts = $t => 
-	$t.each(function() { 
-		_iScript(jQuery(this)); 
-	}),
-	_newArray = $t =>	 
-		$t.each(function() { 
-			if(url = jQuery(this).attr(PK)) $scriptsO.push(url); 
-		}),
-	_classAlways = $t => $t.attr("data-class") == "always" || hints.find(url),
+let _allScripts = $t => $t.forEach(e => _iScript(e)),
+	_newArray = $t => $t.forEach(e => (url = e.getAttribute(PK)) ? $scriptsO.push(url) : 0),
+	_classAlways = $t => $t.getAttribute("data-class") == "always" || hints.find(url),
 	_iScript = $S => { 
-		url = $S.attr(PK);
+		url = $S.getAttribute(PK);
 
-		if(PK == "href") return jQuery(linki.replace("*", url)).appendTo("head"); 
+		if(PK == "href") return qs("head").appendChild(_parse(linki.replace("*", url))); 
 		if(!url) return scripts.a($S); 
 		
-		var script = document.createElement("script");
-		script.async = asyncdef; 
-		_copyAttributes(script, $S); 
-		document.head.appendChild(script); 
+		var sc = document.createElement("script");
+		sc.async = asyncdef; 
+		_copyAttributes(sc, $S); 
+		qs("head").appendChild(sc); 
 	},
-	_removeScript = () => jQuery((PK == "href" ? linkr : scrr).replace("!", url)).remove()
+	_removeScript = () => qa((PK == "href" ? linkr : scrr).replace("!", url)).forEach(e => e.parentNode.removeChild(e))
 }}
 
 
