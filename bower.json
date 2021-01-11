@@ -1,7 +1,7 @@
 {
 "name": "ajaxify-4nf",
 "title": "Ajaxify",
-"description": "Ajaxify - A jQuery Ajax Plugin",
+"description": "Ajaxify - The Ajax Plugin",
 "keywords": [
 "ui",
 "animation",
@@ -17,7 +17,7 @@
 "performance",
 "speed"
 ],
-"version": "7.7.1",
+"version": "8.0.0",
 "authors": [
     "Arvind Gupta"
 ],
@@ -33,6 +33,5 @@
 "docs": "https://4nf.org/ajaxify-overview/",
 "download": "https://4nf.org/ajaxify.min.js",
 "dependencies": {
-"jquery": ">=1.8.0"
 }
 }
