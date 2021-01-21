@@ -318,8 +318,9 @@ class Ajaxify { constructor(options) {
 		if (!o || typeof(o) !== "string") {
 			//if (document.readyState === "complete") run(); // ensure ajaxify is run if plugin script is loaded asynchronously
 			//else window.onload = () => run(); // run ajaxify on page load
-			if (document.readyState !== "loading") run();
-			else document.addEventListener('DOMContentLoaded', () => run());
+			if (document.readyState === "complete" || 
+				(document.readyState !== "loading" && !document.documentElement.doScroll)) run();
+			else document.addEventListener('DOMContentLoaded', run);
 			return $;
 		}
 		else return pronto.a(0, o);
