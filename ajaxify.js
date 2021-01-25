@@ -34,10 +34,10 @@ var gsettings, dsettings =
  
 // script and style handling settings, prefetch
 	deltas : true, // true = deltas loaded, false = all scripts loaded
-	asyncin: true, // async load of dynamically inserted inline scripts, false = synchronous / true = asynchronous
 	asyncdef : true, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
 	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
+	inlinesync: true, // synchronise inline scripts loading by adding a central tiny delay to all of them
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
 	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
@@ -367,7 +367,7 @@ class classScripts { constructor() {
 	let $s = false, inlhints = 0, skphints = 0, txt = 0,
 	canonical = gsettings.canonical,
 	inline = gsettings.inline,
-	asyncin = gsettings.asyncin,
+	inlinesync = gsettings.inlinesync,
 	inlinehints = gsettings.inlinehints,
 	inlineskip = gsettings.inlineskip,
 	inlineappend = gsettings.inlineappend,
@@ -418,7 +418,7 @@ let _allstyle = $s =>
 		return qs("body").appendChild(sc);
 	},
 	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
-	_addScripts = $s => ( addAll.a($s.c, "href"), asyncin ? setTimeout(() => addAll.a($s.j, "src")) : addAll.a($s.j, "src"))
+	_addScripts = $s => ( addAll.a($s.c, "href"), inlinesync ? setTimeout(() => addAll.a($s.j, "src")) : addAll.a($s.j, "src"))
 }}
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" <object> that is passed in and fills it
