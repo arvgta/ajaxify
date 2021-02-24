@@ -58,9 +58,11 @@ $.s = {
 	passCount: false // Show number of pass for debugging
 };
 
+
 $.pass = 0; $.currentURL = "";
 $.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 $.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); }
+$.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); }
 
 //Module global variables
 let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
@@ -84,13 +86,6 @@ inlineclass = "ajy-inline";
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
-
-function _internal(url) {
-	if (!url) return false;
-	if (typeof(url) === "object") url = url.href;
-	if (url==="") return true;
-	return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":");
-}
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
@@ -469,7 +464,7 @@ class RQ { constructor() {
 		if(o === "v") { //validate value passed in "p", which is expected to be a click event value - also performs "i" afterwards
 			if(!p) return false; //ensure data
 			_setE(p, t); //Set event and href in one go
-			if(!_internal(h)) return false; //if not internal -> report failure
+			if(!$.internal(h)) return false; //if not internal -> report failure
 			o = "i"; //continue with "i"
 		}
 
@@ -535,7 +530,7 @@ class Frms { constructor() {
 		if(o === "a") divs.forEach(div => { //iterate through divs
 		Array.prototype.filter.call(qa($.s.forms, div), function(e) { //filter forms
 			let c = e.getAttribute("action");
-			return(_internal(c && c.length > 0 ? c : $.currentURL)); //ensure "action"
+			return($.internal(c && c.length > 0 ? c : $.currentURL)); //ensure "action"
 		}).forEach(frm => { //iterate through forms
 		frm.addEventListener("submit", q => { //create event listener
 			fm = q.target; // fetch target
