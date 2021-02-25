@@ -669,7 +669,7 @@ class Pronto { constructor() {
 			if(!$this.length) $this = "body";
 			$gthis = qa($this); //copy selection to global selector
 			$.frms = new Frms().a; //initialise forms sub-plugin
-			if($.s.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
+			if($.s.idleTime) $.slides = new classSlides($).a; //initialise optional slideshow sub-plugin
 			$.scrolly = new Scrolly().a; //initialise scroll effects sub-plugin
 			$.offsets = new Offsets().a;
 			$.hApi = new HApi().a;
