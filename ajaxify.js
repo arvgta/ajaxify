@@ -61,8 +61,13 @@ $.s = {
 
 $.pass = 0; $.currentURL = "";
 $.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
-$.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); }
+$.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); }
 $.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); }
+$.evIntercept = () => {
+	let iFn = function (a, b, c = false) { if (a=="DOMContentLoaded" || a=="load") setTimeout(b); else this.ael(a,b,c); }  // if "DOMContentLoaded" or "load" - execute function, else - add event listener	
+	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
+	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
+}
 
 //Module global variables
 let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
@@ -826,6 +831,7 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
+		$.evIntercept();
 		$.scripts = new Scripts().a;
 		$.scripts("i"); 
 		$.cache = new Cache().a;
