@@ -712,7 +712,7 @@ let _init_p = () => {
 	$.frms("d", $gthis);
 	if($.s.idleTime) $.slides("i");
 },
-	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
+	_preftime  = (t, e) => (_prefstop(), ptim = setTimeout(()=> _prefetch(t, e), pd)), // call prefetch if timeout expires without being cleared by _prefstop
 	_prefstop = () => clearTimeout(ptim),
 	_prefetch = (t, e) => {
 		if($.s.prefetchoff === true) return;
