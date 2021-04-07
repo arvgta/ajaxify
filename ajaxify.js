@@ -172,7 +172,7 @@ class Pages { constructor() {
 		}
 
 		if (typeof h === "object") { 
-			if((i=_iPage(h)) === -1) d.push(h); 
+			if((i=_iPage(h[0])) === -1) d.push(h); 
 			else d[i] = h; 
 		}
 
