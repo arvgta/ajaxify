@@ -616,6 +616,8 @@ let _iOffset = h => d.findIndex(e => e[0] == h)
 // ! - scroll to current page offset
 class Scrolly { constructor() {
 
+	if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 	this.a = function (o) {
 		if(!o) return; //ensure operator
 
@@ -645,7 +647,7 @@ class Scrolly { constructor() {
 let _scrll = o => window.scrollTo(0, o)
 }}
 
-// The hApi plugin - manages operatios on the History API centrally
+// The hApi plugin - manages operations on the History API centrally
 // Second parameter (p) - set global currentURL
 // Switch (o) values:
 // = - perform a replaceState, using currentURL
