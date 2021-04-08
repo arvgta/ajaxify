@@ -644,7 +644,7 @@ class Scrolly { constructor() {
 
 		//default -> do nothing
 	};
-let _scrll = o => window.scrollTo(0, o)
+let _scrll = o => o ? window.scrollTo(0, o) : setTimeout(() => window.scrollTo(0, 0), 2) //delay of 2 milliseconds on scroll top
 }}
 
 // The hApi plugin - manages operations on the History API centrally
