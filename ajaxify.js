@@ -653,7 +653,7 @@ class Scrolly { constructor() {
 // = - perform a replaceState, using currentURL
 // otherwise - perform a pushState, using currentURL
 class HApi { constructor() {
-            
+
 	this.a = function (o, p) {
 		if(!o) return; //ensure operator
 		if(p) $.currentURL = p; //if p given -> update current URL
