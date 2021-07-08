@@ -62,13 +62,13 @@ $.s = {
 
 $.pass = 0; $.currentURL = ""; $.h = {};
 $.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
-$.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); }
-$.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); }
+$.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
+$.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
 $.intevents = () => {
-	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);}  // if "DOMContentLoaded" - execute function, else - add event listener	
+	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
 	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
 	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
-}
+};
 
 //Module global variables
 let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
