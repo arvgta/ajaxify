@@ -165,7 +165,7 @@ class Memory { constructor(options) {
 class Pages { constructor() {
 	let d = [], i = -1;
             
-    this.a = function (h) {
+	this.a = function (h) {
 		if (typeof h === "string") { 
 			if(h === "f") d = []; 
 			else if((i=_iPage(h)) !== -1) return d[i][1]; 
