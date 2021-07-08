@@ -306,7 +306,7 @@ class Scripts { constructor() {
 	$.h.inlinehints = new Hints($.s.inlinehints);
 	$.h.inlineskip = new Hints($.s.inlineskip);
 	
-    this.a = function (o) {
+	this.a = function (o) {
 		if (o === "i") { 
 			if(!$s) $s = {}; 
 			return true;
@@ -566,7 +566,7 @@ class Frms { constructor() {
 
 			q.preventDefault(); //prevent default form action
 			return(false); //success -> disable default behaviour
-		})
+		});
 		});
 	});
 	};
@@ -848,6 +848,6 @@ let run = () => {
 		$.addAll = new AddAll().a;
 		$.Rq = new RQ().a;
 		return true; 
-	}
+	};
 $.init(); // initialize Ajaxify on definition
 }}
