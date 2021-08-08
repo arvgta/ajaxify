@@ -47,7 +47,7 @@ $.s = {
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
 	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
-	intevents: true, // intercept events that are fired only on classic page load and simulate their trigger on ajax page load ("DOMContentLoaded")
+	triggerDOMCL: true, // trigger "DOMContentLoaded" programmatically each time around
 	style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
 	prefetchoff : false, // Plugin pre-fetches pages on hoverIntent - true = set off completely // strings - separated by ", " - hints to select out
  
@@ -60,15 +60,15 @@ $.s = {
 };
 
 
-$.pass = 0; $.currentURL = ""; $.h = {};
+$.running = 0; $.pass = 0; $.currentURL = ""; $.h = {};
 $.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 $.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
 $.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
-$.intevents = () => {
+/*$.intevents = () => {
 	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
 	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
 	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
-};
+};*/
 
 //Module global variables
 let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
@@ -789,7 +789,8 @@ let _init_p = () => {
 
 		$.scrolly("!");
 		_gaCaptureView(href);
-		$.trigger("render");
+		$.trigger("render"); 
+		if($.s.triggerDOMCL) document.dispatchEvent(new Event('DOMContentLoaded'));
 		if($.s.passCount) qs("#" + $.s.passCount).innerHTML = "Pass: " + $.pass;
 		if($.s.cb) $.s.cb();
 	},
@@ -822,6 +823,7 @@ $.init = () => {
 };
 
 let run = () => {
+		if($.running) return; else $.running = true;
 		$.s = Object.assign($.s, options);
 		$.pages = new Pages().a;
 		$.pronto = new Pronto().a;
@@ -838,7 +840,7 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
-		if ($.s.intevents) $.intevents(); // intercept events
+		//if ($.s.intevents) $.intevents(); // intercept events
 		$.scripts = new Scripts().a;
 		$.scripts("i"); 
 		$.cache = new Cache().a;
