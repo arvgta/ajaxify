@@ -15,6 +15,13 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 */
 
+let ael = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = function(type, fn, capture = false) {
+	if(type == "DOMContentLoaded" && !capture) capture = { once: true };
+	this.f = ael;
+	this.f(type, fn, capture);
+};
+
 // The main plugin - Ajaxify
 // Is passed the global options 
 // Checks for necessary pre-conditions - otherwise gracefully degrades
@@ -22,6 +29,7 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 // Calls Pronto
 class Ajaxify { constructor(options) {
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; }; //Intuitively better understandable shorthand for String.indexOf() - String.iO()
+
 let $ = this;
 
 //Options default values
@@ -47,6 +55,7 @@ $.s = {
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
 	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
+	intevents : true, //intercept events and make them clean themselves up
 	triggerDOMCL: true, // trigger "DOMContentLoaded" programmatically each time around
 	style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
 	prefetchoff : false, // Plugin pre-fetches pages on hoverIntent - true = set off completely // strings - separated by ", " - hints to select out
@@ -64,11 +73,6 @@ $.running = 0; $.pass = 0; $.currentURL = ""; $.h = {};
 $.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 $.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
 $.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
-/*$.intevents = () => {
-	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
-	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
-	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
-};*/
 
 //Module global variables
 let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
