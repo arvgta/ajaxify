@@ -15,12 +15,25 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 */
 
-let ael = EventTarget.prototype.addEventListener;
-EventTarget.prototype.addEventListener = function(type, fn, capture = false) {
-	if(type == "DOMContentLoaded" && !capture) capture = { once: true };
-	this.f = ael;
-	this.f(type, fn, capture);
+let iFn = function (a, b, c = false) { 
+	if ((this === document || this === window) && a=="DOMContentLoaded") {
+		if(typeof c == "boolean") c = { capture: c, once: true };
+		else c.once = true;
+	}
+	this.ael(a,b,c);
 };
+EventTarget.prototype.ael = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = iFn;
+
+/*let ael = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = function(type, fn, co = false) {
+	if(type == "DOMContentLoaded") {
+		if(typeof co == "boolean") co = { capture: co, once: true };
+		else co.once = true;
+	}
+	this.f = ael;
+	this.f(type, fn, co);
+};*/
 
 // The main plugin - Ajaxify
 // Is passed the global options 
@@ -793,8 +806,8 @@ let _init_p = () => {
 
 		$.scrolly("!");
 		_gaCaptureView(href);
-		$.trigger("render"); 
-		if($.s.triggerDOMCL) document.dispatchEvent(new Event('DOMContentLoaded'));
+		$.trigger("render");
+		if($.s.triggerDOMCL) setTimeout(() => document.dispatchEvent(new Event('DOMContentLoaded')));
 		if($.s.passCount) qs("#" + $.s.passCount).innerHTML = "Pass: " + $.pass;
 		if($.s.cb) $.s.cb();
 	},
