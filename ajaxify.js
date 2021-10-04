@@ -236,12 +236,7 @@ let _lSel = $t => (
 		if (cb) return cb(); 
 	},
 	_ld = ($t, $h) => {
-		if(!$h) { 
-			lg("Inserting placeholder for ID: " + $t.getAttribute("id"));
-			var tagN = $t.tagName.toLowerCase();
-			$t.parentNode.replaceChild($.parse("<" + tagN + " id='" + $t.getAttribute("id") + "'></" + tagN + ">"), $t);
-			return; 
-		}
+		if(!$h) return; //no input
 
 		var $c = $h.cloneNode(true); // clone element node (true = deep clone)
 		qa("script", $c).forEach(e => e.parentNode.removeChild(e));
