@@ -826,7 +826,7 @@ $.init(); // initialize Ajaxify on definition
 // f - flushes the cache
 class Cache { constructor($) { let $ = $, d = false; }
             
-	this.a = function (o) {
+	a(o) {
 		if (!o) return d; 
 	
 		if (typeof o === "string") { //URL or "f" passed
