@@ -71,7 +71,7 @@ $.intevents = () => {
 };
 
 //Module global variables
-let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
+let rootUrl = location.origin,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -826,7 +826,7 @@ let run = () => {
 		}
 	},
 	load = () => { 
-		if (!api || !$.s.pluginon) { 
+		if (!(window.history && window.history.pushState && window.history.replaceState) || !$.s.pluginon) { 
 			lg("Gracefully exiting...");
 			return false;
 		}
