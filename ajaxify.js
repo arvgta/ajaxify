@@ -102,34 +102,6 @@ class Hints { constructor(h) { let _ = this;
 
 function lg(m){ $.s.verbosity && console && console.log(m); }
 
-// The stateful Cache class
-// Usage - parameter "o" values: 
-// none - returns currently cached page
-// <URL> - returns page with specified URL
-// <object> - saves the page in cache
-// f - flushes the cache
-class Cache { constructor() {
-	let d = false;
-            
-	this.a = function (o) {
-		if (!o) return d; 
-	
-		if (typeof o === "string") { //URL or "f" passed
-			if(o === "f") { //"f" passed -> flush
-				$.pages("f"); //delegate flush to $.pages
-				lg("Cache flushed");
-			} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
-
-			return d; //return cached page
-		}
-
-		if (typeof o === "object") { 
-			d = o; 
-			return d; 
-		}
-	};          
- }}
-
 // The stateful Memory class
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 class Memory { constructor(options) {
@@ -835,7 +807,7 @@ let run = () => {
 		if ($.s.intevents) $.intevents(); // intercept events
 		$.scripts = new Scripts().a;
 		$.scripts("i"); 
-		$.cache = new Cache().a;
+		$.cache = new Cache($).a;
 		$.memory = new Memory().a;
 		$.fn = $.getPage = new GetPage().a;
 		$.detScripts = new DetScripts().a;
@@ -845,3 +817,29 @@ let run = () => {
 	};
 $.init(); // initialize Ajaxify on definition
 }}
+
+// The stateful Cache class
+// Usage - parameter "o" values: 
+// none - returns currently cached page
+// <URL> - returns page with specified URL
+// <object> - saves the page in cache
+// f - flushes the cache
+class Cache { constructor($) { let $ = $, d = false; }
+            
+	this.a = function (o) {
+		if (!o) return d; 
+	
+		if (typeof o === "string") { //URL or "f" passed
+			if(o === "f") { //"f" passed -> flush
+				$.pages("f"); //delegate flush to $.pages
+			} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
+
+			return d; //return cached page
+		}
+
+		if (typeof o === "object") { 
+			d = o; 
+			return d; 
+		}
+	};          
+ }
