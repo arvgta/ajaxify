@@ -15,6 +15,13 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 */
 
+//Module global helpers
+let rootUrl = location.origin, inlineclass = "ajy-inline",
+	bdy,
+	qa=(s,o=document)=>o.querySelectorAll(s),
+	qs=(s,o=document)=>o.querySelector(s);
+
+
 // The main plugin - Ajaxify
 // Is passed the global options 
 // Checks for necessary pre-conditions - otherwise gracefully degrades
@@ -69,14 +76,6 @@ $.intevents = () => {
 	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
 	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
 };
-
-//Module global variables
-let rootUrl = location.origin, inlineclass = "ajy-inline";
-
-//Global helpers
-let bdy,
-    qa=(s,o=document)=>o.querySelectorAll(s),
-    qs=(s,o=document)=>o.querySelector(s);
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
@@ -160,10 +159,7 @@ tagsc = /<\/(html|head|body|link)\>/gi,
 
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
-divid12 = '<div id="ajy-$1"$2',
-linki = '<link rel="stylesheet" type="text/css" href="*" />',
-linkr = 'link[href*="!"]',
-scrr = 'script[src*="!"]';
+divid12 = '<div id="ajy-$1"$2';
 
 	this.a = function (o, p, p2) { 
 		if (!o) return $.cache(); 
@@ -346,7 +342,11 @@ let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel")
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
 class AddAll { constructor() {
-	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0;
+	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, 
+linki = '<link rel="stylesheet" type="text/css" href="*" />',
+linkr = 'link[href*="!"]',
+scrr = 'script[src*="!"]';
+
 	$.h.alwayshints = new Hints($.s.alwayshints);
 
 	this.a = function ($this, pk) {
@@ -824,15 +824,15 @@ $.init(); // initialize Ajaxify on definition
 // <URL> - returns page with specified URL
 // <object> - saves the page in cache
 // f - flushes the cache
-class Cache { constructor($) { let $ = $, d = false; }
+class Cache { constructor($) { let d = false, _ = $; 
             
-	a(o) {
+	this.a = function (o) {
 		if (!o) return d; 
 	
 		if (typeof o === "string") { //URL or "f" passed
 			if(o === "f") { //"f" passed -> flush
-				$.pages("f"); //delegate flush to $.pages
-			} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
+				_.pages("f"); //delegate flush to $.pages
+			} else d = _.pages(_.memory(o)); //URL passed -> look up page in memory
 
 			return d; //return cached page
 		}
@@ -842,4 +842,4 @@ class Cache { constructor($) { let $ = $, d = false; }
 			return d; 
 		}
 	};          
- }
+ }}
