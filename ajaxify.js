@@ -89,9 +89,9 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Global helpers
-let doc=document, bdy,
-    qa=(s,o=doc)=>o.querySelectorAll(s),
-    qs=(s,o=doc)=>o.querySelector(s);
+let bdy,
+    qa=(s,o=document)=>o.querySelectorAll(s),
+    qs=(s,o=document)=>o.querySelector(s);
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
