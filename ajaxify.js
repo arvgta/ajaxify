@@ -71,22 +71,7 @@ $.intevents = () => {
 };
 
 //Module global variables
-let rootUrl = location.origin,
-
-//Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
-//Makes it possible to pre-fetch an entire page
-docType = /<\!DOCTYPE[^>]*>/i,
-tagso = /<(html|head|link)([\s\>])/gi,
-tagsod = /<(body)([\s\>])/gi,
-tagsc = /<\/(html|head|body|link)\>/gi,
-
-//Helper strings
-div12 = '<div class="ajy-$1"$2',
-divid12 = '<div id="ajy-$1"$2',
-linki = '<link rel="stylesheet" type="text/css" href="*" />',
-linkr = 'link[href*="!"]', 
-scrr = 'script[src*="!"]',
-inlineclass = "ajy-inline";
+let rootUrl = location.origin, inlineclass = "ajy-inline";
 
 //Global helpers
 let bdy,
@@ -192,8 +177,22 @@ class Pages { constructor() {
 // otherwise - returns selection of current page to client
 
 class GetPage { constructor() {
-	let rsp = 0, cb = 0, plus = 0, rt = "", ct = 0, rc = 0, ac = 0;
-            
+	let rsp = 0, cb = 0, plus = 0, rt = "", ct = 0, rc = 0, ac = 0,
+
+//Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
+//Makes it possible to pre-fetch an entire page
+docType = /<\!DOCTYPE[^>]*>/i,
+tagso = /<(html|head|link)([\s\>])/gi,
+tagsod = /<(body)([\s\>])/gi,
+tagsc = /<\/(html|head|body|link)\>/gi,
+
+//Helper strings
+div12 = '<div class="ajy-$1"$2',
+divid12 = '<div id="ajy-$1"$2',
+linki = '<link rel="stylesheet" type="text/css" href="*" />',
+linkr = 'link[href*="!"]',
+scrr = 'script[src*="!"]';
+
 	this.a = function (o, p, p2) { 
 		if (!o) return $.cache(); 
 
