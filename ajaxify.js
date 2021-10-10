@@ -830,5 +830,5 @@ class Cache {
 	g(){ return this.d; }
 	s(v){ return this.d = v; }
 	f(){ $.pages("f"); }
-	l(u){ return this.d = $.pages($.memory(u)); }
+	l(u){ return this.s($.pages($.memory(u))); }
 }
