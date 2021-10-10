@@ -821,14 +821,10 @@ $.init(); // initialize Ajaxify on definition
 }}
 
 // The stateful Cache class
-// Usage - parameter "o" values: 
-// none - returns currently cached page
-// <URL> - returns page with specified URL
-// <object> - saves the page in cache
-// f - flushes the cache
+// this.d = entire current page (as an object)
 class Cache {
-	g(){ return this.d; }
-	s(v){ return this.d = v; }
-	f(){ $.pages("f"); }
-	l(u){ return this.s($.pages($.memory(u))); }
+	g(){ return this.d; } //getter
+	s(v){ return this.d = v; } //setter
+	f(){ $.pages("f"); } //delegate flush
+	l(u){ return this.s($.pages($.memory(u))); } //lookup URL and load
 }
