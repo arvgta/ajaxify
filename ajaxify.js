@@ -164,7 +164,7 @@ div12 = '<div class="ajy-$1"$2',
 divid12 = '<div id="ajy-$1"$2';
 
 	this.a = function (o, p, p2) { 
-		if (!o) return $.cache(); 
+		if (!o) return $.cache.g(); 
 
 		if (o.iO("/")) { 
 			cb = p; 
@@ -183,11 +183,11 @@ divid12 = '<div id="ajy-$1"$2';
 		if (o === "-") return _lSel(p); 
 		if (o === "x") return rsp; 
 
-		if (!$.cache()) return;
-		if (o === "body") return qs("#ajy-" + o, $.cache());
-		if (o === "script") return qa(o, $.cache()); 
+		if (!$.cache.g()) return;
+		if (o === "body") return qs("#ajy-" + o, $.cache.g());
+		if (o === "script") return qa(o, $.cache.g()); 
 
-		return qs((o === "title") ?	o : ".ajy-" + o, $.cache()); 
+		return qs((o === "title") ?	o : ".ajy-" + o, $.cache.g()); 
 };
 let _lSel = $t => (
 	$.pass++, 
@@ -199,7 +199,7 @@ let _lSel = $t => (
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
-		if ($.Rq("is") || !$.cache(h)) return _lAjax(h, pre); 
+		if ($.Rq("is") || !$.cache.l(h)) return _lAjax(h, pre); 
 
 		plus = 0; 
 		if (cb) return cb(); 
@@ -213,10 +213,10 @@ let _lSel = $t => (
 		$t.innerHTML = $c.innerHTML;
 	},
 	_lEls = $t => 
-		$.cache() && !_isBody($t) && $t.forEach(function($el) { 
-			_ld($el, qs("#" + $el.getAttribute("id"), $.cache()));
+		$.cache.g() && !_isBody($t) && $t.forEach(function($el) { 
+			_ld($el, qs("#" + $el.getAttribute("id"), $.cache.g()));
 		}),
-	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", $.cache())), 1),
+	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", $.cache.g())), 1),
 	_lAjax = (hin, pre) => { 
 		var ispost = $.Rq("is"); 
 		if (pre) rt="p"; else rt="c"; 
@@ -253,7 +253,7 @@ let _lSel = $t => (
 		}).finally(() => rc--); // reset active request counter
 	},
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
-	_cache = (href, h, err) => $.cache($.parse(_parseHTML(h))) && ($.pages([href, $.cache()]), 1) && cb && cb(err),
+	_cache = (href, h, err) => $.cache.s($.parse(_parseHTML(h))) && ($.pages([href, $.cache.g()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
@@ -809,7 +809,7 @@ let run = () => {
 		if ($.s.intevents) $.intevents(); // intercept events
 		$.scripts = new Scripts().a;
 		$.scripts("i"); 
-		$.cache = new Cache().a;
+		$.cache = new Cache();
 		$.memory = new Memory().a;
 		$.fn = $.getPage = new GetPage().a;
 		$.detScripts = new DetScripts().a;
@@ -827,20 +827,8 @@ $.init(); // initialize Ajaxify on definition
 // <object> - saves the page in cache
 // f - flushes the cache
 class Cache {
-	a(o) {
-		if (!o) return this.d;
-
-		if (typeof o === "string") { //URL or "f" passed
-			if(o === "f") { //"f" passed -> flush
-				$.pages("f"); //delegate flush to $.pages
-			} else this.d = $.pages($.memory(o)); //URL passed -> look up page in memory
-
-			return this.d; //return cached page
-		}
-
-		if (typeof o === "object") {
-			this.d = o;
-			return this.d;
-		}
-	}
+	g(){ return this.d; }
+	s(v){ return this.d = v; }
+	f(){ $.pages("f"); }
+	l(u){ return this.d = $.pages($.memory(u)); }
 }
