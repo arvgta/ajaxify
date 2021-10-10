@@ -15,6 +15,8 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 */
 
+let $;
+
 //Module global helpers
 let rootUrl = location.origin, inlineclass = "ajy-inline",
 	bdy,
@@ -29,7 +31,7 @@ let rootUrl = location.origin, inlineclass = "ajy-inline",
 // Calls Pronto
 class Ajaxify { constructor(options) {
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; }; //Intuitively better understandable shorthand for String.indexOf() - String.iO()
-let $ = this;
+$ = this;
 
 //Options default values
 $.s = {
@@ -807,7 +809,7 @@ let run = () => {
 		if ($.s.intevents) $.intevents(); // intercept events
 		$.scripts = new Scripts().a;
 		$.scripts("i"); 
-		$.cache = new Cache($).a;
+		$.cache = new Cache().a;
 		$.memory = new Memory().a;
 		$.fn = $.getPage = new GetPage().a;
 		$.detScripts = new DetScripts().a;
@@ -824,22 +826,21 @@ $.init(); // initialize Ajaxify on definition
 // <URL> - returns page with specified URL
 // <object> - saves the page in cache
 // f - flushes the cache
-class Cache { constructor($) { let d = false, _ = $; 
-            
-	this.a = function (o) {
-		if (!o) return d; 
-	
+class Cache {
+	a(o) {
+		if (!o) return this.d;
+
 		if (typeof o === "string") { //URL or "f" passed
 			if(o === "f") { //"f" passed -> flush
-				_.pages("f"); //delegate flush to $.pages
-			} else d = _.pages(_.memory(o)); //URL passed -> look up page in memory
+				$.pages("f"); //delegate flush to $.pages
+			} else this.d = $.pages($.memory(o)); //URL passed -> look up page in memory
 
-			return d; //return cached page
+			return this.d; //return cached page
 		}
 
-		if (typeof o === "object") { 
-			d = o; 
-			return d; 
+		if (typeof o === "object") {
+			this.d = o;
+			return this.d;
 		}
-	};          
- }}
+	}
+}
