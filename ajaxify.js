@@ -103,18 +103,6 @@ class Hints { constructor(h) { let _ = this;
 
 function lg(m){ $.s.verbosity && console && console.log(m); }
 
-// The stateful Memory class
-// Usage: $.memory(<URL>) - returns the same URL if not turned off internally
-class Memory { constructor(options) {
-	$.h.memoryoff = new Hints($.s.memoryoff);
-
-	this.a = function (h) {
-		if (!h || $.s.memoryoff === true) return false; 
-		if ($.s.memoryoff === false) return h; 
-		return $.h.memoryoff.find(h) ? false : h; 
-	};
-}}
-
 // The stateful Pages class
 // Usage - parameter "h" values:
 // <URL> - returns page with specified URL from internal array
@@ -810,7 +798,7 @@ let run = () => {
 		$.scripts = new Scripts().a;
 		$.scripts("i"); 
 		$.cache = new Cache();
-		$.memory = new Memory().a;
+		$.memory = new Memory(); $.h.memoryoff = new Hints($.s.memoryoff);
 		$.fn = $.getPage = new GetPage().a;
 		$.detScripts = new DetScripts().a;
 		$.addAll = new AddAll().a;
@@ -826,5 +814,15 @@ class Cache {
 	g(){ return this.d; } //getter
 	s(v){ return this.d = v; } //setter
 	f(){ $.pages("f"); } //delegate flush
-	l(u){ return this.s($.pages($.memory(u))); } //lookup URL and load
+	l(u){ return this.s($.pages($.memory.l(u))); } //lookup URL and load
+}
+
+// The stateful Memory class
+// Usage: $.memory.l(<URL>) - returns the same URL if not turned off internally
+class Memory {
+	l(h) {
+		if (!h || $.s.memoryoff === true) return false; 
+		if ($.s.memoryoff === false) return h; 
+		return $.h.memoryoff.find(h) ? false : h; 
+	}
 }
