@@ -811,10 +811,10 @@ $.init(); // initialize Ajaxify on definition
 // The stateful Cache class
 // this.d = entire current page (as an object)
 class Cache {
-	g(){ return this.d; } //getter
-	s(v){ return this.d = v; } //setter
-	f(){ $.pages("f"); } //delegate flush
-	l(u){ return this.s($.pages($.memory.l(u))); } //lookup URL and load
+	g(){ return this.d } //getter
+	s(v){ return this.d = v } //setter
+	f(){ $.pages("f") } //delegate flush
+	l(u){ let v = $.memory.l(u); return this.s(v === false ? v : $.pages(v)) } //lookup URL and load
 }
 
 // The stateful Memory class
