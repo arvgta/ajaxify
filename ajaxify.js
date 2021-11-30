@@ -103,31 +103,6 @@ class Hints { constructor(h) { let _ = this;
 
 function lg(m){ $.s.verbosity && console && console.log(m); }
 
-// The stateful Pages class
-// Usage - parameter "h" values:
-// <URL> - returns page with specified URL from internal array
-// <object> - saves the passed page in internal array
-// false - returns false
-class Pages { constructor() {
-	let d = [], i = -1;
-            
-	this.a = function (h) {
-		if (typeof h === "string") { 
-			if(h === "f") d = []; 
-			else if((i=_iPage(h)) !== -1) return d[i][1]; 
-		}
-
-		if (typeof h === "object") { 
-			if((i=_iPage(h[0])) === -1) d.push(h); 
-			else d[i] = h; 
-		}
-
-		if (typeof h === "boolean") return false; 
-	};
-		
-	let _iPage = h => d.findIndex(e => e[0] == h)
-}}
-
 // The GetPage class
 // First parameter (o) is a switch: 
 // empty - returns cache
@@ -241,7 +216,7 @@ let _lSel = $t => (
 		}).finally(() => rc--); // reset active request counter
 	},
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
-	_cache = (href, h, err) => $.cache.s($.parse(_parseHTML(h))) && ($.pages([href, $.cache.g()]), 1) && cb && cb(err),
+	_cache = (href, h, err) => $.cache.s($.parse(_parseHTML(h))) && ($.pages.p([href, $.cache.g()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
@@ -779,7 +754,7 @@ $.init = () => {
 
 let run = () => {
 		$.s = Object.assign($.s, options);
-		$.pages = new Pages().a;
+		($.pages = new Pages()).f();
 		$.pronto = new Pronto().a;
 		if (load()) { 
 			$.pronto($.s.elements, "i"); 
@@ -813,8 +788,7 @@ $.init(); // initialize Ajaxify on definition
 class Cache {
 	g(){ return this.d } //getter
 	s(v){ return this.d = v } //setter
-	f(){ $.pages("f") } //delegate flush
-	l(u){ let v = $.memory.l(u); return this.s(v === false ? v : $.pages(v)) } //lookup URL and load
+	l(u){ let v = $.memory.l(u); return this.s(v === false ? v : $.pages.l(v)) } //lookup URL and load
 }
 
 // The stateful Memory class
@@ -825,4 +799,13 @@ class Memory {
 		if ($.s.memoryoff === false) return h; 
 		return $.h.memoryoff.find(h) ? false : h; 
 	}
+}
+
+// The stateful Pages class
+// this.d = Array of pages - [0] = URL // [1] = reference to whole page
+class Pages {
+	f(){ this.d = [] } //flush
+	l(u){ if (this.P(u)) return this.d[this.i][1] } //lookup URL and return page
+	p(o){ if(this.P(o[0])) this.d[this.i]=o; else this.d.push(o) } //update or push page passed as an object
+	P(u){ return (this.i = this.d.findIndex(e => e[0] == u)) + 1 } //lookup page index and store in "i"
 }
