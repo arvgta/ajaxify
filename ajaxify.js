@@ -578,22 +578,6 @@ class Scrolly { constructor() {
 	let _scrll = o => setTimeout(() => window.scrollTo(0, o), 10) //delay of 10 milliseconds on all scroll effects
 }}
 
-// The hApi plugin - manages operations on the History API centrally
-// Second parameter (p) - set global currentURL
-// Switch (o) values:
-// = - perform a replaceState, using currentURL
-// otherwise - perform a pushState, using currentURL
-class HApi { constructor() {
-
-	this.a = function (o, p) {
-		if(!o) return; //ensure operator
-		if(p) $.currentURL = p; //if p given -> update current URL
-
-		if(o === "=") history.replaceState({ url: $.currentURL }, "state-" + $.currentURL, $.currentURL); //perform replaceState
-		else if ($.currentURL !== window.location.href) history.pushState({ url: $.currentURL }, "state-" + $.currentURL, $.currentURL); //perform pushState
-	};
-}}
-
 // The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
 // Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
 // Switch (h) values:
@@ -615,7 +599,7 @@ class Pronto { constructor() {
 			if($.s.idleTime) $.slides = new classSlides($).a; //initialise optional slideshow sub-plugin
 			$.scrolly = new Scrolly().a; //initialise scroll effects sub-plugin
 			$.offsets = new Offsets().a;
-			$.hApi = new HApi().a;
+			$.hApi = new HApi();
 			_init_p(); //initialise Pronto sub-plugin
 			return $this; //return query selector for chaining
 		}
@@ -632,7 +616,7 @@ class Pronto { constructor() {
 		}
 	};
 let _init_p = () => {
-	$.hApi("=", window.location.href);
+	$.hApi.r(window.location.href);
 	window.addEventListener("popstate", _onPop);
 	if ($.s.prefetchoff !== true) {
 		_on("mouseenter", $.s.selector, _preftime); // start prefetch timeout
@@ -665,13 +649,13 @@ let _init_p = () => {
 		if(!href || _exoticKey(t)) return;
 		if(href.substr(-1) ==="#") return true;
 		if(_hashChange()) {
-			$.hApi("=", href);
+			$.hApi.r(href);
 			return true;
 		}
 
 		$.scrolly("+");
 		_stopBubbling(e);
-		if($.Rq("=")) $.hApi("=");
+		if($.Rq("=")) $.hApi.r();
 		if($.s.refresh || !$.Rq("=")) _request(notPush);
 	},
 	_request = notPush => {
@@ -713,7 +697,7 @@ let _init_p = () => {
 		var href = $.Rq("h"), title;
 		href = $.Rq("c", href);
 
-		$.hApi($.Rq("p") ? "+" : "=", href);
+		if($.Rq("p")) $.hApi.p(href); else $.hApi.r(href);
 		if(title = $.fn("title")) qs("title").innerHTML = title.innerHTML;
 		$.Rq("C", $.fn("-", $gthis));
 		$.frms("a");
@@ -795,9 +779,9 @@ class Cache {
 // Usage: $.memory.l(<URL>) - returns the same URL if not turned off internally
 class Memory {
 	l(h) {
-		if (!h || $.s.memoryoff === true) return false; 
-		if ($.s.memoryoff === false) return h; 
-		return $.h.memoryoff.find(h) ? false : h; 
+		if (!h || $.s.memoryoff === true) return false;
+		if ($.s.memoryoff === false) return h;
+		return $.h.memoryoff.find(h) ? false : h;
 	}
 }
 
@@ -808,4 +792,12 @@ class Pages {
 	l(u){ if (this.P(u)) return this.d[this.i][1] } //lookup URL and return page
 	p(o){ if(this.P(o[0])) this.d[this.i]=o; else this.d.push(o) } //update or push page passed as an object
 	P(u){ return (this.i = this.d.findIndex(e => e[0] == u)) + 1 } //lookup page index and store in "i"
+}
+
+// The HAPi class
+// operates on $.currentURL - manages operations on the History API centrally(replaceState / pushState)
+class HApi {
+	r(h) { let c = this.u(h); history.replaceState({ url: c }, "state-" + c, c); } //perform replaceState
+	p(h) { let c = this.u(h); if (c !== window.location.href) history.pushState({ url: c }, "state-" + c, c); } //perform pushState
+	u(h) { if(h) $.currentURL = h; return $.currentURL; } //update currentURL if given and return always
 }
