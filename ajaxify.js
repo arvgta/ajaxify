@@ -52,7 +52,6 @@ $.s = {
 	asyncdef : true, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
 	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
-	inlinesync : false, // synchronise inline scripts loading by adding a central tiny delay to all of them
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
 	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
@@ -276,7 +275,7 @@ let _allstyle = $s =>
 		return qs("body").appendChild(sc);
 	},
 	_addstyle = t => qs("head").appendChild($.parse('<style>' + t + '</style>')),
-	_addScripts = $s => ( $.addAll($s.c, "href"), $.s.inlinesync ? setTimeout(() => $.addAll($s.j, "src")) : $.addAll($s.j, "src"))
+	_addScripts = $s => ($.addAll($s.c, "href"), $.addAll($s.j, "src"))
 }}
 
 // The DetScripts plugin - stands for "detach scripts"
