@@ -515,30 +515,6 @@ let _k = () => {
 	}
 }}
 
-// The stateful Offsets plugin
-// Usage:
-// 1) $.offsets(<URL>) - returns offset of specified URL from internal array
-// 2) $.offsets() - saves the current URL + offset in internal array
-class Offsets { constructor() {
-	let d = [], i = -1;
-            
-	this.a = function (h) {
-		if (typeof h === "string") { //Lookup page offset
-			h = h.iO("?") ? h.split("?")[0] : h; //Handle root URL only from dynamic pages
-			i = _iOffset(h); //Fetch offset
-			if(i === -1) return 0; // scrollTop if not found
-			return d[i][1]; //Return offset that was found
-		}
-
-		//Add page offset
-		var u = $.currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
-		i = _iOffset(us); //get page index
-		if(i === -1) d.push(os); //doesn't exist -> push to array
-		else d[i] = os; //exists -> overwrite
-	};
-let _iOffset = h => d.findIndex(e => e[0] == h)
-}}
-
 // The Scrolly plugin - manages scroll effects centrally
 // scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
 // Switch (o) values:
@@ -564,8 +540,8 @@ class Scrolly { constructor() {
 		}
 
 		if($.s.scrolltop === "s") { //smart scroll enabled
-			if(op === "+") $.offsets(); //add page offset
-			if(op === "!") _scrll($.offsets(o)); //scroll to stored position of page
+			if(op === "+") $.offsets.p(o); //add page offset
+			if(op === "!") _scrll($.offsets.l(o)); //scroll to stored position of page
 
 			return;
 		}
@@ -597,7 +573,7 @@ class Pronto { constructor() {
 			$.frms = new Frms().a; //initialise forms sub-plugin
 			if($.s.idleTime) $.slides = new classSlides($).a; //initialise optional slideshow sub-plugin
 			$.scrolly = new Scrolly().a; //initialise scroll effects sub-plugin
-			$.offsets = new Offsets().a;
+			($.offsets = new Offsets()).f();
 			$.hApi = new HApi();
 			_init_p(); //initialise Pronto sub-plugin
 			return $this; //return query selector for chaining
@@ -791,6 +767,21 @@ class Pages {
 	l(u){ if (this.P(u)) return this.d[this.i][1] } //lookup URL and return page
 	p(o){ if(this.P(o[0])) this.d[this.i]=o; else this.d.push(o) } //update or push page passed as an object
 	P(u){ return (this.i = this.d.findIndex(e => e[0] == u)) + 1 } //lookup page index and store in "i"
+}
+
+// The Offsets class
+// this.d = Array of pages - [0] = URL // [1] = offset
+class Offsets {
+  f() { this.d = [] } //flush internal offsets array - must be performed by parent
+  l(h) { if(h.iO("?")) h = h.split("?")[0]; //lookup page offset
+    return this.O(h) ? this.d[this.i][1] : 0; //return if found otherwise 0
+  }
+  p(h) { let us1 = h.iO("?") ? h.split("?")[0] : h, //initialise all helper variables in one go
+	us = us1.iO("#") ? us1.split("#")[0] : us1,
+	os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
+    if(this.O(us)) this.d[this.i]=os; else this.d.push(os); // update if found, otherwise push
+  }
+  O(h) { return (this.i = this.d.findIndex(e => e[0] == h)) + 1 } //find URL in internal array - add 1 for convenience
 }
 
 // The HAPi class
