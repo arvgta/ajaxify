@@ -515,44 +515,6 @@ let _k = () => {
 	}
 }}
 
-// The Scrolly plugin - manages scroll effects centrally
-// scrolltop values: "s" - "smart" (default), true - always scroll to top, false - no scroll
-// Switch (o) values:
-// + - add current page to offsets
-// ! - scroll to current page offset
-class Scrolly { constructor() {
-
-	if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-
-	this.a = function (o) {
-		if(!o) return; //ensure operator
-
-		var op = o; //cache operator
-
-		if(o === "+" || o === "!") o = $.currentURL; //fetch currentURL for "+" and "-" operators
-
-		if(op !== "+" && o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
-			let $el = qs("#" + o.split("#")[1]); //fetch the element
-			if (!$el) return; //nothing found -> return quickly
-			let box = $el.getBoundingClientRect();
-			_scrll(box.top + window.pageYOffset - document.documentElement.clientTop); // ...animate to ID
-			return;
-		}
-
-		if($.s.scrolltop === "s") { //smart scroll enabled
-			if(op === "+") $.offsets.p(o); //add page offset
-			if(op === "!") _scrll($.offsets.l(o)); //scroll to stored position of page
-
-			return;
-		}
-
-		if(op !== "+" && $.s.scrolltop) _scrll(0); //otherwise scroll to top of page
-
-		//default -> do nothing
-	};
-	let _scrll = o => setTimeout(() => window.scrollTo(0, o), 10) //delay of 10 milliseconds on all scroll effects
-}}
-
 // The Pronto plugin - Pronto variant of Ben Plum's Pronto plugin - low level event handling in general
 // Works on a selection, passed to Pronto by the selection, which specifies, which elements to Ajaxify
 // Switch (h) values:
@@ -572,7 +534,7 @@ class Pronto { constructor() {
 			$gthis = qa($this); //copy selection to global selector
 			$.frms = new Frms().a; //initialise forms sub-plugin
 			if($.s.idleTime) $.slides = new classSlides($).a; //initialise optional slideshow sub-plugin
-			$.scrolly = new Scrolly().a; //initialise scroll effects sub-plugin
+			$.scrolly = new Scrolly(); //initialise scroll effects sub-plugin
 			($.offsets = new Offsets()).f();
 			$.hApi = new HApi();
 			_init_p(); //initialise Pronto sub-plugin
@@ -628,7 +590,7 @@ let _init_p = () => {
 			return true;
 		}
 
-		$.scrolly("+");
+		$.scrolly.p();
 		_stopBubbling(e);
 		if($.Rq("=")) $.hApi.r();
 		if($.s.refresh || !$.Rq("=")) _request(notPush);
@@ -659,7 +621,7 @@ let _init_p = () => {
 		$.Rq("i");
 		$.Rq("h", url);
 		$.Rq("p", false);
-		$.scrolly("+");
+		$.scrolly.p();
 
 		if (!url || url === $.currentURL) return;
 		$.trigger("request");
@@ -677,7 +639,7 @@ let _init_p = () => {
 		$.Rq("C", $.fn("-", $gthis));
 		$.frms("a");
 
-		$.scrolly("!");
+		$.scrolly.l();
 		_gaCaptureView(href);
 		$.trigger("render");
 		if($.s.passCount) qs("#" + $.s.passCount).innerHTML = "Pass: " + $.pass;
@@ -753,7 +715,7 @@ class Cache {
 // The stateful Memory class
 // Usage: $.memory.l(<URL>) - returns the same URL if not turned off internally
 class Memory {
-	l(h) {
+	l(h){
 		if (!h || $.s.memoryoff === true) return false;
 		if ($.s.memoryoff === false) return h;
 		return $.h.memoryoff.find(h) ? false : h;
@@ -772,22 +734,39 @@ class Pages {
 // The Offsets class
 // this.d = Array of pages - [0] = URL // [1] = offset
 class Offsets {
-  f() { this.d = [] } //flush internal offsets array - must be performed by parent
-  l(h) { if(h.iO("?")) h = h.split("?")[0]; //lookup page offset
+  f(){ this.d = [] } //flush internal offsets array - must be performed by parent
+  l(h){ if(h.iO("?")) h = h.split("?")[0]; //lookup page offset
     return this.O(h) ? this.d[this.i][1] : 0; //return if found otherwise 0
   }
-  p(h) { let us1 = h.iO("?") ? h.split("?")[0] : h, //initialise all helper variables in one go
+  p(h){ let us1 = h.iO("?") ? h.split("?")[0] : h, //initialise all helper variables in one go
 	us = us1.iO("#") ? us1.split("#")[0] : us1,
 	os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
-    if(this.O(us)) this.d[this.i]=os; else this.d.push(os); // update if found, otherwise push
+	if(this.O(us)) this.d[this.i]=os; else this.d.push(os); // update if found, otherwise push
   }
-  O(h) { return (this.i = this.d.findIndex(e => e[0] == h)) + 1 } //find URL in internal array - add 1 for convenience
+  O(h){ return (this.i = this.d.findIndex(e => e[0] == h)) + 1 } //find URL in internal array - add 1 for convenience
+}
+
+// The Scrolly class
+// operates on $.currentURL
+class Scrolly { constructor() { if ('scrollRestoration' in history) history.scrollRestoration = 'manual' }
+	p(){ $.s.scrolltop == "s" && $.offsets.p($.currentURL) }
+	l(){ let o = $.currentURL;
+		if(o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
+			let $el = qs("#" + o.split("#")[1]); //fetch the element
+			if (!$el) return; //nothing found -> return quickly
+			let box = $el.getBoundingClientRect();
+			return this.s(box.top + window.pageYOffset - document.documentElement.clientTop); // ...animate to ID
+		}
+		if($.s.scrolltop == "s") this.s($.offsets.l(o)); //smart scroll -> lookup and restore offset
+		else $.s.scrolltop && this.s(0); //scrolltop true -> scroll to top of page
+	}
+	s(o){ setTimeout(() => window.scrollTo(0, o), 10) } //scroll to offset with small timeout
 }
 
 // The HAPi class
 // operates on $.currentURL - manages operations on the History API centrally(replaceState / pushState)
 class HApi {
-	r(h) { let c = this.u(h); history.replaceState({ url: c }, "state-" + c, c); } //perform replaceState
-	p(h) { let c = this.u(h); if (c !== window.location.href) history.pushState({ url: c }, "state-" + c, c); } //perform pushState
-	u(h) { if(h) $.currentURL = h; return $.currentURL; } //update currentURL if given and return always
+	r(h){ let c = this.u(h); history.replaceState({ url: c }, "state-" + c, c); } //perform replaceState
+	p(h){ let c = this.u(h); if (c !== window.location.href) history.pushState({ url: c }, "state-" + c, c); } //perform pushState
+	u(h){ if(h) $.currentURL = h; return $.currentURL; } //update currentURL if given and return always
 }
