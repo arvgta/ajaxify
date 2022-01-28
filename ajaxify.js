@@ -760,7 +760,7 @@ class Scrolly { constructor() { if ('scrollRestoration' in history) history.scro
 		if(Ay.s.scrolltop == "s") this.s(Ay.offsets.l(o)); //smart scroll -> lookup and restore offset
 		else Ay.s.scrolltop && this.s(0); //scrolltop true -> scroll to top of page
 	}
-	s(o){ setTimeout(() => window.scrollTo(0, o), 10) } //scroll to offset with small timeout
+	s(o){ window.scrollTo(0, o) } //scroll to offset
 }
 
 // The HAPi class
