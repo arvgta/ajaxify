@@ -241,12 +241,12 @@ class Scripts { constructor() {
 		if (o === "s") return _allstyle($s.y); 
 
 		if (o === "1") { 
-			Ay.detScripts($s); 
+			Ay.detScripts.d($s); 
 			return _addScripts($s); 
 		}
 
 		if (o === "c") return Ay.s.canonical && $s.can ? $s.can.getAttribute("href") : false;
-		if (o === "d") return Ay.detScripts($s);
+		if (o === "d") return Ay.detScripts.d($s);
 		if (o && typeof o == "object") return _onetxt(o);
 
 		if (Ay.scripts("d")) return;
@@ -276,28 +276,6 @@ let _allstyle = $s =>
 	},
 	_addstyle = t => qs("head").appendChild(Ay.parse('<style>' + t + '</style>')),
 	_addScripts = $s => (Ay.addAll($s.c, "href"), Ay.addAll($s.j, "src"))
-}}
-
-// The DetScripts plugin - stands for "detach scripts"
-// Works on "$s" <object> that is passed in and fills it
-// Fetches all stylesheets in the head
-// Fetches the canonical URL
-// Fetches all external scripts on the page
-// Fetches all inline scripts on the page
-class DetScripts { constructor() {
-	let head = 0, lk = 0, j = 0;
-            
-	this.a = function ($s) {
-		head = Ay.pass ? Ay.fn("head") : qs("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
-		if (!head) return true;
-		lk = qa(Ay.pass ? ".ajy-link" : "link", head); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-		j = Ay.pass ? Ay.fn("script") : qa("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
-		$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
-		$s.y = qa("style", head); //Extract style tags
-		$s.can = _rel(lk, "canonical"); //Extract canonical tag
-		$s.j = j; //Assign JSs to internal selection
-	};
-let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel").iO(v));
 }}
 
 // The AddAll plugin
@@ -696,7 +674,7 @@ let run = () => {
 		Ay.cache = new Cache();
 		Ay.memory = new Memory(); Ay.h.memoryoff = new Hints(Ay.s.memoryoff);
 		Ay.fn = Ay.getPage = new GetPage().a;
-		Ay.detScripts = new DetScripts().a;
+		Ay.detScripts = new DetScripts();
 		Ay.addAll = new AddAll().a;
 		Ay.Rq = new RQ().a;
 		return true; 
@@ -731,19 +709,33 @@ class Pages {
 	P(u){ return (this.i = this.d.findIndex(e => e[0] == u)) + 1 } //lookup page index and store in "i"
 }
 
+// The DetScripts class - stands for "detach scripts"
+// Works on "s" <object> that is passed in and fills it
+class DetScripts { 
+	d(s) {
+		if(!(this.h = Ay.pass ? Ay.fn("head") : qs("head"))) return true; //If pass is 0 -> fetch head from DOM, otherwise from target page
+		this.lk = qa(Ay.pass ? ".ajy-link" : "link", this.h); //If pass is 0 -> fetch links from DOM, otherwise from target page
+		s.j = Ay.pass ? Ay.fn("script") : qa("script"); //If pass is 0 -> fetch JSs from DOM, otherwise from target page
+		s.c = this.x("stylesheet"); //Extract stylesheets
+		s.y = qa("style", this.h); //Extract style tags
+		s.can = this.x("canonical"); //Extract canonical tag
+	}
+	x(v){ return Array.prototype.filter.call(this.lk, e => e.getAttribute("rel").iO(v)) } //Extract link tags with given "rel"
+}
+
 // The Offsets class
 // this.d = Array of pages - [0] = URL // [1] = offset
 class Offsets {
-  f(){ this.d = [] } //flush internal offsets array - must be performed by parent
-  l(h){ if(h.iO("?")) h = h.split("?")[0]; //lookup page offset
-    return this.O(h) ? this.d[this.i][1] : 0; //return if found otherwise 0
-  }
-  p(h){ let us1 = h.iO("?") ? h.split("?")[0] : h, //initialise all helper variables in one go
-	us = us1.iO("#") ? us1.split("#")[0] : us1,
-	os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
-	if(this.O(us)) this.d[this.i]=os; else this.d.push(os); // update if found, otherwise push
-  }
-  O(h){ return (this.i = this.d.findIndex(e => e[0] == h)) + 1 } //find URL in internal array - add 1 for convenience
+	f(){ this.d = [] } //flush internal offsets array - must be performed by parent
+	l(h){ if(h.iO("?")) h = h.split("?")[0]; //lookup page offset
+		return this.O(h) ? this.d[this.i][1] : 0; //return if found otherwise 0
+	}
+	p(h){ let us1 = h.iO("?") ? h.split("?")[0] : h, //initialise all helper variables in one go
+		us = us1.iO("#") ? us1.split("#")[0] : us1,
+		os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
+		if(this.O(us)) this.d[this.i]=os; else this.d.push(os); // update if found, otherwise push
+	}
+	O(h){ return (this.i = this.d.findIndex(e => e[0] == h)) + 1 } //find URL in internal array - add 1 for convenience
 }
 
 // The Scrolly class
@@ -752,9 +744,9 @@ class Scrolly { constructor() { if ('scrollRestoration' in history) history.scro
 	p(){ Ay.s.scrolltop == "s" && Ay.offsets.p(Ay.currentURL) }
 	l(){ let o = Ay.currentURL;
 		if(o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
-			let $el = qs("#" + o.split("#")[1]); //fetch the element
-			if (!$el) return; //nothing found -> return quickly
-			let box = $el.getBoundingClientRect();
+			let el = qs("#" + o.split("#")[1]); //fetch the element
+			if(!el) return; //nothing found -> return quickly
+			let box = el.getBoundingClientRect();
 			return this.s(box.top + window.pageYOffset - document.documentElement.clientTop); // ...animate to ID
 		}
 		if(Ay.s.scrolltop == "s") this.s(Ay.offsets.l(o)); //smart scroll -> lookup and restore offset
