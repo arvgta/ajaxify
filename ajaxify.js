@@ -1,9 +1,11 @@
-/* 
- * ajaxify.js 
+/*
+ * ajaxify.js
  * Ajaxify - The Ajax Plugin
- * https://4nf.org/ 
- * 
- * Copyright Arvind Gupta; MIT Licensed 
+ * https://4nf.org/
+ *
+ * Copyright Arvind Gupta; MIT Licensed
+ *
+ * Version 8.2.2
  */ 
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -646,7 +648,7 @@ Ay.init = () => {
 		if (document.readyState === "complete" || 
 			(document.readyState !== "loading" && !document.documentElement.doScroll)) run();
 		else document.addEventListener('DOMContentLoaded', run);
-		return $;
+		return Ay;
 	}
 	else return Ay.pronto(0, o);
 };
