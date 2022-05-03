@@ -47,7 +47,7 @@ Ay.s = {
 // visual effects settings
 	requestDelay : 0, //in msec - Delay of Pronto request
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
-	scrollDelay : true, // Minimal delay on all scroll effects, useful in case of e.g. smooth scroll
+	scrollDelay : 2, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
 	bodyClasses : false, // Copy body classes from target page, set to "true" to enable
  
 // script and style handling settings, prefetch
@@ -755,7 +755,7 @@ class Scrolly { constructor() { if ('scrollRestoration' in history) history.scro
 		if(Ay.s.scrolltop == "s") this.s(Ay.offsets.l(o)); //smart scroll -> lookup and restore offset
 		else Ay.s.scrolltop && this.s(0); //scrolltop true -> scroll to top of page
 	}
-	s(o){ Ay.s.scrollDelay ? setTimeout(() => window.scrollTo(0, o), 0) : window.scrollTo(0, o) } //scroll to offset
+	s(o){ setTimeout(() => window.scrollTo(0, o), Ay.s.scrollDelay) } //scroll to offset
 }
 
 // The HAPi class
