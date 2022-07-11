@@ -5,7 +5,7 @@
  *
  * Copyright Arvind Gupta; MIT Licensed
  *
- * Version 8.2.3
+ * Version 8.2.4
  */
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -47,7 +47,7 @@ Ay.s = {
 // visual effects settings
 	requestDelay : 0, //in msec - Delay of Pronto request
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
-	scrollDelay : 2, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
+	scrollDelay : 0, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
 	bodyClasses : false, // Copy body classes from target page, set to "true" to enable
  
 // script and style handling settings, prefetch
