@@ -152,7 +152,7 @@ divid12 = '<div id="ajy-$1"$2';
 		if (o === "body") return qs("#ajy-" + o, Ay.cache.g());
 		if (o === "script") return qa(o, Ay.cache.g()); 
 
-		return qs((o === "title") ?	o : ".ajy-" + o, Ay.cache.g()); 
+		return qs((o === "title") ? o : ".ajy-" + o, Ay.cache.g()); 
 };
 let _lSel = $t => (
 	Ay.pass++, 
