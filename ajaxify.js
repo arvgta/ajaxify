@@ -197,7 +197,7 @@ let _lSel = $t => (
 			signal: ac.signal
 		}).then(r => {
 			if (!r.ok || !_isHtml(r)) {
-				if (!pre) {location.href = hin; _cl(); Ay.pronto(0, Ay.currentURL);}
+				if (!pre) {location.href = hin;/* _cl(); Ay.pronto(0, Ay.currentURL);*/}
 				return;
 			}
 			rsp = r; // store response
