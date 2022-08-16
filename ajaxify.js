@@ -5,7 +5,7 @@
  *
  * Copyright Arvind Gupta; MIT Licensed
  *
- * Version 8.2.4
+ * Version 8.2.5
  */
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -25,6 +25,15 @@ let rootUrl = location.origin, inlineclass = "ajy-inline",
 	qa=(s,o=document)=>o.querySelectorAll(s),
 	qs=(s,o=document)=>o.querySelector(s);
 
+let iFn = function (a, b, c = false) { 
+	if (/*(this === document || this === window) &&*/ a=="DOMContentLoaded") {
+		if(typeof c == "boolean") c = { capture: c, once: true };
+		else c.once = true;
+	}
+	this.ael(a,b,c);
+};
+EventTarget.prototype.ael = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = iFn;
 
 // The main plugin - Ajaxify
 // Is passed the global options 
@@ -71,15 +80,10 @@ Ay.s = {
 };
 
 
-Ay.pass = 0; Ay.currentURL = ""; Ay.h = {};
+Ay.running = 0; Ay.pass = 0; Ay.currentURL = ""; Ay.h = {};
 Ay.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 Ay.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Ay.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
 Ay.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
-Ay.intevents = () => {
-	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
-	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
-	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
-};
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
@@ -197,7 +201,7 @@ let _lSel = $t => (
 			signal: ac.signal
 		}).then(r => {
 			if (!r.ok || !_isHtml(r)) {
-				if (!pre) {location.href = hin;/* _cl(); Ay.pronto(0, Ay.currentURL);*/}
+				if (!pre) {location.href = hin;}
 				return;
 			}
 			rsp = r; // store response
@@ -623,6 +627,7 @@ let _init_p = () => {
 		Ay.scrolly.l();
 		_gaCaptureView(href);
 		Ay.trigger("render");
+		document.dispatchEvent(new Event('DOMContentLoaded', {bubbles: true, cancelable: true}));
 		if(Ay.s.passCount) qs("#" + Ay.s.passCount).innerHTML = "Pass: " + Ay.pass;
 		if(Ay.s.cb) Ay.s.cb();
 	},
@@ -655,6 +660,7 @@ Ay.init = () => {
 };
 
 let run = () => {
+		if(Ay.running) return; else Ay.running = true;
 		Ay.s = Object.assign(Ay.s, options);
 		(Ay.pages = new Pages()).f();
 		Ay.pronto = new Pronto().a;
@@ -671,7 +677,7 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
-		if (Ay.s.intevents) Ay.intevents(); // intercept events
+		//if (Ay.s.intevents) Ay.intevents(); // intercept events
 		Ay.scripts = new Scripts().a;
 		Ay.scripts("i"); 
 		Ay.cache = new Cache();
