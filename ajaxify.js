@@ -57,7 +57,7 @@ Ay.s = {
 	requestDelay : 0, //in msec - Delay of Pronto request
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
 	scrollDelay : 0, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
-	bodyClasses : false, // Copy body classes from target page, set to "true" to enable
+	bodyClasses : true, // Copy body attributes from target page, set to "false" to disable
  
 // script and style handling settings, prefetch
 	deltas : true, // true = deltas loaded, false = all scripts loaded
@@ -614,7 +614,7 @@ let _init_p = () => {
 	},
 	_doRender = () => {
 		Ay.trigger("load");
-		if(Ay.s.bodyClasses) { var classes = Ay.fn("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
+		if(Ay.s.bodyClasses) _copyAttributes(bdy, Ay.fn("body"), true);
 
 		var href = Ay.Rq("h"), title;
 		href = Ay.Rq("c", href);
