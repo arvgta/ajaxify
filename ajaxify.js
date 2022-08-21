@@ -87,7 +87,7 @@ Ay.internal = (url) => { if (!url) return false; if (typeof(url) === "object") u
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
-	[...$S.attributes].forEach(e => el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
+	[...$S.attributes].forEach(e => e.nodeValue == "ajy-body" || el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 }
 
 function _on(eventName, elementSelector, handler, el = document) { //e.currentTarget is document when the handler is called
