@@ -25,15 +25,6 @@ let rootUrl = location.origin, inlineclass = "ajy-inline",
 	qa=(s,o=document)=>o.querySelectorAll(s),
 	qs=(s,o=document)=>o.querySelector(s);
 
-let iFn = function (a, b, c = false) { 
-	if (/*(this === document || this === window) &&*/ a=="DOMContentLoaded") {
-		if(typeof c == "boolean") c = { capture: c, once: true };
-		else c.once = true;
-	}
-	this.ael(a,b,c);
-};
-EventTarget.prototype.ael = EventTarget.prototype.addEventListener;
-EventTarget.prototype.addEventListener = iFn;
 
 // The main plugin - Ajaxify
 // Is passed the global options 
@@ -57,7 +48,7 @@ Ay.s = {
 	requestDelay : 0, //in msec - Delay of Pronto request
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
 	scrollDelay : 0, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
-	bodyClasses : true, // Copy body attributes from target page, set to "false" to disable
+	bodyClasses : true, // Copy body classes from target page, set to "true" to enable
  
 // script and style handling settings, prefetch
 	deltas : true, // true = deltas loaded, false = all scripts loaded
@@ -84,6 +75,11 @@ Ay.running = 0; Ay.pass = 0; Ay.currentURL = ""; Ay.h = {};
 Ay.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 Ay.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Ay.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
 Ay.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
+Ay.intevents = () => {
+	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
+	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
+	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
+};
 
 function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
@@ -623,11 +619,11 @@ let _init_p = () => {
 		if(title = Ay.fn("title")) qs("title").innerHTML = title.innerHTML;
 		Ay.Rq("C", Ay.fn("-", $gthis));
 		Ay.frms("a");
+		//document.dispatchEvent(new Event('DOMContentLoaded', {bubbles: true, cancelable: true}));
 
 		Ay.scrolly.l();
 		_gaCaptureView(href);
 		Ay.trigger("render");
-		document.dispatchEvent(new Event('DOMContentLoaded', {bubbles: true, cancelable: true}));
 		if(Ay.s.passCount) qs("#" + Ay.s.passCount).innerHTML = "Pass: " + Ay.pass;
 		if(Ay.s.cb) Ay.s.cb();
 	},
@@ -677,7 +673,7 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
-		//if (Ay.s.intevents) Ay.intevents(); // intercept events
+		if (Ay.s.intevents) Ay.intevents(); // intercept events
 		Ay.scripts = new Scripts().a;
 		Ay.scripts("i"); 
 		Ay.cache = new Cache();
