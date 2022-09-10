@@ -231,54 +231,54 @@ let _lSel = t => (
 // <object> - handle one inline script
 // otherwise - delta loading
 class Scripts { constructor() {
-	let $s = false, txt = 0;
+	let S = false, txt = 0;
 	Ay.h.inlinehints = new Hints(Ay.s.inlinehints);
 	Ay.h.inlineskip = new Hints(Ay.s.inlineskip);
 	
 	this.a = function (o) {
 		if (o === "i") { 
-			if(!$s) $s = {}; 
+			if(!S) S = {}; 
 			return true;
 		}
 
-		if (o === "s") return _allstyle($s.y); 
+		if (o === "s") return _allstyle(S.y); 
 
 		if (o === "1") { 
-			Ay.detScripts.d($s); 
-			return _addScripts($s); 
+			Ay.detScripts.d(S); 
+			return _addScripts(S); 
 		}
 
-		if (o === "c") return Ay.s.canonical && $s.can ? $s.can.getAttribute("href") : false;
-		if (o === "d") return Ay.detScripts.d($s);
+		if (o === "c") return Ay.s.canonical && S.can ? S.can.getAttribute("href") : false;
+		if (o === "d") return Ay.detScripts.d(S);
 		if (o && typeof o == "object") return _onetxt(o);
 
 		if (Ay.scripts("d")) return;
-		_addScripts($s);
+		_addScripts(S);
 };
-let _allstyle = $s =>	 
-	!Ay.s.style || !$s || (
+let _allstyle = S =>	 
+	!Ay.s.style || !S || (
 	qa("style", qs("head")).forEach(e => e.parentNode.removeChild(e)),
-	$s.forEach(el => _addstyle(el.textContent))
+	S.forEach(el => _addstyle(el.textContent))
 	),
-	_onetxt = $s => 
-		(!(txt = $s.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
-			((Ay.s.inline && !Ay.h.inlineskip.find(txt)) || $s.classList.contains("ajaxy") || 
+	_onetxt = S => 
+		(!(txt = S.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
+			((Ay.s.inline && !Ay.h.inlineskip.find(txt)) || S.classList.contains("ajaxy") || 
 			Ay.h.inlinehints.find(txt))
-		) && _addtxt($s),
-	_addtxt = $s => { 
+		) && _addtxt(S),
+	_addtxt = S => { 
 		if(!txt || !txt.length) return; 
-		if(Ay.s.inlineappend || ($s.getAttribute("type") && !$s.getAttribute("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
+		if(Ay.s.inlineappend || (S.getAttribute("type") && !S.getAttribute("type").iO("text/javascript"))) try { return _apptxt(S); } catch (e) { }
 
 		try { eval(txt); } catch (e1) { 
 			lg("Error in inline script : " + txt + "\nError code : " + e1);
 		}
 	},
-	_apptxt = $s => { let sc = document.createElement("script"); _copyAttributes(sc, $s); sc.classList.add(inlineclass);
-		try {sc.appendChild(document.createTextNode($s.textContent))} catch(e) {sc.text = $s.textContent};
+	_apptxt = S => { let sc = document.createElement("script"); _copyAttributes(sc, S); sc.classList.add(inlineclass);
+		try {sc.appendChild(document.createTextNode(S.textContent))} catch(e) {sc.text = S.textContent};
 		return qs("body").appendChild(sc);
 	},
 	_addstyle = t => qs("head").appendChild(Ay.parse('<style>' + t + '</style>')),
-	_addScripts = $s => (Ay.addAll($s.c, "href"), Ay.addAll($s.j, "src"))
+	_addScripts = S => (Ay.addAll(S.c, "href"), Ay.addAll(S.j, "src"))
 }}
 
 // The AddAll plugin
