@@ -5,7 +5,7 @@
  *
  * Copyright Arvind Gupta; MIT Licensed
  *
- * Version 8.2.5
+ * Version 8.2.6
  */
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -81,9 +81,9 @@ Ay.intevents = () => {
 	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
 };
 
-function _copyAttributes(el, $S, flush) { //copy all attributes of element generically
+function _copyAttributes(el, S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
-	[...$S.attributes].forEach(e => e.nodeValue == "ajy-body" || el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
+	[...S.attributes].forEach(e => e.nodeValue == "ajy-body" || el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 }
 
 function _on(eventName, elementSelector, handler, el = document) { //e.currentTarget is document when the handler is called
@@ -287,57 +287,57 @@ let _allstyle = $s =>
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
 class AddAll { constructor() {
-	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, 
+	let scriptsO = [], sCssO = [], sO = [], PK = 0, url = 0, 
 linki = '<link rel="stylesheet" type="text/css" href="*" />',
 linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]';
 
 	Ay.h.alwayshints = new Hints(Ay.s.alwayshints);
 
-	this.a = function ($this, pk) {
-		if(!$this.length) return; //ensure input
+	this.a = function (sl, pk) {
+		if(!sl.length) return; //ensure input
 		if(Ay.s.deltas === "n") return true; //Delta-loading completely disabled
 
 		PK = pk; //Copy "primary key" into internal variable
 
-		if(!Ay.s.deltas) return _allScripts($this); //process all scripts
+		if(!Ay.s.deltas) return _allScripts(sl); //process all scripts
 		//deltas presumed to be "true" -> proceed with normal delta-loading
 
-		$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
+		scriptsO = PK == "href" ? sCssO : sO; //Copy old.  Stylesheets or JS
 
-		if(!Ay.pass) _newArray($this); //Fill new array on initial load, nothing more
-		else $this.forEach(function(s) { //Iterate through selection
-			var $t = s;
-			url = $t.getAttribute(PK);
-			if(_classAlways($t)) { //Class always handling
+		if(!Ay.pass) _newArray(sl); //Fill new array on initial load, nothing more
+		else sl.forEach(function(s) { //Iterate through selection
+			var t = s;
+			url = t.getAttribute(PK);
+			if(_classAlways(t)) { //Class always handling
 				_removeScript(); //remove from DOM
-				_iScript($t); //insert back single external script in the head
+				_iScript(t); //insert back single external script in the head
 				return;
 			}
 			if(url) { //URL?
-				if(!$scriptsO.some(e => e == url)) { // Test, whether new
-					$scriptsO.push(url); //If yes: Push to old array
-					_iScript($t);
+				if(!scriptsO.some(e => e == url)) { // Test, whether new
+					scriptsO.push(url); //If yes: Push to old array
+					_iScript(t);
 				}
 				//Otherwise nothing to do
 				return;
 			}
 
-			if(PK != "href" && !$t.classList.contains("no-ajaxy")) Ay.scripts($t); //Inline JS script? -> inject into DOM
+			if(PK != "href" && !t.classList.contains("no-ajaxy")) Ay.scripts(t); //Inline JS script? -> inject into DOM
 		});
 };
-let _allScripts = $t => $t.forEach(e => _iScript(e)),
-	_newArray = $t => $t.forEach(e => (url = e.getAttribute(PK)) ? $scriptsO.push(url) : 0),
-	_classAlways = $t => $t.getAttribute("data-class") == "always" || Ay.h.alwayshints.find(url),
-	_iScript = $S => { 
-		url = $S.getAttribute(PK);
+let _allScripts = t => t.forEach(e => _iScript(e)),
+	_newArray = t => t.forEach(e => (url = e.getAttribute(PK)) ? scriptsO.push(url) : 0),
+	_classAlways = t => t.getAttribute("data-class") == "always" || Ay.h.alwayshints.find(url),
+	_iScript = S => { 
+		url = S.getAttribute(PK);
 
 		if(PK == "href") return qs("head").appendChild(Ay.parse(linki.replace("*", url))); 
-		if(!url) return Ay.scripts($S); 
+		if(!url) return Ay.scripts(S); 
 		
 		var sc = document.createElement("script");
 		sc.async = Ay.s.asyncdef; 
-		_copyAttributes(sc, $S); 
+		_copyAttributes(sc, S); 
 		qs("head").appendChild(sc); 
 	},
 	_removeScript = () => qa((PK == "href" ? linkr : scrr).replace("!", url)).forEach(e => e.parentNode.removeChild(e))
