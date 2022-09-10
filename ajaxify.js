@@ -356,7 +356,7 @@ let _allScripts = t => t.forEach(e => _iScript(e)),
 // e - set / get internal "e" (event)
 // p - set / get internal "p" (push flag)
 // is - set / get internal "ispost" (flag whether request is a POST)
-// d - set / get internal "d" (data for central $.ajax())
+// d - set / get internal "d" (data for central fetch())
 // C - set / get internal "can" ("href" of canonical URL)
 // c - check whether simple canonical URL is given and return, otherwise return value passed in "p"
 class RQ { constructor() {
@@ -419,7 +419,7 @@ class RQ { constructor() {
 			return ispost;
 		}
 
-		if(o === "d") { //set / get internal "d" (data for central $.ajax())
+		if(o === "d") { //set / get internal "d" (data for central fetch())
 			if(p) data = p;
 			return data;
 		}
@@ -502,23 +502,23 @@ let _k = () => {
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
 class Pronto { constructor() {
-	let $gthis = 0, requestTimer = 0, pd = 150, ptim = 0;
+	let gsl = 0, requestTimer = 0, pd = 150, ptim = 0;
 	Ay.h.prefetchoff = new Hints(Ay.s.prefetchoff);
 
-	this.a = function ($this, h) {
+	this.a = function (sl, h) {
 		if(!h) return; //ensure data
 
 		if(h === "i") { //request to initialise
 			bdy = document.body;
-			if(!$this.length) $this = "body";
-			$gthis = qa($this); //copy selection to global selector
+			if(!sl.length) sl = "body";
+			gsl = qa(sl); //copy selection to global selector
 			Ay.frms = new Frms().a; //initialise forms sub-plugin
 			if(Ay.s.idleTime) Ay.slides = new classSlides(Ay).a; //initialise optional slideshow sub-plugin
 			Ay.scrolly = new Scrolly(); //initialise scroll effects sub-plugin
 			(Ay.offsets = new Offsets()).f();
 			Ay.hApi = new HApi();
 			_init_p(); //initialise Pronto sub-plugin
-			return $this; //return query selector for chaining
+			return sl; //return query selector for chaining
 		}
 
 		if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
@@ -543,7 +543,7 @@ let _init_p = () => {
 	_on("click", Ay.s.selector, _click, bdy);
 	Ay.frms("d", qa("body"));
 	Ay.frms("a");
-	Ay.frms("d", $gthis);
+	Ay.frms("d", gsl);
 	if(Ay.s.idleTime) Ay.slides("i");
 },
 	_preftime  = (t, e) => (_prefstop(), ptim = setTimeout(()=> _prefetch(t, e), pd)), // call prefetch if timeout expires without being cleared by _prefstop
@@ -616,7 +616,7 @@ let _init_p = () => {
 
 		if(Ay.Rq("p")) Ay.hApi.p(href); else Ay.hApi.r(href);
 		if(title = Ay.fn("title")) qs("title").innerHTML = title.innerHTML;
-		Ay.Rq("C", Ay.fn("-", $gthis));
+		Ay.Rq("C", Ay.fn("-", gsl));
 		Ay.frms("a");
 
 		Ay.scrolly.l();
