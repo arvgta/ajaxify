@@ -154,9 +154,9 @@ divid12 = '<div id="ajy-$1"$2';
 
 		return qs((o === "title") ? o : ".ajy-" + o, Ay.cache.g()); 
 };
-let _lSel = $t => (
+let _lSel = t => (
 	Ay.pass++, 
-	_lEls($t), 
+	_lEls(t), 
 	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? e.parentNode.removeChild(e) : false), 
 	Ay.scripts(true), 
 	Ay.scripts("s"), 
@@ -169,19 +169,19 @@ let _lSel = $t => (
 		plus = 0; 
 		if (cb) return cb(); 
 	},
-	_ld = ($t, $h) => {
-		if(!$h) return; //no input
+	_ld = (t, h) => {
+		if(!h) return; //no input
 
-		var $c = $h.cloneNode(true); // clone element node (true = deep clone)
-		qa("script", $c).forEach(e => e.parentNode.removeChild(e));
-		_copyAttributes($t, $c, true); 
-		$t.innerHTML = $c.innerHTML;
+		var c = h.cloneNode(true); // clone element node (true = deep clone)
+		qa("script", c).forEach(e => e.parentNode.removeChild(e));
+		_copyAttributes(t, c, true); 
+		t.innerHTML = c.innerHTML;
 	},
-	_lEls = $t => 
-		Ay.cache.g() && !_isBody($t) && $t.forEach(function($el) { 
-			_ld($el, qs("#" + $el.getAttribute("id"), Ay.cache.g()));
+	_lEls = t => 
+		Ay.cache.g() && !_isBody(t) && t.forEach(function(e) { 
+			_ld(e, qs("#" + e.getAttribute("id"), Ay.cache.g()));
 		}),
-	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", Ay.cache.g())), 1),
+	_isBody = t => t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", Ay.cache.g())), 1),
 	_lAjax = (hin, pre) => { 
 		var ispost = Ay.Rq("is"); 
 		if (pre) rt="p"; else rt="c"; 
@@ -306,8 +306,7 @@ scrr = 'script[src*="!"]';
 		scriptsO = PK == "href" ? sCssO : sO; //Copy old.  Stylesheets or JS
 
 		if(!Ay.pass) _newArray(sl); //Fill new array on initial load, nothing more
-		else sl.forEach(function(s) { //Iterate through selection
-			var t = s;
+		else sl.forEach(function(t) { //Iterate through selection
 			url = t.getAttribute(PK);
 			if(_classAlways(t)) { //Class always handling
 				_removeScript(); //remove from DOM
