@@ -25,12 +25,13 @@ let rootUrl = location.origin, inlineclass = "ajy-inline",
 	qa=(s,o=document)=>o.querySelectorAll(s),
 	qs=(s,o=document)=>o.querySelector(s),
 	qha=(e)=>qs("head").appendChild(e),
-	prC=(e)=>e.parentNode.removeChild(e);
+	prC=(e)=>e.parentNode.removeChild(e),
+	dcE=(e)=>document.createElement(e),
 
-function _copyAttributes(el, S, flush) { //copy all attributes of element generically
+_copyAttributes=(el, S, flush)=>{ //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
 	[...S.attributes].forEach(e => e.nodeValue == "ajy-body" || el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
-}
+};
 
 // The main plugin - Ajaxify
 // Is passed the global options 
@@ -78,7 +79,7 @@ Ay.s = {
 
 
 Ay.pass = 0; Ay.currentURL = ""; Ay.h = {};
-Ay.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
+Ay.parse = (s, pl) => (pl = dcE('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
 Ay.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Ay.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
 Ay.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
 Ay.intevents = () => {
@@ -221,7 +222,7 @@ let _lSel = t => (
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
 	_cache = (href, h, err) => Ay.cache.s(Ay.parse(_parseHTML(h))) && (Ay.pages.p([href, Ay.cache.g()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
-	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
+	_parseHTML = h => dcE("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
 }}
 
@@ -274,7 +275,7 @@ let _allstyle = S =>
 			lg("Error in inline script : " + txt + "\nError code : " + e1);
 		}
 	},
-	_apptxt = S => { let sc = document.createElement("script"); _copyAttributes(sc, S); sc.classList.add(inlineclass);
+	_apptxt = S => { let sc = dcE("script"); _copyAttributes(sc, S); sc.classList.add(inlineclass);
 		try {sc.appendChild(document.createTextNode(S.textContent))} catch(e) {sc.text = S.textContent};
 		return qs("body").appendChild(sc);
 	},
@@ -709,8 +710,7 @@ class HApi {
 // Works on a new selection of scripts to apply delta-loading to it 
 class AddAll { constructor() { this.CSS = []; this.JS = []; }  
 	a(sl, pk) { //only public function
-		if(!sl.length) return; //ensure input
-		if(Ay.s.deltas === "n") return true; //Delta-loading completely disabled
+		if(!sl.length || Ay.s.deltas === "n") return; //ensure input and that delta-loading is enabled
 
 		this.PK = pk; //Copy "primary key" into internal variable
 
@@ -742,12 +742,10 @@ class AddAll { constructor() { this.CSS = []; this.JS = []; }
 	gA(e){ return this.u = e.getAttribute(this.PK) }
 	iScript(S){
 		this.gA(S);
-		if(this.PK == "href") 
-			return qha(Ay.parse('<link rel="stylesheet" type="text/css" href="*" />'.replace("*", this.u)));
-		
+		if(this.PK == "href") return qha(Ay.parse('<link rel="stylesheet" type="text/css" href="*" />'.replace("*", this.u)));
 		if(!this.u) return Ay.scripts(S); 
 		
-		var sc = document.createElement("script");
+		var sc = dcE("script");
 		sc.async = Ay.s.asyncdef; 
 		_copyAttributes(sc, S); 
 		qha(sc); 
