@@ -705,7 +705,7 @@ class HApi {
 
 // The AddAll class
 // Works on a new selection of scripts to apply delta-loading to it 
-class AddAll { constructor() { this.O = []; this.CSS = []; this.JS = []; }  
+class AddAll { constructor() { this.CSS = []; this.JS = []; }  
 	a(sl, pk) { //only public function
 		if(!sl.length) return; //ensure input
 		if(Ay.s.deltas === "n") return true; //Delta-loading completely disabled
