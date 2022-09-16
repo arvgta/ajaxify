@@ -23,7 +23,9 @@ let Ay; //to become the global handle for the main Ajaxify parent class - if use
 let rootUrl = location.origin, inlineclass = "ajy-inline",
 	bdy,
 	qa=(s,o=document)=>o.querySelectorAll(s),
-	qs=(s,o=document)=>o.querySelector(s);
+	qs=(s,o=document)=>o.querySelector(s),
+	qha=(e)=>qs("head").appendChild(e),
+	prC=(e)=>e.parentNode.removeChild(e);
 
 function _copyAttributes(el, S, flush) { //copy all attributes of element generically
 	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
@@ -156,7 +158,7 @@ divid12 = '<div id="ajy-$1"$2';
 let _lSel = t => (
 	Ay.pass++, 
 	_lEls(t), 
-	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? e.parentNode.removeChild(e) : false), 
+	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? prC(e) : false), 
 	Ay.scripts(true), 
 	Ay.scripts("s"), 
 	Ay.scripts("c") 
@@ -172,7 +174,7 @@ let _lSel = t => (
 		if(!h) return; //no input
 
 		var c = h.cloneNode(true); // clone element node (true = deep clone)
-		qa("script", c).forEach(e => e.parentNode.removeChild(e));
+		qa("script", c).forEach(e => prC(e));
 		_copyAttributes(t, c, true); 
 		t.innerHTML = c.innerHTML;
 	},
@@ -256,7 +258,7 @@ class Scripts { constructor() {
 };
 let _allstyle = S =>	 
 	!Ay.s.style || !S || (
-	qa("style", qs("head")).forEach(e => e.parentNode.removeChild(e)),
+	qa("style", qs("head")).forEach(e => prC(e)),
 	S.forEach(el => _addstyle(el.textContent))
 	),
 	_onetxt = S => 
@@ -276,7 +278,7 @@ let _allstyle = S =>
 		try {sc.appendChild(document.createTextNode(S.textContent))} catch(e) {sc.text = S.textContent};
 		return qs("body").appendChild(sc);
 	},
-	_addstyle = t => qs("head").appendChild(Ay.parse('<style>' + t + '</style>')),
+	_addstyle = t => qha(Ay.parse('<style>' + t + '</style>')),
 	_addScripts = S => (Ay.addAll.a(S.c, "href"), Ay.addAll.a(S.j, "src"))
 }}
 
@@ -740,16 +742,15 @@ class AddAll { constructor() { this.CSS = []; this.JS = []; }
 	gA(e){ return this.u = e.getAttribute(this.PK) }
 	iScript(S){
 		this.gA(S);
-
 		if(this.PK == "href") 
-			return qs("head").appendChild(Ay.parse('<link rel="stylesheet" type="text/css" href="*" />'.replace("*", this.u)));
+			return qha(Ay.parse('<link rel="stylesheet" type="text/css" href="*" />'.replace("*", this.u)));
 		
 		if(!this.u) return Ay.scripts(S); 
 		
 		var sc = document.createElement("script");
 		sc.async = Ay.s.asyncdef; 
 		_copyAttributes(sc, S); 
-		qs("head").appendChild(sc); 
+		qha(sc); 
 	}
-	removeScript(){ qa((this.PK == "href" ? 'link[href*="!"]' : 'script[src*="!"]').replace("!", this.u)).forEach(e => e.parentNode.removeChild(e)) }
+	removeScript(){ qa((this.PK == "href" ? 'link[href*="!"]' : 'script[src*="!"]').replace("!", this.u)).forEach(e => prC(e)) }
 }
