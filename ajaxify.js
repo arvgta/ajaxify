@@ -715,12 +715,12 @@ class AddAll { constructor() { this.O = []; this.CSS = []; this.JS = []; }
 		if(!Ay.s.deltas) return sl.forEach(e => this.iScript(e)); //process all scripts and return quickly
 		//deltas presumed to be "true" -> proceed with normal delta-loading
 
-		this.O = pk == "href" ? this.CSS : this.JS; //Copy old.  Stylesheets or JS
+		this.O = pk == "href" ? this.CSS : this.JS; //Load old stylesheets or JS
 
-		if(!Ay.pass) sl.forEach(e => this.gA(e) && this.O.push(this.u)); //Fill new array on initial load, nothing more
-		else sl.forEach(t => { //Iterate through selection
+		sl.forEach(t => { //Iterate through selection
 			let url = this.gA(t); //fetch URL
-			if(t.getAttribute("data-class") == "always" || Ay.h.alwayshints.find(this.u)) { //Class always handling
+			if(!Ay.pass) return url && this.O.push(url); //Fill new array on initial load, nothing more
+			if(t.getAttribute("data-class") == "always" || Ay.h.alwayshints.find(url)) { //Class always handling
 				this.removeScript(); //remove from DOM
 				this.iScript(t); //insert back single external script in the head
 				return;
