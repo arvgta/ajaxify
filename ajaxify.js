@@ -63,7 +63,7 @@ Ay.s = {
 	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
-	inlineskip : "addEventListener, adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
+	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
 	intevents: true, // intercept events that are fired only on classic page load and simulate their trigger on ajax page load ("DOMContentLoaded")
 	style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
