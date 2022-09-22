@@ -63,7 +63,7 @@ Ay.s = {
 	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
-	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
+	inlineskip : "addEventListener, adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
 	intevents: true, // intercept events that are fired only on classic page load and simulate their trigger on ajax page load ("DOMContentLoaded")
 	style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
@@ -80,7 +80,7 @@ Ay.s = {
 
 Ay.pass = 0; Ay.currentURL = ""; Ay.h = {};
 Ay.parse = (s, pl) => (pl = dcE('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
-Ay.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Ay.Rq("e"); window.dispatchEvent(ev); document.dispatchEvent(ev); };
+Ay.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Ay.Rq("e"); window.dispatchEvent(ev); };
 Ay.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
 Ay.intevents = () => {
 	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
@@ -259,8 +259,12 @@ class Scripts { constructor() {
 };
 let _allstyle = S =>	 
 	!Ay.s.style || !S || (
-	qa("style", qs("head")).forEach(e => prC(e)),
-	S.forEach(el => _addstyle(el.textContent))
+	qa("style", qs("head")).forEach(e => prC(e)), //delete old style tags
+	S.forEach(el => {
+		let st = Ay.parse('<style>' + el.textContent + '</style>');
+		_copyAttributes(st, el);
+		qha(st); //append to the head
+	})
 	),
 	_onetxt = S => 
 		(!(txt = S.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
@@ -279,7 +283,6 @@ let _allstyle = S =>
 		try {sc.appendChild(document.createTextNode(S.textContent))} catch(e) {sc.text = S.textContent};
 		return qs("body").appendChild(sc);
 	},
-	_addstyle = t => qha(Ay.parse('<style>' + t + '</style>')),
 	_addScripts = S => (Ay.addAll.a(S.c, "href"), Ay.addAll.a(S.j, "src"))
 }}
 
