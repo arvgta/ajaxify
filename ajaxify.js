@@ -19,6 +19,8 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 let Ay; //to become the global handle for the main Ajaxify parent class - if used by you already, please rename and rebuild
 
+function _won(a, b, c = false) { if(c === false) c = {once: true}; window.addEventListener(a, b, c); };
+
 //Module global helpers
 let rootUrl = location.origin, inlineclass = "ajy-inline",
 	bdy,
@@ -29,7 +31,7 @@ let rootUrl = location.origin, inlineclass = "ajy-inline",
 	dcE=(e)=>document.createElement(e),
 
 _copyAttributes=(el, S, flush)=>{ //copy all attributes of element generically
-	if (flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
+	if(flush) [...el.attributes].forEach(e => el.removeAttribute(e.name)); //delete all old attributes
 	[...S.attributes].forEach(e => e.nodeValue == "ajy-body" || el.setAttribute(e.nodeName, e.nodeValue)); //low-level insertion
 };
 
