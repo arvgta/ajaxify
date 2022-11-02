@@ -5,7 +5,7 @@
  *
  * Copyright Arvind Gupta; MIT Licensed
  *
- * Version 8.2.7
+ * Version 8.2.8
  */
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -162,9 +162,9 @@ let _lSel = t => (
 	Ay.pass++, 
 	_lEls(t), 
 	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? prC(e) : false), 
-	Ay.scripts(true), 
-	Ay.scripts("s"), 
-	Ay.scripts("c") 
+	Ay.scripts.t(), 
+	Ay.scripts.s(), 
+	Ay.scripts.c() 
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
@@ -226,66 +226,6 @@ let _lSel = t => (
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => dcE("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
-}}
-
-// The stateful Scripts plugin
-// First parameter "o" is switch:
-// i - initailise options
-// c - fetch canonical URL
-// <object> - handle one inline script
-// otherwise - delta loading
-class Scripts { constructor() {
-	let S = false, txt = 0;
-	Ay.h.inlinehints = new Hints(Ay.s.inlinehints);
-	Ay.h.inlineskip = new Hints(Ay.s.inlineskip);
-	
-	this.a = function (o) {
-		if (o === "i") { 
-			if(!S) S = {}; 
-			return true;
-		}
-
-		if (o === "s") return _allstyle(S.y); 
-
-		if (o === "1") { 
-			Ay.detScripts.d(S); 
-			return _addScripts(S); 
-		}
-
-		if (o === "c") return Ay.s.canonical && S.can ? S.can.getAttribute("href") : false;
-		if (o === "d") return Ay.detScripts.d(S);
-		if (o && typeof o == "object") return _onetxt(o);
-
-		if (Ay.scripts("d")) return;
-		_addScripts(S);
-};
-let _allstyle = S =>	 
-	!Ay.s.style || !S || (
-	qa("style", qs("head")).forEach(e => prC(e)), //delete old style tags
-	S.forEach(el => {
-		let st = Ay.parse('<style>' + el.textContent + '</style>');
-		_copyAttributes(st, el);
-		qha(st); //append to the head
-	})
-	),
-	_onetxt = S => 
-		(!(txt = S.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
-			((Ay.s.inline && !Ay.h.inlineskip.find(txt)) || S.classList.contains("ajaxy") || 
-			Ay.h.inlinehints.find(txt))
-		) && _addtxt(S),
-	_addtxt = S => { 
-		if(!txt || !txt.length) return; 
-		if(Ay.s.inlineappend || (S.getAttribute("type") && !S.getAttribute("type").iO("text/javascript"))) try { return _apptxt(S); } catch (e) { }
-
-		try { eval(txt); } catch (e1) { 
-			lg("Error in inline script : " + txt + "\nError code : " + e1);
-		}
-	},
-	_apptxt = S => { let sc = dcE("script"); _copyAttributes(sc, S); sc.classList.add(inlineclass);
-		try {sc.appendChild(document.createTextNode(S.textContent))} catch(e) {sc.text = S.textContent};
-		return qs("body").appendChild(sc);
-	},
-	_addScripts = S => (Ay.addAll.a(S.c, "href"), Ay.addAll.a(S.j, "src"))
 }}
 
 // The Rq plugin - stands for request
@@ -605,7 +545,7 @@ let run = () => {
 		Ay.pronto = new Pronto().a;
 		if (load()) { 
 			Ay.pronto(Ay.s.elements, "i"); 
-			if (Ay.s.deltas) Ay.scripts("1"); 
+			if (Ay.s.deltas) Ay.scripts.o(); 
 		}
 	},
 	load = () => { 
@@ -617,8 +557,7 @@ let run = () => {
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
 		if (Ay.s.intevents) Ay.intevents(); // intercept events
-		Ay.scripts = new Scripts().a;
-		Ay.scripts("i"); 
+		Ay.scripts = new Scrpts(); Ay.h.inlinehints = new Hints(Ay.s.inlinehints); Ay.h.inlineskip = new Hints(Ay.s.inlineskip); 
 		Ay.cache = new Cache();
 		Ay.memory = new Memory(); Ay.h.memoryoff = new Hints(Ay.s.memoryoff);
 		Ay.fn = Ay.getPage = new GetPage().a;
@@ -743,14 +682,14 @@ class AddAll { constructor() { this.CSS = []; this.JS = []; }
 				return;
 			}
 
-			if(pk != "href" && !t.classList.contains("no-ajaxy")) Ay.scripts(t); //Inline JS script? -> inject into DOM
+			if(pk != "href" && !t.classList.contains("no-ajaxy")) Ay.scripts.i(t); //Inline JS script? -> inject into DOM
 		});
 }
 	gA(e){ return this.u = e.getAttribute(this.PK) }
 	iScript(S){
 		this.gA(S);
 		if(this.PK == "href") return qha(Ay.parse('<link rel="stylesheet" type="text/css" href="*" />'.replace("*", this.u)));
-		if(!this.u) return Ay.scripts(S); 
+		if(!this.u) return Ay.scripts.i(S); 
 		
 		var sc = dcE("script");
 		sc.async = Ay.s.asyncdef; 
@@ -758,4 +697,45 @@ class AddAll { constructor() { this.CSS = []; this.JS = []; }
 		qha(sc); 
 	}
 	removeScript(){ qa((this.PK == "href" ? 'link[href*="!"]' : 'script[src*="!"]').replace("!", this.u)).forEach(e => prC(e)) }
+}
+
+// The stateful Scrpts plugin
+class Scrpts { constructor(){ this.S = {} }
+	s(){ this.allstyle(this.S.y) } //all style tags
+	o(){ this.d(); this.a() } //on initial load
+	c(){ return Ay.s.canonical && this.S.can ? this.S.can.getAttribute("href") : false } //canonical href
+	d(){ return Ay.detScripts.d(this.S) } //detach scripts - returning true indicates an error
+	i(o){ this.one(o) } //inline script -> o is scripts object
+	t(){ this.d() || this.a() } //former "true" / default method - detach and delta load
+	a(){ this.delta(this.S) } //delta loading core
+
+	allstyle(S){	 
+		!Ay.s.style || !S || (
+		qa("style", qs("head")).forEach(e => prC(e)),
+		S.forEach(el => {
+			let st = Ay.parse('<style>' + el.textContent + '</style>');
+			_copyAttributes(st, el);
+			qha(st); //append to the head
+		})
+		)
+	}
+	one(S){ 
+		(!(this.x = S.textContent).iO("new Ajaxify(") && 
+			((Ay.s.inline && !Ay.h.inlineskip.find(this.x)) || S.classList.contains("ajaxy") || 
+			Ay.h.inlinehints.find(this.x))
+		) && this.add(S)
+	}
+	add(S){ 
+		if(!this.x || !this.x.length) return; 
+		if(Ay.s.inlineappend || (S.getAttribute("type") && !S.getAttribute("type").iO("text/javascript"))) try { return this.app(S); } catch (e) { }
+
+		try { eval(this.x) } catch (e1) { 
+			lg("Error in inline script : " + this.x + "\nError code : " + e1);
+		}
+	}
+	app(S){ let sc = dcE("script"); _copyAttributes(sc, S); sc.classList.add(inlineclass);
+		try {sc.appendChild(document.createTextNode(this.x))} catch(e) {sc.text = this.x}
+		return qs("body").appendChild(sc);
+	}
+	delta(S){ Ay.addAll.a(S.c, "href"), Ay.addAll.a(S.j, "src") }
 }
