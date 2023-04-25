@@ -5,7 +5,7 @@
  *
  * Copyright Arvind Gupta; MIT Licensed
  *
- * Version 8.2.8
+ * Version 8.2.9
  */
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -122,11 +122,12 @@ class GetPage { constructor() {
 	let rsp = 0, cb = 0, plus = 0, rt = "", ct = 0, rc = 0, ac = 0,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
+//for html, head and body tag
 //Makes it possible to pre-fetch an entire page
 docType = /<\!DOCTYPE[^>]*>/i,
-tagso = /<(html|head|link)([\s\>])/gi,
+tagso = /<(html|head)([\s\>])/gi,
 tagsod = /<(body)([\s\>])/gi,
-tagsc = /<\/(html|head|body|link)\>/gi,
+tagsc = /<\/(html|head|body)\>/gi,
 
 //Helper strings
 div12 = '<div class="ajy-$1"$2',
@@ -601,7 +602,7 @@ class Pages {
 class DetScripts { 
 	d(s) {
 		if(!(this.h = Ay.pass ? Ay.fn("head") : qs("head"))) return true; //If pass is 0 -> fetch head from DOM, otherwise from target page
-		this.lk = qa(Ay.pass ? ".ajy-link" : "link", this.h); //If pass is 0 -> fetch links from DOM, otherwise from target page
+		this.lk = qa("link", this.h); // Fetch links from DOM
 		s.j = Ay.pass ? Ay.fn("script") : qa("script"); //If pass is 0 -> fetch JSs from DOM, otherwise from target page
 		s.c = this.x("stylesheet"); //Extract stylesheets
 		s.y = qa("style", this.h); //Extract style tags
@@ -685,7 +686,9 @@ class AddAll { constructor() { this.CSS = []; this.JS = []; }
 			if(pk != "href" && !t.classList.contains("no-ajaxy")) Ay.scripts.i(t); //Inline JS script? -> inject into DOM
 		});
 }
-	gA(e){ return this.u = e.getAttribute(this.PK) }
+    // Fetch full url of link or script tag
+	gA(e){ return this.u = e[this.PK]; }
+
 	iScript(S){
 		this.gA(S);
 		if(this.PK == "href") return qha(Ay.parse('<link rel="stylesheet" type="text/css" href="*" />'.replace("*", this.u)));
