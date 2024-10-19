@@ -1,7 +1,7 @@
 {
 "name": "ajaxify",
 "title": "Ajaxify",
-"description": "Ajaxify - The Ajax Plugin",
+"description": "Ajaxify - An Ajax Plugin",
 "keywords": [
 "ui",
 "animation",
@@ -17,7 +17,7 @@
 "performance",
 "speed"
 ],
-"version": "8.2.9",
+"version": "8.3.0",
 "author": {
 "name": "Arvind Gupta",
 "url": "https://4nf.org/more/about/"
