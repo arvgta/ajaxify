@@ -62,7 +62,7 @@ Ay.s = {
 	refresh : false, // Refresh the page even if link clicked is current page
  
 // visual effects settings
-	requestDelay : 0, //in msec - Delay of Pronto request
+	requestDelay : 0, // in msec - Delay of Pronto request
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
 	scrollDelay : false, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
 	bodyClasses : true, // Copy body attributes from target page, set to "false" to disable
@@ -80,12 +80,12 @@ Ay.s = {
 	prefetchoff : false, // Plugin pre-fetches pages on hoverIntent - true = set off completely // strings - separated by ", " - hints to select out
  
 // debugging & advanced settings
-	verbosity : 0, //Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
+	verbosity : 0, // Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
 	memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
 	cb : 0, // callback handler on completion of each Ajax request - default 0
 	pluginon : true, // Plugin set "on" or "off" (==false) manually
 	passCount: false, // Show number of pass for debugging
-	DCLDelay: 0
+	DCLDelay: 0 // "DOMContentLoaded delay" - 0 = no delay, false = no triggering of DOMContentLoaded and load at all, otherwise delay in milliseconds
 };
 
 
