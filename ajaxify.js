@@ -19,6 +19,17 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 let Ay; //to become the global handle for the main Ajaxify parent class - if used by you already, please rename and rebuild
 
+let iFn = function (a, b, c = false) {
+	// if "DOMContentLoaded" - execute function, else - add event listener
+	if ((this === document || this === window) && (a == "DOMContentLoaded")) {
+		c = c ? Object.assign(c, { once: true }) : { once: true };
+	}
+	return this && this.ael(a, b, c);
+};
+EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
+EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
+			
+			
 function _won(a, b, c = false) { if(c === false) c = {once: true}; window.addEventListener(a, b, c) };
 
 //Module global helpers
