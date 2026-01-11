@@ -5,7 +5,7 @@
  *
  * Copyright Arvind Gupta; MIT Licensed
  *
- * Version 8.3.1
+ * Version 8.4.0 - Rollback to 8.2.9
  */
  
 /* INTERFACE: See also https://4nf.org/interface/
@@ -19,18 +19,7 @@ Ajaxifies the whole site, dynamically replacing the elements specified in "eleme
 
 let Ay; //to become the global handle for the main Ajaxify parent class - if used by you already, please rename and rebuild
 
-let iFn = function (a, b, c = false) {
-	// if "DOMContentLoaded" - execute function, else - add event listener
-	if ((this === document || this === window) && (a == "DOMContentLoaded")) {
-		c = c ? Object.assign(c, { once: true }) : { once: true };
-	}
-	return this && this.ael(a, b, c);
-};
-EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
-EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
-			
-			
-function _won(a, b, c = false) { if(c === false) c = {once: true}; window.addEventListener(a, b, c) };
+function _won(a, b, c = false) { if(c === false) c = {once: true}; setTimeout( () => window.addEventListener(a, b, c) ); };
 
 //Module global helpers
 let rootUrl = location.origin, inlineclass = "ajy-inline",
@@ -65,7 +54,7 @@ Ay.s = {
 	refresh : false, // Refresh the page even if link clicked is current page
  
 // visual effects settings
-	requestDelay : 0, // in msec - Delay of Pronto request
+	requestDelay : 0, //in msec - Delay of Pronto request
 	scrolltop : "s", // Smart scroll, true = always scroll to top of page, false = no scroll
 	scrollDelay : false, // Minimal delay on all scroll effects in milliseconds, useful in case of e.g. smooth scroll
 	bodyClasses : true, // Copy body attributes from target page, set to "false" to disable
@@ -78,41 +67,28 @@ Ay.s = {
 	inlinehints : false, // strings - separated by ", " - if matched in any inline scripts - only these are executed - set "inline" to false beforehand
 	inlineskip : "adsbygoogle", // strings - separated by ", " - if matched in any inline scripts - these are NOT are executed - set "inline" to true beforehand 
 	inlineappend : true, // append scripts to the main content element, instead of "eval"-ing them
+	intevents: true, // intercept events that are fired only on classic page load and simulate their trigger on ajax page load ("DOMContentLoaded")
 	style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
 	prefetchoff : false, // Plugin pre-fetches pages on hoverIntent - true = set off completely // strings - separated by ", " - hints to select out
  
 // debugging & advanced settings
-	verbosity : 0, // Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
+	verbosity : 0, //Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
 	memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
 	cb : 0, // callback handler on completion of each Ajax request - default 0
 	pluginon : true, // Plugin set "on" or "off" (==false) manually
-	passCount: false, // Show number of pass for debugging
-	DCLDelay: 0 // "DOMContentLoaded delay" - 0 = no delay, false = no triggering of DOMContentLoaded at all, otherwise delay in milliseconds
+	passCount: false // Show number of pass for debugging
 };
 
 
-Ay.pass = 0; Ay.running = false; Ay.currentURL = ""; Ay.h = {};
+Ay.pass = 0; Ay.currentURL = ""; Ay.h = {};
 Ay.parse = (s, pl) => (pl = dcE('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
+Ay.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Ay.Rq("e"); window.dispatchEvent(ev); };
 Ay.internal = (url) => { if (!url) return false; if (typeof(url) === "object") url = url.href; if (url==="") return true; return url.substring(0,rootUrl.length) === rootUrl || !url.iO(":"); };
-
-		// Trigger event
-		Ay.triggerEvent = (v) => {
-			if (Ay.s.DCLDelay !== false) {
-				const evnt = new Event(v, { bubbles: true, cancelable: true });
-				const dw = window; //v === "DOMContentLoaded" ? document : window;
-				Ay.s.DCLDelay === 0
-					? dw.dispatchEvent(evnt)
-					: setTimeout(() => {
-						dw.dispatchEvent(evnt);
-					}, Ay.s.DCLDelay);
-			}
-		};
-
-		Ay.trigger = (t, e) => {
-			const ev = new Event("pronto." + t, { bubbles: true, cancelable: false });
-			ev.data = e ? e : Ay.Rq("e");
-			window.dispatchEvent(ev);
-		};
+Ay.intevents = () => {
+	let iFn = function (a, b, c = false) { if ((this === document || this === window) && a=="DOMContentLoaded") setTimeout(b); else this.ael(a,b,c);};  // if "DOMContentLoaded" - execute function, else - add event listener	
+	EventTarget.prototype.ael = EventTarget.prototype.addEventListener; // store original method
+	EventTarget.prototype.addEventListener = iFn; // start intercepting event listener addition
+};
 
 function _on(eventName, elementSelector, handler, el = document) { //e.currentTarget is document when the handler is called
 	el.addEventListener(eventName, function(e) {
@@ -532,7 +508,7 @@ let _init_p = () => {
 
 		Ay.scrolly.l();
 		_gaCaptureView(href);
-		Ay.triggerEvent("DOMContentLoaded");
+		Ay.trigger("render");
 		if(Ay.s.passCount) qs("#" + Ay.s.passCount).innerHTML = "Pass: " + Ay.pass;
 		if(Ay.s.cb) Ay.s.cb();
 	},
@@ -565,8 +541,6 @@ Ay.init = () => {
 };
 
 let run = () => {
-		if(Ay.running) return; //avoid multiple run attempts
-		Ay.running = true;
 		Ay.s = Object.assign(Ay.s, options);
 		(Ay.pages = new Pages()).f();
 		Ay.pronto = new Pronto().a;
@@ -583,6 +557,7 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
+		if (Ay.s.intevents) Ay.intevents(); // intercept events
 		Ay.scripts = new Scrpts(); Ay.h.inlinehints = new Hints(Ay.s.inlinehints); Ay.h.inlineskip = new Hints(Ay.s.inlineskip); 
 		Ay.cache = new Cache();
 		Ay.memory = new Memory(); Ay.h.memoryoff = new Hints(Ay.s.memoryoff);
